@@ -1,0 +1,95 @@
+{
+  "name": "ai-maltose",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "eslint": "./node_modules/.bin/eslint \"src/**/*.{js,jsx,ts,tsx}\" --ignore-pattern \"src/lib/\" --ignore-pattern \"src/shared/\"",
+    "check-types": "tsc --noemit",
+    "eslint:commit": "git diff --cached --name-only | grep -E 'src.*\\.[jt]sx?$' | xargs ./node_modules/.bin/eslint --quiet",
+    "eslint:quiet": "./node_modules/.bin/eslint \"src/**/*.{js,jsx,ts,tsx}\" --ignore-pattern \"src/lib/\" --ignore-pattern \"src/shared/\" --quiet",
+    "prettier:single": "./node_modules/.bin/prettier --single-quote --no-semi --trailing-comma es5 --print-width 120 --tab-width 4 --arrow-parens avoid --write",
+    "prettier": "./node_modules/.bin/prettier --single-quote --no-semi --trailing-comma es5 --print-width 120 --tab-width 4 --arrow-parens avoid --write \"app/**/*.{js,jsx,ts,tsx}\"",
+    "prettier:check": "npm run prettier -- --list-different",
+    "lint-staged": "lint-staged"
+  },
+  "precommit": "lint-staged",
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "npm run eslint:commit",
+      "prettier --single-quote --no-semi --trailing-comma es5 --print-width 120 --tab-width 4 --arrow-parens avoid --write \"!lib/**\" \"!shared/**\"",
+      "git add"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "ai",
+    "graphql"
+  ],
+  "author": "Erik <erikloo310@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VeryInt/AI-Maltose.git"
+  },
+  "bugs": {
+    "url": "https://github.com/VeryInt/AI-Maltose/issues"
+  },
+  "homepage": "https://github.com/VeryInt/AI-Maltose#readme",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.19.0",
+    "@azure/openai": "^1.0.0-beta.12",
+    "@google/generative-ai": "^0.3.1",
+    "@graphql-tools/schema": "^10.0.3",
+    "@graphql-yoga/plugin-defer-stream": "^3.2.0",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "dataloader": "^2.2.2",
+    "dotenv": "^16.4.5",
+    "graphql": "^16.8.1",
+    "graphql-yoga": "^5.2.0",
+    "groq-sdk": "^0.3.2",
+    "jose": "^5.2.4",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.379.0",
+    "next": "14.1.4",
+    "openai": "^4.29.2",
+    "qs": "^6.12.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-markdown": "^9.0.1",
+    "react-resizable-panels": "^2.0.19",
+    "react-syntax-highlighter": "^15.5.0",
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss-animate": "^1.0.7",
+    "vaul": "^0.9.1",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.0",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.4",
+    "lint-staged": "^15.2.2",
+    "lodash-ts": "^1.2.7",
+    "postcss": "^8",
+    "pre-commit": "^1.2.2",
+    "prettier": "^3.2.5",
+    "tailwindcss": "^3.3.0",
+    "ts-loader": "^9.5.1",
+    "ts-node": "10.9.2",
+    "ts-node-dev": "2.0.0",
+    "typescript": "^5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
