@@ -1,5 +1,5 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useMainStore } from './providers'
 import { MainStoreProvider } from './providers'
 import {
@@ -11,9 +11,11 @@ import {
 import Sidebar from '@/app/modules/Sidebar'
 import Chatinput from '@/app/modules/ChatInput'
 import ConversationBox from '@/app/modules/ConversationBox'
+import { sleep } from '../../shared/util'
   
 const Main = () => {
     const { isloading, updateIsLoading } = useMainStore(state => state)
+    const [isRequesting, setIsRequesting] = useState(false)
     useEffect(() => {
         let vh = window.innerHeight * 0.01
         // Then we set the value in the --vh custom property to the root of the document
@@ -27,6 +29,12 @@ const Main = () => {
             document.documentElement.style.setProperty('--vh', `${vh}px`)
         })
     }, [])
+
+    const handleSendQuestion = async (question: string) => {
+        setIsRequesting(true)
+        await sleep(3)
+        setIsRequesting(false)
+    }
 
     return (
         <div className="flex flex-col w-full h-full focus-visible:outline-0">
@@ -47,7 +55,7 @@ const Main = () => {
                 <ConversationBox />
             </div>
             <div className='w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base'>
-                <Chatinput />
+                <Chatinput isRequesting={isRequesting} onSendQuestion={handleSendQuestion} />
             </div>
         </div>
     )

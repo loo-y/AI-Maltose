@@ -2,7 +2,12 @@
 import React, { useState, ChangeEvent, KeyboardEvent, useRef } from 'react'
 import _ from 'lodash'
 
-const Chatinput = ({maxRows = 5}: {maxRows?: number}) => {
+interface IChatInputProps {
+    maxRows?: number,
+    onSendQuestion: (question: string) => void
+    isRequesting?: boolean
+}
+const Chatinput = ({maxRows = 5, isRequesting = false, onSendQuestion}: IChatInputProps) => {
     const [isComposing, setIsComposing] = useState(false)
     const [inputValue, setInputValue] = useState<string>('')
     const [inputRows, setInputRows] = useState<number>(1)
@@ -50,9 +55,12 @@ const Chatinput = ({maxRows = 5}: {maxRows?: number}) => {
         }
     }
     const handleSendQuestion = () => {
+        const question = _.trim(inputValue)
+        if(question){
+            onSendQuestion(_.trim(inputValue))
             setInputValue('')
             setInputRows(1)
-        
+        }
     }
 
     const handleFocus = () => {
@@ -74,6 +82,7 @@ const Chatinput = ({maxRows = 5}: {maxRows?: number}) => {
             <div className="flex flex-grow flex-row  border-0 pl-5 gap-1 ">
                 <div className="flex my-1 flex-row flex-grow ml-2 mb-3 items-center">
                     <textarea
+                        disabled={isRequesting ? true : undefined}
                         id={`chat-input`}
                         value={inputValue}
                         ref={inputRef}
@@ -96,8 +105,8 @@ const Chatinput = ({maxRows = 5}: {maxRows?: number}) => {
                         <div
                             className="svg-image flex h-10 w-10 overflow-hidden items-center justify-center cursor-pointer bg-lightGreen rounded-full"
                             onClick={handleSendQuestion}
-                        >
-                            <img src={'/images/icons/arrow-up.svg'} className="h-9 w-9" />
+                        >   
+                            <img src={isRequesting ? '/images/icons/stop.svg' : '/images/icons/arrow-up.svg'} className="h-9 w-9" />
                         </div>
                     </div>
                 </div>
