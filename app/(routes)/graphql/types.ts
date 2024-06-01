@@ -1,9 +1,6 @@
-export enum Roles {
-    system = 'system',
-    user = 'user',
-    assistant = 'assistant', // Openai
-    model = 'model', // GeminiPro
-}
+import { IChatMessage, Roles, SystemMessage, UserMessage, AssistantMessage } from '@/app/shared/interface'
+export { Roles }
+export type { IChatMessage, SystemMessage, UserMessage, AssistantMessage}
 
 export interface IMessage {
     role: Roles
@@ -18,7 +15,7 @@ export interface IClaudeMessage {
 }
 
 export interface ICommonDalArgs {
-    messages?: IMessage[]
+    messages?: IChatMessage[]
     model?: string
     apiKey?: string
     isStream?: boolean

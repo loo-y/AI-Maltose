@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useMainStore } from './providers'
 import { MainStoreProvider } from './providers'
+import _ from 'lodash'
 import {
     Drawer,
     DrawerClose,
@@ -12,6 +13,8 @@ import Sidebar from '@/app/modules/Sidebar'
 import Chatinput from '@/app/modules/ChatInput'
 import ConversationBox from '@/app/modules/ConversationBox'
 import { sleep } from '../../shared/util'
+import { fetchAIGraphql }  from '../../shared/fetches'
+import { IChatMessage, Roles } from '@/app/shared/interface'
   
 const Main = () => {
     const { isloading, updateIsLoading } = useMainStore(state => state)
@@ -32,7 +35,11 @@ const Main = () => {
 
     const handleSendQuestion = async (question: string) => {
         setIsRequesting(true)
-        await sleep(3)
+        await helperGetAIResponse({
+            messages: [
+                { role: Roles.user, content: question }
+            ]
+        })
         setIsRequesting(false)
     }
 
@@ -70,3 +77,37 @@ const MainPage = () => {
 }
 
 export default MainPage
+
+
+const helperGetAIResponse = async ({
+    messages,
+    onStream,
+}: {
+    messages: IChatMessage[]
+    onStream?: (arg: any) => void
+}) => {
+    return new Promise((resolve, reject) =>
+        fetchAIGraphql({
+            messages,
+            // isStream: true,
+            queryOpenAI: true,
+            openAIParams: {
+                baseUrl: `https://openrouter.ai/api/v1`,
+                model: `meta-llama/llama-3-8b-instruct:free`,
+            },
+            // queryGroq: true,
+            streamHandler: (streamResult: { data: string; status?: boolean }) => {
+                console.log('streamHandler', streamResult)
+                const { data, status } = streamResult || {}
+                if(status){
+                    typeof onStream == `function` && onStream(data || ``)
+                }
+            },
+            completeHandler: (value:string) => {
+                typeof onStream == `function` && onStream(`__{{streamCompleted}}__`)
+                resolve(true)
+            },
+        })
+    )
+}
+

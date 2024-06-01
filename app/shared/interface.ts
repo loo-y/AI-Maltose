@@ -1,5 +1,5 @@
 // type chatItem
-interface SystemMessage {
+export interface SystemMessage {
     role: Roles.system,
     content: string,
     name?: string
@@ -17,7 +17,7 @@ export interface UserMessage {
 
 export interface AssistantMessage {
     provider?: string,
-    role: Roles.assistant,
+    role: Roles.assistant | Roles.model,
     content?: string | null,
     name?: string
     tool_calls?: {
@@ -38,7 +38,35 @@ export enum Roles {
     user = 'user',
     assistant = 'assistant',
     system = 'system',
+    model = 'model', // GeminiPro
 }
 
 // type history
 export type IHistory = IChatMessage[]
+
+export interface IGrahpqlAIFetchProps {
+    prompt?: string
+    messages?: IChatMessage[]
+    maxTokens?: number
+    isStream?: boolean
+    queryQwen?: boolean
+    qwenParams?: Record<string, any>
+    queryGeminiPro?: boolean
+    geminiProParams?: Record<string, any>
+    queryMoonshot?: boolean
+    moonshotParams?: Record<string, any>
+    queryGroq?: boolean
+    groqParams?: Record<string, any>
+    queryClaude?: boolean
+    claudeParams?: Record<string, any>
+    queryErnie?: boolean
+    ernieParams?: Record<string, any>
+    queryOpenAI?: boolean
+    openAIParams?: Record<string, any>
+    queryWorkersAI?: boolean
+    workersAIParams?: Record<string, any>
+    queryLingyiwanwu?: boolean
+    lingyiwanwuParams?: Record<string, any>
+    streamHandler?: (data: any) => void
+    completeHandler?: (data: any) => void
+}

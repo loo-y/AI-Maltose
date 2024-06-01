@@ -1,6 +1,6 @@
 // import 'dotenv/config'
 import DataLoader from 'dataloader'
-import { IOpenaiArgs, Roles, IMessage } from '../../types'
+import { IOpenaiArgs, Roles, IMessage, IChatMessage, SystemMessage, UserMessage, AssistantMessage } from '../../types'
 import OpenAI from 'openai'
 import _ from 'lodash'
 import { generationConfig } from '../../utils/constants'
@@ -13,11 +13,25 @@ const availableFunctions: Record<string, any> = {
 
 const DEFAULT_MODEL_NAME = 'gpt-3.5-turbo'
 
-const convertMessages = (messages: IOpenaiArgs['messages']): { history: IMessage[] } => {
+const convertMessages = (messages: IOpenaiArgs['messages']): { history: IChatMessage[] } => {
     let history = _.map(messages, message => {
-        return {
-            role: message.role == Roles.model ? Roles.assistant : message.role,
-            content: message.content,
+        const {role,content} = message || {}
+        switch (role) {
+            case Roles.system:
+                return {
+                    role: Roles.system,
+                    content: content,
+                } as SystemMessage
+            case Roles.user:
+                return {
+                    role: Roles.user,
+                    content: content,
+                }  as UserMessage
+            default:
+                return {
+                    role: Roles.assistant,
+                    content: content,
+                } as AssistantMessage
         }
     })
     return {
