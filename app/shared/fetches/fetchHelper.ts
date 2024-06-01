@@ -38,7 +38,7 @@ export const getGraphqlAIMashupBody = ({
                               content: prompt,
                           },
                       ],
-                maxTokens: maxTokens || 2048,
+                maxTokens: maxTokens || 512,
             },
         }
     if (queryQwen) {

@@ -86,28 +86,31 @@ const helperGetAIResponse = async ({
     messages: IChatMessage[]
     onStream?: (arg: any) => void
 }) => {
-    return new Promise((resolve, reject) =>
-        fetchAIGraphql({
-            messages,
-            // isStream: true,
-            queryOpenAI: true,
-            openAIParams: {
-                baseUrl: `https://openrouter.ai/api/v1`,
-                model: `meta-llama/llama-3-8b-instruct:free`,
-            },
-            // queryGroq: true,
-            streamHandler: (streamResult: { data: string; status?: boolean }) => {
-                console.log('streamHandler', streamResult)
-                const { data, status } = streamResult || {}
-                if(status){
-                    typeof onStream == `function` && onStream(data || ``)
-                }
-            },
-            completeHandler: (value:string) => {
-                typeof onStream == `function` && onStream(`__{{streamCompleted}}__`)
-                resolve(true)
-            },
-        })
-    )
+    return Promise.race([
+        new Promise((resolve, reject) =>
+            fetchAIGraphql({
+                messages,
+                isStream: true,
+                queryOpenAI: true,
+                openAIParams: {
+                    baseUrl: `https://openrouter.ai/api/v1`,
+                    model: `mistralai/mistral-7b-instruct:free`,
+                },
+                // queryGroq: true,
+                streamHandler: (streamResult: { data: string; status?: boolean }) => {
+                    console.log('streamHandler', streamResult)
+                    const { data, status } = streamResult || {}
+                    if(status){
+                        typeof onStream == `function` && onStream(data || ``)
+                    }
+                },
+                completeHandler: (value:string) => {
+                    typeof onStream == `function` && onStream(`__{{streamCompleted}}__`)
+                    resolve(true)
+                },
+            })
+        ),
+        sleep(10),
+    ])
 }
 
