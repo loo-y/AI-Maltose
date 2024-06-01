@@ -90,12 +90,13 @@ const helperGetAIResponse = async ({
         new Promise((resolve, reject) =>
             fetchAIGraphql({
                 messages,
-                isStream: true,
+                // isStream: true,
                 queryOpenAI: true,
                 openAIParams: {
                     baseUrl: `https://openrouter.ai/api/v1`,
                     model: `mistralai/mistral-7b-instruct:free`,
                 },
+                maxTokens: 100,
                 // queryGroq: true,
                 streamHandler: (streamResult: { data: string; status?: boolean }) => {
                     console.log('streamHandler', streamResult)
