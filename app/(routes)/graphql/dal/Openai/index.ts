@@ -15,7 +15,7 @@ const DEFAULT_MODEL_NAME = 'gpt-3.5-turbo'
 
 const convertMessages = (messages: IOpenaiArgs['messages']): { history: IChatMessage[] } => {
     let history = _.map(messages, message => {
-        const {role,content} = message || {}
+        const { role, content } = message || {}
         switch (role) {
             case Roles.system:
                 return {
@@ -26,7 +26,7 @@ const convertMessages = (messages: IOpenaiArgs['messages']): { history: IChatMes
                 return {
                     role: Roles.user,
                     content: content,
-                }  as UserMessage
+                } as UserMessage
             default:
                 return {
                     role: Roles.assistant,

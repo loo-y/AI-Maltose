@@ -3,19 +3,14 @@ import { useEffect, useState } from 'react'
 import { useMainStore } from './providers'
 import { MainStoreProvider } from './providers'
 import _ from 'lodash'
-import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerTrigger,
-  } from "@/components/ui/drawer"
+import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import Sidebar from '@/app/modules/Sidebar'
 import Chatinput from '@/app/modules/ChatInput'
 import ConversationBox from '@/app/modules/ConversationBox'
 import { sleep } from '../../shared/util'
-import { fetchAIGraphql }  from '../../shared/fetches'
+import { fetchAIGraphql } from '../../shared/fetches'
 import { IChatMessage, Roles } from '@/app/shared/interface'
-  
+
 const Main = () => {
     const { isloading, updateIsLoading } = useMainStore(state => state)
     const [isRequesting, setIsRequesting] = useState(false)
@@ -36,32 +31,31 @@ const Main = () => {
     const handleSendQuestion = async (question: string) => {
         setIsRequesting(true)
         await helperGetAIResponse({
-            messages: [
-                { role: Roles.user, content: question }
-            ]
+            messages: [{ role: Roles.user, content: question }],
         })
         setIsRequesting(false)
     }
 
     return (
         <div className="flex flex-col w-full h-full focus-visible:outline-0">
-            <div className='flex-1 overflow-hidden overflow-y-scroll'>
-                <div className='absolute flex flex-row  h-14 w-full items-center justify-between'>
-                    <div className='topleft ml-4'>
-                    <Drawer direction="left"> 
-                    <DrawerTrigger>Open</DrawerTrigger>
-                    <DrawerContent direction="left" className='bg-transparent rounded-tl-none rounded-r-xl h-full w-[280px] fixed bottom-0 left-0 !right-auto z-[9999] overflow-hidden'>
-                        <Sidebar />
-                    </DrawerContent>
-                    </Drawer>
+            <div className="flex-1 overflow-hidden overflow-y-scroll">
+                <div className="absolute flex flex-row  h-14 w-full items-center justify-between">
+                    <div className="topleft ml-4">
+                        <Drawer direction="left">
+                            <DrawerTrigger>Open</DrawerTrigger>
+                            <DrawerContent
+                                direction="left"
+                                className="bg-transparent rounded-tl-none rounded-r-xl h-full w-[280px] fixed bottom-0 left-0 !right-auto z-[9999] overflow-hidden"
+                            >
+                                <Sidebar />
+                            </DrawerContent>
+                        </Drawer>
                     </div>
-                    <div className='topright'>
-
-                    </div>
+                    <div className="topright"></div>
                 </div>
                 <ConversationBox />
             </div>
-            <div className='w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base'>
+            <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
                 <Chatinput isRequesting={isRequesting} onSendQuestion={handleSendQuestion} />
             </div>
         </div>
@@ -77,7 +71,6 @@ const MainPage = () => {
 }
 
 export default MainPage
-
 
 const helperGetAIResponse = async ({
     messages,
@@ -101,11 +94,11 @@ const helperGetAIResponse = async ({
                 streamHandler: (streamResult: { data: string; status?: boolean }) => {
                     console.log('streamHandler', streamResult)
                     const { data, status } = streamResult || {}
-                    if(status){
+                    if (status) {
                         typeof onStream == `function` && onStream(data || ``)
                     }
                 },
-                completeHandler: (value:string) => {
+                completeHandler: (value: string) => {
                     typeof onStream == `function` && onStream(`__{{streamCompleted}}__`)
                     resolve(true)
                 },
@@ -114,4 +107,3 @@ const helperGetAIResponse = async ({
         sleep(10),
     ])
 }
-

@@ -107,3 +107,7 @@ body *:hover {
   height: 100vh; /* 此处使用了 vh 单位 */
   height: calc(var(--vh, 1vh) * 100); /* 使用 --vh 变量 */
 }
+
+.signmodule .cl-footer div:last-child{
+  display: none;
+}

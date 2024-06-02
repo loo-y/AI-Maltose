@@ -5,7 +5,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 
 const graphqlUrl = '/graphql'
 
-const getCommonOptions = async ({userToken}: {userToken: string}) => {
+const getCommonOptions = async ({ userToken }: { userToken: string }) => {
     const headers = _.omitBy(
         {
             'Content-Type': 'application/json',
@@ -22,9 +22,7 @@ const getCommonOptions = async ({userToken}: {userToken: string}) => {
 }
 
 export const fetchAIGraphql = async (paramsForAIGraphql: IGrahpqlAIFetchProps) => {
-    const {
-        isStream, ...rest
-    } = paramsForAIGraphql || {}
+    const { isStream, ...rest } = paramsForAIGraphql || {}
     if (isStream) {
         return fetchAIGraphqlStream(paramsForAIGraphql)
     }
@@ -34,8 +32,8 @@ export const fetchAIGraphql = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =
         name: `GetAiGraphqlQuery`,
     })
 
-    try{
-        const options = await getCommonOptions({userToken: 'test'})
+    try {
+        const options = await getCommonOptions({ userToken: 'test' })
 
         const response = await fetch(graphqlUrl, {
             ...options,
@@ -46,7 +44,7 @@ export const fetchAIGraphql = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =
             content: data.data,
             status: true,
         }
-    }catch(e){
+    } catch (e) {
         console.log(e)
         return {
             content: String(e),
@@ -63,7 +61,7 @@ const fetchAIGraphqlStream = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =>
         name: `GetAiGraphqlQuery`,
     })
     try {
-        const options = await getCommonOptions({userToken: 'test'})
+        const options = await getCommonOptions({ userToken: 'test' })
         await fetchEventSource(graphqlUrl, {
             ...options,
             method: 'POST',
@@ -77,18 +75,20 @@ const fetchAIGraphqlStream = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =>
                         _.map(incremental || [], (_incremental: { items: string[]; path: (string | Number)[] }) => {
                             const { items, path } = _incremental || {}
                             // const [chat, aiType, index] = path as [string, String, Number]
-                            typeof streamHandler == `function` && streamHandler({
-                                content: items?.[0] || ``,
-                                status: true,
-                            })
+                            typeof streamHandler == `function` &&
+                                streamHandler({
+                                    content: items?.[0] || ``,
+                                    status: true,
+                                })
                         })
                     }
                 } catch (err) {
                     console.log(`err`, err)
-                    typeof streamHandler == `function` && streamHandler({
-                        content: String(err),
-                        status: false,
-                    })
+                    typeof streamHandler == `function` &&
+                        streamHandler({
+                            content: String(err),
+                            status: false,
+                        })
                 }
             },
             onclose() {

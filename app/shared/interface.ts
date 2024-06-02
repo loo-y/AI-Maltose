@@ -1,35 +1,33 @@
 // type chatItem
 export interface SystemMessage {
-    role: Roles.system,
-    content: string,
+    role: Roles.system
+    content: string
     name?: string
 }
 
-export type TextMessage = { type: 'text', text: string };
-export type ImageUrlMessage = { type: 'image_url', image_url: { url: string; detail?: string } };
-
+export type TextMessage = { type: 'text'; text: string }
+export type ImageUrlMessage = { type: 'image_url'; image_url: { url: string; detail?: string } }
 
 export interface UserMessage {
-    role: Roles.user,
-    content: string | (TextMessage | ImageUrlMessage)[],
+    role: Roles.user
+    content: string | (TextMessage | ImageUrlMessage)[]
     name?: string
 }
 
 export interface AssistantMessage {
-    provider?: string,
-    role: Roles.assistant | Roles.model,
-    content?: string | null,
+    provider?: string
+    role: Roles.assistant | Roles.model
+    content?: string | null
     name?: string
     tool_calls?: {
-        id: string,
-        name: string,
+        id: string
+        name: string
         function: {
-            name: string,
-            arguments: string,
+            name: string
+            arguments: string
         }
     }[]
 }
-
 
 export type IChatMessage = SystemMessage | UserMessage | AssistantMessage
 

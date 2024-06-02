@@ -14,7 +14,7 @@ const loaderD1 = async (ctx: TBaseContext, args: ICommonDalArgs, key: string) =>
                 console.log(`loaderClaude-keys-🐹🐹🐹`, keys)
                 try {
                     const geminiProAnswerList = await Promise.all(
-                        keys.map(key =>{
+                        keys.map(key => {
                             return ''
                         })
                     )
@@ -32,4 +32,4 @@ const loaderD1 = async (ctx: TBaseContext, args: ICommonDalArgs, key: string) =>
     return ctx.loaderD1
 }
 
-export default {  loader: loaderD1 }
+export default { loader: loaderD1 }

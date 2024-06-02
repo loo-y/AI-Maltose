@@ -2,22 +2,22 @@
 import React, { useEffect, useState } from 'react'
 import { IHistory, Roles, IChatMessage, UserMessage, TextMessage, ImageUrlMessage } from '../shared/interface'
 import _ from 'lodash'
-interface IChatUserMessageProps{
+interface IChatUserMessageProps {
     chatMessage: UserMessage
 }
-const  ChatUserMessage = ({chatMessage}: IChatUserMessageProps) =>{
-    const { role, content} = chatMessage || {}
+const ChatUserMessage = ({ chatMessage }: IChatUserMessageProps) => {
+    const { role, content } = chatMessage || {}
 
     return (
         <div className="w-full">
-            <div className='py-2 px-3 text-base m-auto md:px-5 lg:px-1 xl:px-5'>
-                <div className='mx-auto flex flex-1 gap-3 md:gap-6 md:max-w-[50rem] w-full justify-end px-4'>
-                    <div className='flex relative max-w-[70%]'>
-                    {typeof content === 'string' ? (
-                        <div className='text-gray-600 bg-gray-100 rounded-3xl  px-5 py-2.5'>
-                            {content}
-                        </div>
-                    ) : <ObjectContent content={content} />}
+            <div className="py-2 px-3 text-base m-auto md:px-5 lg:px-1 xl:px-5">
+                <div className="mx-auto flex flex-1 gap-3 md:gap-6 md:max-w-[50rem] w-full justify-end px-4">
+                    <div className="flex relative max-w-[70%]">
+                        {typeof content === 'string' ? (
+                            <div className="text-gray-600 bg-gray-100 rounded-3xl  px-5 py-2.5">{content}</div>
+                        ) : (
+                            <ObjectContent content={content} />
+                        )}
                     </div>
                 </div>
             </div>
@@ -27,34 +27,40 @@ const  ChatUserMessage = ({chatMessage}: IChatUserMessageProps) =>{
 
 export default ChatUserMessage
 
-
-const ObjectContent = ({content}: {content: (TextMessage | ImageUrlMessage)[]}) => {
-    const textContentList = _.filter(content, (message: TextMessage | ImageUrlMessage) => message.type === 'text') as TextMessage[]
-    const imageContentList = _.filter(content, (message: TextMessage | ImageUrlMessage) => message.type === 'image_url' && message.image_url?.url) as ImageUrlMessage[]
+const ObjectContent = ({ content }: { content: (TextMessage | ImageUrlMessage)[] }) => {
+    const textContentList = _.filter(
+        content,
+        (message: TextMessage | ImageUrlMessage) => message.type === 'text'
+    ) as TextMessage[]
+    const imageContentList = _.filter(
+        content,
+        (message: TextMessage | ImageUrlMessage) => message.type === 'image_url' && message.image_url?.url
+    ) as ImageUrlMessage[]
     const textContent = _.map(textContentList, (message: TextMessage) => message.text).join('\n')
     return (
-        <div className='objectcontent gap-1 flex flex-col'>
+        <div className="objectcontent gap-1 flex flex-col">
             {!_.isEmpty(imageContentList) ? (
-                <div className='flex flex-wrap gap-1 justify-end'>
-                    {
-                        _.map(imageContentList, (message: ImageUrlMessage, index: number) => {
-                            const { url, detail } = message.image_url
-                            return (
-                                <div key={`imageContentList-${index}`} className=' w-32 h-32 rounded-lg cursor-pointer overflow-hidden'>
-                                    <img src={url} alt={detail || ''} className="object-cover w-full h-full" />
-                                </div>
-                            )
-                        })
-                    }
+                <div className="flex flex-wrap gap-1 justify-end">
+                    {_.map(imageContentList, (message: ImageUrlMessage, index: number) => {
+                        const { url, detail } = message.image_url
+                        return (
+                            <div
+                                key={`imageContentList-${index}`}
+                                className=" w-32 h-32 rounded-lg cursor-pointer overflow-hidden"
+                            >
+                                <img src={url} alt={detail || ''} className="object-cover w-full h-full" />
+                            </div>
+                        )
+                    })}
                 </div>
             ) : null}
             {textContent ? (
-                <div className='flex justify-end flex-row w-full'>
-                    <div className='text-gray-600 bg-gray-100 rounded-3xl  px-5 py-2.5 rounded-tr-lg  '>{textContent}</div>
+                <div className="flex justify-end flex-row w-full">
+                    <div className="text-gray-600 bg-gray-100 rounded-3xl  px-5 py-2.5 rounded-tr-lg  ">
+                        {textContent}
+                    </div>
                 </div>
-            ) : null
-                
-            }
+            ) : null}
         </div>
     )
 }

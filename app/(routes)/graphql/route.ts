@@ -1,15 +1,15 @@
 import { createSchema, createYoga } from 'graphql-yoga'
 import { schema } from './schema'
 import { useDeferStream } from '@graphql-yoga/plugin-defer-stream'
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server'
 
 // vercel edge runtime
 export const runtime = 'edge'
 
 const { handleRequest } = createYoga({
     schema,
-    context: async ()=>{
-        const { userId } = auth();
+    context: async () => {
+        const { userId } = auth()
         console.log(`userId`, userId)
         return { userId: userId }
     },
