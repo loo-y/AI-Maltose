@@ -1,6 +1,14 @@
 // import 'dotenv/config'
 import DataLoader from 'dataloader'
-import { ICommonDalArgs, Roles, IAzureOpenaiArgs, IMessage } from '../../types'
+import {
+    ICommonDalArgs,
+    Roles,
+    IAzureOpenaiArgs,
+    IChatMessage,
+    SystemMessage,
+    UserMessage,
+    AssistantMessage,
+} from '../../types'
 import { OpenAIClient, AzureKeyCredential } from '@azure/openai'
 import _ from 'lodash'
 import { generationConfig } from '../../utils/constants'
@@ -15,11 +23,25 @@ const availableFunctions: Record<string, any> = {
 const DEFAULT_MODEL_NAME = `gpt-35-turbo` // deploymentId
 // const DEFAULT_MODEL_NAME = `gpt-4`
 
-const convertMessages = (messages: ICommonDalArgs['messages']): { history: IMessage[] } => {
+const convertMessages = (messages: ICommonDalArgs['messages']): { history: IChatMessage[] } => {
     let history = _.map(messages, message => {
-        return {
-            role: message.role == Roles.model ? Roles.assistant : message.role,
-            content: message.content,
+        const { role, content } = message || {}
+        switch (role) {
+            case Roles.system:
+                return {
+                    role: Roles.system,
+                    content: content,
+                } as SystemMessage
+            case Roles.user:
+                return {
+                    role: Roles.user,
+                    content: content,
+                } as UserMessage
+            default:
+                return {
+                    role: Roles.assistant,
+                    content: content,
+                } as AssistantMessage
         }
     })
     return {
