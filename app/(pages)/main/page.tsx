@@ -10,6 +10,7 @@ import ConversationBox from '@/app/modules/ConversationBox'
 import { sleep } from '../../shared/util'
 import { fetchAIGraphql } from '../../shared/fetches'
 import { IChatMessage, Roles } from '@/app/shared/interface'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 
 const Main = () => {
     const { isloading, updateIsLoading } = useMainStore(state => state)
@@ -51,7 +52,11 @@ const Main = () => {
                             </DrawerContent>
                         </Drawer>
                     </div>
-                    <div className="topright"></div>
+                    <div className="topright signmodule mr-4">
+                        <SignedIn>
+                            <UserButton />
+                        </SignedIn>
+                    </div>
                 </div>
                 <ConversationBox />
             </div>

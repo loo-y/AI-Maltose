@@ -30,7 +30,7 @@ const resolvers = {
     Query: {
         chat: async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
             const chatArgs = args.params
-            console.log(`context`, context.userId)
+            console.log(`context.user`, context.userId)
             if (!context.userId) {
                 throw new Error('Unauthorized')
             }

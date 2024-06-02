@@ -111,3 +111,6 @@ body *:hover {
 .signmodule .cl-footer div:last-child{
   display: none;
 }
+.cl-userButtonPopoverRootBox .cl-userButtonPopoverFooter{
+  display: none;
+}
