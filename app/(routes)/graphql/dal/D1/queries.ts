@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { D1Tables } from './constant'
+import { D1Tables } from '../../utils/constants'
 
 const { CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_D1_DATABASE_ID, CLOUDFLARE_BEAR_TOKEN } =
     (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)

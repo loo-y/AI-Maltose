@@ -8,9 +8,10 @@ import Sidebar from '@/app/modules/Sidebar'
 import Chatinput from '@/app/modules/ChatInput'
 import ConversationBox from '@/app/modules/ConversationBox'
 import { sleep } from '../../shared/util'
-import { fetchAIGraphql } from '../../shared/fetches'
+import { fetchAIGraphql } from '@/app/shared/fetches'
 import { IChatMessage, Roles } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
+import ImageUploadButton from '@/app/modules/ImageUploadButton'
 
 const Main = () => {
     const { isloading, updateIsLoading } = useMainStore(state => state)
@@ -61,6 +62,7 @@ const Main = () => {
                 <ConversationBox />
             </div>
             <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
+                <ImageUploadButton />
                 <Chatinput isRequesting={isRequesting} onSendQuestion={handleSendQuestion} />
             </div>
         </div>

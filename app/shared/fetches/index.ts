@@ -31,10 +31,9 @@ export const fetchAIGraphql = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =
         ...rest,
         name: `GetAiGraphqlQuery`,
     })
+    const options = await getCommonOptions({ userToken: 'test' })
 
     try {
-        const options = await getCommonOptions({ userToken: 'test' })
-
         const response = await fetch(graphqlUrl, {
             ...options,
             body: JSON.stringify(body),
@@ -116,6 +115,34 @@ const fetchAIGraphqlStream = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =>
                 err,
                 status: false,
             })
+        }
+    }
+}
+
+export const fetchUploadImage = async (imageBlob: Blob) => {
+    const url = `/api/imageUpload`
+    const options = await getCommonOptions({ userToken: 'test' })
+    delete options.headers['Content-Type']
+    // 创建 FormData 对象
+    const formData = new FormData()
+    // 将 Blob 对象添加到 FormData 对象中
+    formData.append('file', imageBlob, 'blob')
+    try {
+        const response = await fetch(url, {
+            ...options,
+            method: 'POST',
+            body: formData,
+        })
+        const data = await response.json()
+        return {
+            data,
+            status: true,
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            content: String(e),
+            status: false,
         }
     }
 }
