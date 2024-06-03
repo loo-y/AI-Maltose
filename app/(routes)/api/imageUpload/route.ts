@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-
+import { imageHost, salt } from '../utils/constants'
+import { imageIDEncrypt } from '../utils/tools'
 export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'GET request not allowed' }, { status: 405 })
 }
@@ -10,7 +11,7 @@ export async function POST(req: NextRequest) {
     }
     try {
         const formData = await req.formData()
-        const response = await fetch('https://telegra.ph/upload', {
+        const response = await fetch(`${imageHost}/upload`, {
             method: 'POST',
             headers: {
                 ...headers,
@@ -19,7 +20,13 @@ export async function POST(req: NextRequest) {
         })
 
         const data = await response.json()
-        return NextResponse.json(data)
+        const src = data?.[0]?.src
+        if (src) {
+            return NextResponse.json({ imageID: imageIDEncrypt(src, salt) })
+        }
+        return NextResponse.json({
+            error: 'Failed to upload image',
+        })
     } catch (error) {
         console.error(error)
         return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 })
