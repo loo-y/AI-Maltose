@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server'
-import { imageHost, salt } from '../../utils/constants'
+import { imageHost } from '../../utils/constants'
 import { imageIDDecrypt } from '../../utils/tools'
 export async function GET(request: NextRequest, { params }: { params: { imageID: string } }) {
     const { imageID } = params || {}
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest, { params }: { params: { imageID:
     try {
         // 获取 query 参数中的 URL
         const { searchParams } = new URL(request.url)
-        const imageRealID = imageIDDecrypt(imageID, salt)
+        const imageRealID = imageIDDecrypt(imageID)
         console.log(`imageRealID`, imageRealID)
         const imageUrl = `${imageHost}${imageRealID}` // searchParams.get('url')
 

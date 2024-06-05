@@ -1,4 +1,4 @@
-import { headers } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
 import { env } from 'process'
 import * as D1Fetches from '../../graphql/dal/D1/queries'
 export const runtime = 'edge'
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     // const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database`, options);
-    const result = await D1Fetches.queryUserConversationMessages({ userId: '1', conversationId: 1 })
+    const result = await D1Fetches.queryUserConversationMessages({ userID: '1', conversationID: 1 })
     // const result = await D1Fetches.addMessages({
     //     userId: '1',
     //     userType: 'user',

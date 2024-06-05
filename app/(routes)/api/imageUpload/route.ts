@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { imageHost, salt } from '../utils/constants'
+import { imageHost } from '../utils/constants'
 import { imageIDEncrypt } from '../utils/tools'
 export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'GET request not allowed' }, { status: 405 })
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
         const data = await response.json()
         const src = data?.[0]?.src
         if (src) {
-            return NextResponse.json({ imageID: imageIDEncrypt(src, salt) })
+            return NextResponse.json({ imageID: imageIDEncrypt(src) })
         }
         return NextResponse.json({
             error: 'Failed to upload image',
