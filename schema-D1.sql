@@ -57,29 +57,31 @@ VALUES
 -- 创建 ai_bots 表
 CREATE TABLE IF NOT EXISTS ai_bots (
     ai_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    aiid TEXT UNIQUE NOT NULL,
     ainame TEXT NOT NULL,
     api_url TEXT,
+    api_key TEXT,
     userid TEXT, -- 属于哪个用户
     is_custom BOOLEAN DEFAULT FALSE
 );
 
 -- 插入 ai_bots 表的示例数据
-INSERT INTO ai_bots (ainame, api_url, userid, is_custom) VALUES
-('AI Bot 1', 'http://example.com/api1', NULL, FALSE),
-('AI Bot 2', 'http://example.com/api2', 'user1id', TRUE);
+INSERT INTO ai_bots (ainame, api_url, api_key, userid, is_custom) VALUES
+('AI Bot 1', 'openai', 'http://example.com/api1', 'apikey', NULL, FALSE),
+('AI Bot 2', 'openai_custom_10000', 'http://example.com/api2', 'apikey', 'user1id', TRUE);
 
 -- 创建 conversation_ai 表
 CREATE TABLE IF NOT EXISTS conversation_ai (
     conversation_ai_id INTEGER PRIMARY KEY AUTOINCREMENT,
     conversation_id INTEGER,
-    ai_id INTEGER,
+    aiid TEXT,
     FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id),
-    FOREIGN KEY (ai_id) REFERENCES ai_bots(ai_id)
+    FOREIGN KEY (aiid) REFERENCES ai_bots(aiid)
 );
 
 -- 插入 conversation_ai 表的示例数据
-INSERT INTO conversation_ai (conversation_id, ai_id)
-SELECT conversation_id, ai_id FROM conversations, ai_bots
+INSERT INTO conversation_ai (conversation_id, aiid)
+SELECT conversation_id, aiid FROM conversations, ai_bots
 WHERE conversations.userid = (SELECT userid FROM users WHERE username = 'user1')
 AND ai_bots.ainame = 'AI Bot 1';
 
@@ -100,18 +102,18 @@ SELECT userid, 50.00 FROM users WHERE username = 'user1';
 CREATE TABLE IF NOT EXISTS consumption_records (
     consumption_id INTEGER PRIMARY KEY AUTOINCREMENT,
     userid INTEGER,
-    ai_id INTEGER,
+    aiid TEXT,
     conversation_id INTEGER,
     points DECIMAL(10, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userid) REFERENCES users(userid),
-    FOREIGN KEY (ai_id) REFERENCES ai_bots(ai_id),
+    FOREIGN KEY (aiid) REFERENCES ai_bots(aiid),
     FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id)
 );
 
 -- 插入 consumption_records 表的示例数据
-INSERT INTO consumption_records (userid, ai_id, conversation_id, points)
-SELECT u.userid, a.ai_id, c.conversation_id, 5.00
+INSERT INTO consumption_records (userid, aiid, conversation_id, points)
+SELECT u.userid, a.aiid, c.conversation_id, 5.00
 FROM users u
 JOIN conversations c ON u.userid = c.userid
 JOIN ai_bots a ON a.ainame = 'AI Bot 1'
