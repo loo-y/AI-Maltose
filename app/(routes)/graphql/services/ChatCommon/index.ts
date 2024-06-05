@@ -4,9 +4,6 @@ const typeDefinitions = `
         chat(params: ChatArgs): Chat
     }
 
-    type Chat {
-        JSON: JSON
-    }
     type ChatResult {
         text: String!
     }

@@ -39,7 +39,7 @@ export const searchWebTool = {
 }
 
 export const D1Tables = {
-    usersInfo: 'usersInfo',
+    users: 'users',
     conversations: 'conversations',
     messages: 'messages',
 }

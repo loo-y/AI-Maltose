@@ -6,18 +6,12 @@ import { Repeater } from 'graphql-yoga'
 const typeDefinitions = `
     scalar JSON
     type User {
-        BasicInfo: BaicInfoResult
-    }
-
-    type BaicInfoResult {
-        userInfo: JSON
-        JSON: JSON
+        BasicInfo: JSON
     }
 `
 export const BasicInfo = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const { userID } = parent || {}
     const userInfo = await queryUser({ userID })
-    console.log(`userInfo`, userInfo)
     return {
         userInfo,
     }
@@ -25,7 +19,7 @@ export const BasicInfo = async (parent: TParent, args: Record<string, any>, cont
 
 const resolvers = {
     User: {
-        BasicInfo,
+        BasicInfo: BasicInfo,
     },
 }
 

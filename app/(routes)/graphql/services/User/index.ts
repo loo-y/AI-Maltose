@@ -4,10 +4,6 @@ const typeDefinitions = `
         user(params: UserArgs): User
     }
 
-    type User {
-        JSON: JSON
-    }
-
     input UserArgs {
         "ConversationID"
         conversationID: Int

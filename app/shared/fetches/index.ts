@@ -153,8 +153,8 @@ export const fetchUserInfoGraphql = async ({ conversationID }: { conversationID:
         operationName: `GetUserQuery`,
         query: `
             query GetUserQuery($params: UserArgs){
-                user {
-                    basicInfo { JSON }
+                user(params: $params) {
+                    BasicInfo
                 }
             }
         `,
@@ -171,7 +171,7 @@ export const fetchUserInfoGraphql = async ({ conversationID }: { conversationID:
         })
         const data = await response.json()
         return {
-            content: data.data,
+            data: data.data,
             status: true,
         }
     } catch (e) {

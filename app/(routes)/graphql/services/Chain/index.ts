@@ -1,6 +1,7 @@
 import _ from 'lodash'
 // import { Claude } from '../Claude'
 import { ChainType } from '../../utils/constants'
+// 以下需要以 require 方式导入，使得 Chain 在将各个 AI 作为 params 时可以获取对应的关系
 const { Claude, ClaudeStream } = require('../AIService/Claude')
 const { Groq } = require('../AIService/Groq')
 const { GeminiPro } = require('../AIService/GeminiPro')

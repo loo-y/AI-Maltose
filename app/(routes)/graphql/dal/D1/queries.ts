@@ -16,9 +16,9 @@ export const queryUser = async ({ userID }: { userID: string }) => {
         body: JSON.stringify({
             params: [userID],
             sql: `
-                SELECT u.*, c.* 
-                FROM ${D1Tables.usersInfo} u 
-                JOIN ${D1Tables.conversations} c 
+                SELECT c.*, u.*
+                FROM ${D1Tables.users} u 
+                LEFT JOIN ${D1Tables.conversations} c 
                 ON u.userid = c.userid 
                 WHERE u.userid = ?
             `,
@@ -35,12 +35,15 @@ export const queryUser = async ({ userID }: { userID: string }) => {
                 username: userData[0]?.username,
                 email: userData[0]?.email,
                 balance: userData[0]?.balance,
-                conversations: _.map(userData, d => {
-                    return {
-                        conversationID: d.conversation_id,
-                        createAt: d.create_at,
-                    }
-                }),
+                conversations: _.filter(
+                    _.map(userData, d => {
+                        return {
+                            conversationID: d.conversation_id,
+                            createAt: d.create_at,
+                        }
+                    }),
+                    d => d?.conversationID
+                ),
             }
 
             return userInfo
