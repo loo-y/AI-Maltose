@@ -1,4 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { env } from 'process'
 import * as D1Fetches from '../../graphql/dal/D1/queries'

@@ -2,6 +2,11 @@ import { createStore } from 'zustand/vanilla'
 
 type MainState = {
     isloading?: boolean
+    userInfo: Record<string, any>
+    conversations: {
+        id: number
+        topic: string
+    }[]
 }
 
 type MainActions = {
@@ -10,12 +15,14 @@ type MainActions = {
 
 export type MainStore = MainState & MainActions
 
-export const initMainStore = (): MainState => {
-    return { isloading: false }
-}
-
 const defaultInitState: MainState = {
     isloading: false,
+    userInfo: {},
+    conversations: [],
+}
+
+export const initMainStore = (): MainState => {
+    return defaultInitState
 }
 
 export const createMainStore = (initState: MainState = defaultInitState) => {
