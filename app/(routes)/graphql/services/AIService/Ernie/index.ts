@@ -1,29 +1,32 @@
 // import 'dotenv/config'
-import ZhipuDal from '../../dal/Zhipu'
+import ErnieDal from '../../../dal/Ernie'
 import _ from 'lodash'
 import { Repeater } from 'graphql-yoga'
 
 const typeDefinitions = `
     scalar JSON
     type Chat {
-        Zhipu(params: ZhipuArgs): ChatResult
-        ZhipuStream(params: ZhipuArgs): [String]
+        Ernie(params: ErnieArgs): ChatResult
+        ErnieStream(params: ErnieArgs): [String]
     }
 
-    input ZhipuArgs {
+    input ErnieArgs {
         messages: Message
         "API_KEY"
         apiKey: String
+        "Secret_Key"
+        secretKey: String
         "Model Name"
         model: String
         "Max Tokens"
         maxTokens: Int
     }
 `
-export const Zhipu = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+
+export const Ernie = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
-    const zhipuArgs = args?.params || {}
-    const { messages: appendMessages, apiKey, model, maxTokens } = zhipuArgs || {}
+    const ernieArgs = args?.params || {}
+    const { messages: appendMessages, apiKey, secretKey, model, maxTokens } = ernieArgs || {}
     const maxTokensUse = maxTokens || baseMaxTokens
     const messages = _.concat([], baseMessages || [], appendMessages || []) || []
     const key = messages.at(-1)?.content
@@ -32,26 +35,27 @@ export const Zhipu = async (parent: TParent, args: Record<string, any>, context:
         return { text: '' }
     }
     const text: any = await (
-        await ZhipuDal.loader(context, { messages, apiKey, model, maxOutputTokens: maxTokensUse }, key)
+        await ErnieDal.loader(context, { messages, apiKey, secretKey, model, maxOutputTokens: maxTokensUse }, key)
     ).load(key)
     return { text }
 }
 
-export const ZhipuStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+export const ErnieStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const xvalue = new Repeater<String>(async (push, stop) => {
         const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
-        const zhipuArgs = args?.params || {}
-        const { messages: appendMessages, apiKey, model, maxTokens } = zhipuArgs || {}
+        const ernieArgs = args?.params || {}
+        const { messages: appendMessages, apiKey, secretKey, model, maxTokens } = ernieArgs || {}
         const maxTokensUse = maxTokens || baseMaxTokens
         const messages = _.concat([], baseMessages || [], appendMessages || []) || []
         const key = `${messages.at(-1)?.content || ''}_stream`
 
         await (
-            await ZhipuDal.loader(
+            await ErnieDal.loader(
                 context,
                 {
                     messages,
                     apiKey,
+                    secretKey,
                     model,
                     maxOutputTokens: maxTokensUse,
                     isStream: true,
@@ -59,6 +63,7 @@ export const ZhipuStream = async (parent: TParent, args: Record<string, any>, co
                         stop()
                     },
                     streamHandler: ({ token, status }) => {
+                        console.log(`streamHandle`, token)
                         if (token && status) {
                             push(token)
                         }
@@ -73,8 +78,8 @@ export const ZhipuStream = async (parent: TParent, args: Record<string, any>, co
 
 const resolvers = {
     Chat: {
-        Zhipu,
-        ZhipuStream,
+        Ernie,
+        ErnieStream,
     },
 }
 

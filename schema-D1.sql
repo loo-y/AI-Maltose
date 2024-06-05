@@ -23,6 +23,7 @@ WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'user2@example.com');
 CREATE TABLE IF NOT EXISTS conversations (
     conversation_id INTEGER PRIMARY KEY AUTOINCREMENT,
     userid TEXT,
+    topic TEXT,
     cleared_message_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userid) REFERENCES users(userid)

@@ -10,17 +10,17 @@ const commonD1Options = {
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${CLOUDFLARE_BEAR_TOKEN}` },
 }
 
-export const queryUser = async ({ userId }: { userId: string }) => {
+export const queryUser = async ({ userID }: { userID: string }) => {
     const requestOptions = {
         ...commonD1Options,
         body: JSON.stringify({
-            params: [userId],
+            params: [userID],
             sql: `
                 SELECT u.*, c.* 
                 FROM ${D1Tables.usersInfo} u 
                 JOIN ${D1Tables.conversations} c 
-                ON u.user_id = c.user_id 
-                WHERE u.user_id = ?
+                ON u.userid = c.userid 
+                WHERE u.userid = ?
             `,
         }),
     }
@@ -30,7 +30,7 @@ export const queryUser = async ({ userId }: { userId: string }) => {
         const userData = result?.result?.[0]?.results
         if (!_.isEmpty(userData)) {
             const userInfo = {
-                userID: userData[0]?.user_id,
+                userID: userData[0]?.userid,
                 username: userData[0]?.username,
                 email: userData[0]?.email,
                 balance: userData[0]?.balance,
@@ -51,16 +51,16 @@ export const queryUser = async ({ userId }: { userId: string }) => {
 }
 
 export const queryUserConversationMessages = async ({
-    userId,
-    conversationId,
+    userID,
+    conversationID,
 }: {
-    userId: string
-    conversationId: number
+    userID: string
+    conversationID: number
 }) => {
     const requestOptions = {
         ...commonD1Options,
         body: JSON.stringify({
-            params: [userId, conversationId],
+            params: [userID, conversationID],
             sql: `
                 SELECT * 
                 FROM ${D1Tables.messages} 
@@ -81,10 +81,11 @@ export const queryUserConversationMessages = async ({
                     senderType: v?.[0]?.sender_type,
                     messageId: v?.[0]?.message_id,
                     conversationId: v?.[0]?.conversation_id,
-                    contentList: _.map(v, m => {
+                    content: _.map(v, m => {
                         return {
-                            content: m.content,
-                            contentType: m.content_type,
+                            text: m.content_type == `image_url` ? undefined : m.content,
+                            image_url: m.content_type == `image_url` ? { url: m.content } : undefined,
+                            type: m.content_type,
                             createAt: m.create_at,
                         }
                     }),

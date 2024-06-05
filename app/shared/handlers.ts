@@ -48,3 +48,6 @@ export const handleGetAIResponse = async ({
         sleep(10),
     ])
 }
+
+// get messages and info by single conversation
+export const handleGetConversation = async ({ conversationID }: { conversationID: number }) => {}

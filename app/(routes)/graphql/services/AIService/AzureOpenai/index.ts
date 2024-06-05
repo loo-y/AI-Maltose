@@ -1,30 +1,31 @@
 // import 'dotenv/config'
-import MoonshotDal from '../../dal/Moonshot'
+import AzureOpenaiDal from '../../../dal/AzureOpenai'
 import _ from 'lodash'
 import { Repeater } from 'graphql-yoga'
 
 const typeDefinitions = `
     scalar JSON
     type Chat {
-        Moonshot(params: MoonshotArgs): ChatResult
-        MoonshotStream(params: MoonshotArgs): [String]
+        AzureOpenai(params: AzureOpenaiArgs): ChatResult
+        AzureOpenaiStream(params: AzureOpenaiArgs): [String]
     }
 
-    input MoonshotArgs {
+    input AzureOpenaiArgs {
         messages: Message
         "API_KEY"
         apiKey: String
+        "ENDPOINT"
+        endpoint: String
         "Model Name"
         model: String
         "Max Tokens"
         maxTokens: Int
     }
 `
-
-export const Moonshot = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+export const AzureOpenai = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb } = parent || {}
-    const moonshotArgs = args?.params || {}
-    const { messages: appendMessages, apiKey, model, maxTokens } = moonshotArgs || {}
+    const azureOpenaiArgs = args?.params || {}
+    const { messages: appendMessages, apiKey, model, maxTokens, endpoint } = azureOpenaiArgs || {}
     const maxTokensUse = maxTokens || baseMaxTokens
     const messages = _.concat([], baseMessages || [], appendMessages || []) || []
     const key = messages.at(-1)?.content
@@ -33,28 +34,33 @@ export const Moonshot = async (parent: TParent, args: Record<string, any>, conte
         return { text: '' }
     }
     const text: any = await (
-        await MoonshotDal.loader(context, { messages, apiKey, model, maxOutputTokens: maxTokensUse, searchWeb }, key)
+        await AzureOpenaiDal.loader(
+            context,
+            { messages, apiKey, model, maxOutputTokens: maxTokensUse, endpoint, searchWeb },
+            key
+        )
     ).load(key)
     return { text }
 }
 
-export const MoonshotStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+export const AzureOpenaiStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const xvalue = new Repeater<String>(async (push, stop) => {
         const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb } = parent || {}
-        const moonshotArgs = args?.params || {}
-        const { messages: appendMessages, apiKey, model, maxTokens } = moonshotArgs || {}
+        const azureOpenaiArgs = args?.params || {}
+        const { messages: appendMessages, apiKey, model, maxTokens, endpoint } = azureOpenaiArgs || {}
         const maxTokensUse = maxTokens || baseMaxTokens
         const messages = _.concat([], baseMessages || [], appendMessages || []) || []
         const key = `${messages.at(-1)?.content || ''}_stream`
 
         await (
-            await MoonshotDal.loader(
+            await AzureOpenaiDal.loader(
                 context,
                 {
                     messages,
                     apiKey,
                     model,
                     maxOutputTokens: maxTokensUse,
+                    endpoint,
                     isStream: true,
                     searchWeb,
                     completeHandler: ({ content, status }) => {
@@ -75,8 +81,8 @@ export const MoonshotStream = async (parent: TParent, args: Record<string, any>,
 
 const resolvers = {
     Chat: {
-        Moonshot,
-        MoonshotStream,
+        AzureOpenai,
+        AzureOpenaiStream,
     },
 }
 

@@ -1,32 +1,31 @@
 // import 'dotenv/config'
-import GeminiProDal from '../../dal/GeminiPro'
+import WorkersAIDal from '../../../dal/WorkersAI'
 import _ from 'lodash'
 import { Repeater } from 'graphql-yoga'
 
 const typeDefinitions = `
     scalar JSON
     type Chat {
-        GeminiPro(params: GeminiProArgs): ChatResult
-        GeminiProStream(params: GeminiProArgs): [String]
+        WorkersAI(params: WorkersAIArgs): ChatResult
+        WorkersAIStream(params: WorkersAIArgs): [String]
     }
 
-    input GeminiProArgs {
+    input WorkersAIArgs {
         messages: Message
+        "Account ID"
+        accountID: String
         "API_KEY"
         apiKey: String
         "Model Name"
         model: String
-        "API Version"
-        apiVersion: String
         "Max Tokens"
         maxTokens: Int
     }
 `
-
-export const GeminiPro = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+export const WorkersAI = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
-    const geminiProArgs = args?.params || {}
-    const { messages: appendMessages, apiKey, model, apiVersion, maxTokens } = geminiProArgs || {}
+    const workersAIArgs = args?.params || {}
+    const { messages: appendMessages, apiKey, model, maxTokens, accountID } = workersAIArgs || {}
     const maxTokensUse = maxTokens || baseMaxTokens
     const messages = _.concat([], baseMessages || [], appendMessages || []) || []
     const key = messages.at(-1)?.content
@@ -35,29 +34,30 @@ export const GeminiPro = async (parent: TParent, args: Record<string, any>, cont
         return { text: '' }
     }
     const text: any = await (
-        await GeminiProDal.loader(context, { messages, apiKey, model, apiVersion, maxOutputTokens: maxTokensUse }, key)
+        await WorkersAIDal.loader(context, { messages, apiKey, model, maxOutputTokens: maxTokensUse, accountID }, key)
     ).load(key)
     return { text }
 }
-export const GeminiProStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+
+export const WorkersAIStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const xvalue = new Repeater<String>(async (push, stop) => {
         const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
-        const geminiProArgs = args?.params || {}
-        const { messages: appendMessages, apiKey, model, apiVersion, maxTokens } = geminiProArgs || {}
+        const workersAIArgs = args?.params || {}
+        const { messages: appendMessages, apiKey, model, maxTokens, accountID } = workersAIArgs || {}
         const maxTokensUse = maxTokens || baseMaxTokens
         const messages = _.concat([], baseMessages || [], appendMessages || []) || []
         const key = `${messages.at(-1)?.content || ''}_stream`
 
         await (
-            await GeminiProDal.loader(
+            await WorkersAIDal.loader(
                 context,
                 {
                     messages,
                     apiKey,
                     model,
                     maxOutputTokens: maxTokensUse,
-                    apiVersion,
                     isStream: true,
+                    accountID,
                     completeHandler: ({ content, status }) => {
                         stop()
                     },
@@ -76,8 +76,8 @@ export const GeminiProStream = async (parent: TParent, args: Record<string, any>
 
 const resolvers = {
     Chat: {
-        GeminiPro,
-        GeminiProStream,
+        WorkersAI,
+        WorkersAIStream,
     },
 }
 

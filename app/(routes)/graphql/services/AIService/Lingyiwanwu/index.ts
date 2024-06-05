@@ -1,16 +1,16 @@
 // import 'dotenv/config'
-import QwenDal from '../../dal/Qwen'
+import LingyiwanwuDal from '../../../dal/Lingyiwanwu'
 import _ from 'lodash'
 import { Repeater } from 'graphql-yoga'
 
 const typeDefinitions = `
     scalar JSON
     type Chat {
-        Qwen(params: QwenArgs): ChatResult
-        QwenStream(params: QwenArgs): [String]
+        Lingyiwanwu(params: LingyiwanwuArgs): ChatResult
+        LingyiwanwuStream(params: LingyiwanwuArgs): [String]
     }
 
-    input QwenArgs {
+    input LingyiwanwuArgs {
         messages: Message
         "API_KEY"
         apiKey: String
@@ -20,10 +20,11 @@ const typeDefinitions = `
         maxTokens: Int
     }
 `
-export const Qwen = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
-    const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb } = parent || {}
-    const qwenArgs = args?.params || {}
-    const { messages: appendMessages, apiKey, model, maxTokens } = qwenArgs || {}
+
+export const Lingyiwanwu = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+    const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
+    const lingyiwanwuArgs = args?.params || {}
+    const { messages: appendMessages, apiKey, model, maxTokens } = lingyiwanwuArgs || {}
     const maxTokensUse = maxTokens || baseMaxTokens
     const messages = _.concat([], baseMessages || [], appendMessages || []) || []
     const key = messages.at(-1)?.content
@@ -32,22 +33,22 @@ export const Qwen = async (parent: TParent, args: Record<string, any>, context: 
         return { text: '' }
     }
     const text: any = await (
-        await QwenDal.loader(context, { messages, apiKey, model, maxOutputTokens: maxTokensUse, searchWeb }, key)
+        await LingyiwanwuDal.loader(context, { messages, apiKey, model, maxOutputTokens: maxTokensUse }, key)
     ).load(key)
     return { text }
 }
 
-export const QwenStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+export const LingyiwanwuStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const xvalue = new Repeater<String>(async (push, stop) => {
-        const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb } = parent || {}
-        const qwenArgs = args?.params || {}
-        const { messages: appendMessages, apiKey, model, maxTokens } = qwenArgs || {}
+        const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
+        const lingyiwanwuArgs = args?.params || {}
+        const { messages: appendMessages, apiKey, model, maxTokens } = lingyiwanwuArgs || {}
         const maxTokensUse = maxTokens || baseMaxTokens
         const messages = _.concat([], baseMessages || [], appendMessages || []) || []
         const key = `${messages.at(-1)?.content || ''}_stream`
 
         await (
-            await QwenDal.loader(
+            await LingyiwanwuDal.loader(
                 context,
                 {
                     messages,
@@ -55,7 +56,6 @@ export const QwenStream = async (parent: TParent, args: Record<string, any>, con
                     model,
                     maxOutputTokens: maxTokensUse,
                     isStream: true,
-                    searchWeb,
                     completeHandler: ({ content, status }) => {
                         stop()
                     },
@@ -74,8 +74,8 @@ export const QwenStream = async (parent: TParent, args: Record<string, any>, con
 
 const resolvers = {
     Chat: {
-        Qwen,
-        QwenStream,
+        Lingyiwanwu,
+        LingyiwanwuStream,
     },
 }
 

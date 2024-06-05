@@ -1,16 +1,16 @@
 // import 'dotenv/config'
-import LingyiwanwuDal from '../../dal/Lingyiwanwu'
+import MoonshotDal from '../../../dal/Moonshot'
 import _ from 'lodash'
 import { Repeater } from 'graphql-yoga'
 
 const typeDefinitions = `
     scalar JSON
     type Chat {
-        Lingyiwanwu(params: LingyiwanwuArgs): ChatResult
-        LingyiwanwuStream(params: LingyiwanwuArgs): [String]
+        Moonshot(params: MoonshotArgs): ChatResult
+        MoonshotStream(params: MoonshotArgs): [String]
     }
 
-    input LingyiwanwuArgs {
+    input MoonshotArgs {
         messages: Message
         "API_KEY"
         apiKey: String
@@ -21,10 +21,10 @@ const typeDefinitions = `
     }
 `
 
-export const Lingyiwanwu = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
-    const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
-    const lingyiwanwuArgs = args?.params || {}
-    const { messages: appendMessages, apiKey, model, maxTokens } = lingyiwanwuArgs || {}
+export const Moonshot = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+    const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb } = parent || {}
+    const moonshotArgs = args?.params || {}
+    const { messages: appendMessages, apiKey, model, maxTokens } = moonshotArgs || {}
     const maxTokensUse = maxTokens || baseMaxTokens
     const messages = _.concat([], baseMessages || [], appendMessages || []) || []
     const key = messages.at(-1)?.content
@@ -33,22 +33,22 @@ export const Lingyiwanwu = async (parent: TParent, args: Record<string, any>, co
         return { text: '' }
     }
     const text: any = await (
-        await LingyiwanwuDal.loader(context, { messages, apiKey, model, maxOutputTokens: maxTokensUse }, key)
+        await MoonshotDal.loader(context, { messages, apiKey, model, maxOutputTokens: maxTokensUse, searchWeb }, key)
     ).load(key)
     return { text }
 }
 
-export const LingyiwanwuStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+export const MoonshotStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const xvalue = new Repeater<String>(async (push, stop) => {
-        const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
-        const lingyiwanwuArgs = args?.params || {}
-        const { messages: appendMessages, apiKey, model, maxTokens } = lingyiwanwuArgs || {}
+        const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb } = parent || {}
+        const moonshotArgs = args?.params || {}
+        const { messages: appendMessages, apiKey, model, maxTokens } = moonshotArgs || {}
         const maxTokensUse = maxTokens || baseMaxTokens
         const messages = _.concat([], baseMessages || [], appendMessages || []) || []
         const key = `${messages.at(-1)?.content || ''}_stream`
 
         await (
-            await LingyiwanwuDal.loader(
+            await MoonshotDal.loader(
                 context,
                 {
                     messages,
@@ -56,6 +56,7 @@ export const LingyiwanwuStream = async (parent: TParent, args: Record<string, an
                     model,
                     maxOutputTokens: maxTokensUse,
                     isStream: true,
+                    searchWeb,
                     completeHandler: ({ content, status }) => {
                         stop()
                     },
@@ -74,8 +75,8 @@ export const LingyiwanwuStream = async (parent: TParent, args: Record<string, an
 
 const resolvers = {
     Chat: {
-        Lingyiwanwu,
-        LingyiwanwuStream,
+        Moonshot,
+        MoonshotStream,
     },
 }
 

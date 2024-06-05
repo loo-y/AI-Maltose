@@ -1,16 +1,16 @@
 // import 'dotenv/config'
-import GroqDal from '../../dal/Groq'
+import ZhipuDal from '../../../dal/Zhipu'
 import _ from 'lodash'
 import { Repeater } from 'graphql-yoga'
 
 const typeDefinitions = `
     scalar JSON
     type Chat {
-        Groq(params: GroqArgs): ChatResult
-        GroqStream(params: GroqArgs): [String]
+        Zhipu(params: ZhipuArgs): ChatResult
+        ZhipuStream(params: ZhipuArgs): [String]
     }
 
-    input GroqArgs {
+    input ZhipuArgs {
         messages: Message
         "API_KEY"
         apiKey: String
@@ -20,10 +20,10 @@ const typeDefinitions = `
         maxTokens: Int
     }
 `
-export const Groq = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+export const Zhipu = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
-    const groqArgs = args?.params || {}
-    const { messages: appendMessages, apiKey, model, maxTokens } = groqArgs || {}
+    const zhipuArgs = args?.params || {}
+    const { messages: appendMessages, apiKey, model, maxTokens } = zhipuArgs || {}
     const maxTokensUse = maxTokens || baseMaxTokens
     const messages = _.concat([], baseMessages || [], appendMessages || []) || []
     const key = messages.at(-1)?.content
@@ -32,22 +32,22 @@ export const Groq = async (parent: TParent, args: Record<string, any>, context: 
         return { text: '' }
     }
     const text: any = await (
-        await GroqDal.loader(context, { messages, apiKey, model, maxOutputTokens: maxTokensUse }, key)
+        await ZhipuDal.loader(context, { messages, apiKey, model, maxOutputTokens: maxTokensUse }, key)
     ).load(key)
     return { text }
 }
 
-export const GroqStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+export const ZhipuStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const xvalue = new Repeater<String>(async (push, stop) => {
         const { messages: baseMessages, maxTokens: baseMaxTokens } = parent || {}
-        const groqArgs = args?.params || {}
-        const { messages: appendMessages, apiKey, model, maxTokens } = groqArgs || {}
+        const zhipuArgs = args?.params || {}
+        const { messages: appendMessages, apiKey, model, maxTokens } = zhipuArgs || {}
         const maxTokensUse = maxTokens || baseMaxTokens
         const messages = _.concat([], baseMessages || [], appendMessages || []) || []
         const key = `${messages.at(-1)?.content || ''}_stream`
 
         await (
-            await GroqDal.loader(
+            await ZhipuDal.loader(
                 context,
                 {
                     messages,
@@ -73,8 +73,8 @@ export const GroqStream = async (parent: TParent, args: Record<string, any>, con
 
 const resolvers = {
     Chat: {
-        Groq,
-        GroqStream,
+        Zhipu,
+        ZhipuStream,
     },
 }
 

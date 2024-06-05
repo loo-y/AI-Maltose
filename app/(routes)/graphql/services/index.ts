@@ -1,17 +1,20 @@
 import { IExecutableSchemaDefinition } from '@graphql-tools/schema'
 import ChatCommon from './ChatCommon'
-import GeminiPro from './GeminiPro'
-import Claude from './Claude'
-import Moonshot from './Moonshot'
-import Openai from './Openai'
-import Groq from './Groq'
-import Lingyiwanwu from './Lingyiwanwu'
-import Ernie from './Ernie'
-import Qwen from './Qwen'
-import Zhipu from './Zhipu'
+import GeminiPro from './AIService/GeminiPro'
+import Claude from './AIService/Claude'
+import Moonshot from './AIService/Moonshot'
+import Openai from './AIService/Openai'
+import Groq from './AIService/Groq'
+import Lingyiwanwu from './AIService/Lingyiwanwu'
+import Ernie from './AIService/Ernie'
+import Qwen from './AIService/Qwen'
+import Zhipu from './AIService/Zhipu'
 import Chain from './Chain'
-import AzureOpenai from './AzureOpenai'
-import WorkersAI from './WorkersAI'
+import AzureOpenai from './AIService/AzureOpenai'
+import WorkersAI from './AIService/WorkersAI'
+import User from './User'
+import BasicInfo from './UserService/BasicInfo'
+import ConversationMessages from './UserService/ConversationMessages'
 
 const serviceList = [
     Chain,
@@ -27,6 +30,9 @@ const serviceList = [
     Qwen,
     Zhipu,
     WorkersAI,
+    User,
+    BasicInfo,
+    ConversationMessages,
 ]
 
 export default {
