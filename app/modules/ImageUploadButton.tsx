@@ -12,7 +12,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { fetchUploadImage } from '@/app/shared/fetches'
+import { handleUploadImage } from '@/app/shared/handlers'
 
 const ImageUploadButton = () => {
     const inputRef = useRef<HTMLInputElement>(null)
@@ -43,7 +43,7 @@ const ImageUploadButton = () => {
             // const formData = new FormData();
             // formData.append('file', file);
             const blob = new Blob([file], { type: file.type })
-            helperUploadImage(blob)
+            handleUploadImage(blob)
         }
     }
 
@@ -99,10 +99,4 @@ const OverSizeAlert = ({ title, content, callback }: { title?: string; content?:
             </AlertDialogContent>
         </AlertDialog>
     )
-}
-
-const helperUploadImage = async (imageBlob: Blob) => {
-    const result = await fetchUploadImage(imageBlob)
-
-    console.log(`helperUploadImage`, result)
 }

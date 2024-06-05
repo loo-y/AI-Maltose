@@ -12,6 +12,7 @@ import { fetchAIGraphql } from '@/app/shared/fetches'
 import { IChatMessage, Roles } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import ImageUploadButton from '@/app/modules/ImageUploadButton'
+import { handleGetAIResponse } from '@/app/shared/handlers'
 
 const Main = () => {
     const { isloading, updateIsLoading } = useMainStore(state => state)
@@ -32,7 +33,7 @@ const Main = () => {
 
     const handleSendQuestion = async (question: string) => {
         setIsRequesting(true)
-        await helperGetAIResponse({
+        await handleGetAIResponse({
             messages: [{ role: Roles.user, content: question }],
         })
         setIsRequesting(false)
@@ -78,39 +79,3 @@ const MainPage = () => {
 }
 
 export default MainPage
-
-const helperGetAIResponse = async ({
-    messages,
-    onStream,
-}: {
-    messages: IChatMessage[]
-    onStream?: (arg: any) => void
-}) => {
-    return Promise.race([
-        new Promise((resolve, reject) =>
-            fetchAIGraphql({
-                messages,
-                // isStream: true,
-                queryOpenAI: true,
-                openAIParams: {
-                    baseUrl: `https://openrouter.ai/api/v1`,
-                    model: `mistralai/mistral-7b-instruct:free`,
-                },
-                maxTokens: 100,
-                // queryGroq: true,
-                streamHandler: (streamResult: { data: string; status?: boolean }) => {
-                    console.log('streamHandler', streamResult)
-                    const { data, status } = streamResult || {}
-                    if (status) {
-                        typeof onStream == `function` && onStream(data || ``)
-                    }
-                },
-                completeHandler: (value: string) => {
-                    typeof onStream == `function` && onStream(`__{{streamCompleted}}__`)
-                    resolve(true)
-                },
-            })
-        ),
-        sleep(10),
-    ])
-}
