@@ -5,7 +5,7 @@ import { fetchEventSource } from '@microsoft/fetch-event-source'
 
 const graphqlUrl = '/graphql'
 
-const getCommonOptions = async ({ userToken }: { userToken: string }) => {
+const getCommonOptions = async ({ userToken }: { userToken?: string }) => {
     const headers = _.omitBy(
         {
             'Content-Type': 'application/json',
@@ -136,6 +136,42 @@ export const fetchUploadImage = async (imageBlob: Blob) => {
         const data = await response.json()
         return {
             data,
+            status: true,
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            content: String(e),
+            status: false,
+        }
+    }
+}
+
+export const fetchUserInfoGraphql = async ({ conversationID }: { conversationID: number }) => {
+    const options = await getCommonOptions({})
+    const body = {
+        operationName: `GetUserQuery`,
+        query: `
+            query GetUserQuery($params: UserArgs){
+                user {
+                    basicInfo { JSON }
+                }
+            }
+        `,
+        variables: {
+            params: {
+                conversationID,
+            },
+        },
+    }
+    try {
+        const response = await fetch(graphqlUrl, {
+            ...options,
+            body: JSON.stringify(body),
+        })
+        const data = await response.json()
+        return {
+            content: data.data,
             status: true,
         }
     } catch (e) {

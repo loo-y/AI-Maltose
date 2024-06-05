@@ -27,6 +27,7 @@ export const queryUser = async ({ userID }: { userID: string }) => {
     try {
         const response = await fetch(D1QueryUrl, requestOptions)
         const result = await response.json()
+        console.log(`queryUser result`, result)
         const userData = result?.result?.[0]?.results
         if (!_.isEmpty(userData)) {
             const userInfo = {
@@ -45,7 +46,7 @@ export const queryUser = async ({ userID }: { userID: string }) => {
             return userInfo
         }
     } catch (e) {
-        console.log(e)
+        console.log(`queryUser error`, e)
     }
     return null
 }

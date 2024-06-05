@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { sleep } from './util'
-import { fetchAIGraphql, fetchUploadImage } from './fetches'
+import { fetchAIGraphql, fetchUploadImage, fetchUserInfoGraphql } from './fetches'
 import { IChatMessage } from './interface'
 
 export const handleUploadImage = async (imageBlob: Blob): Promise<string | null> => {
@@ -50,4 +50,8 @@ export const handleGetAIResponse = async ({
 }
 
 // get messages and info by single conversation
-export const handleGetConversation = async ({ conversationID }: { conversationID: number }) => {}
+export const handleGetConversation = async ({ conversationID }: { conversationID: number }) => {
+    const ressult = await fetchUserInfoGraphql({ conversationID })
+    console.log(`userInfo`, ressult)
+    return ressult
+}

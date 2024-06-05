@@ -12,25 +12,15 @@ import { fetchAIGraphql } from '@/app/shared/fetches'
 import { IChatMessage, Roles } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import ImageUploadButton from '@/app/modules/ImageUploadButton'
-import { handleGetAIResponse } from '@/app/shared/handlers'
+import { handleGetAIResponse, handleGetConversation } from '@/app/shared/handlers'
 
 const Main = () => {
     const { isloading, updateIsLoading } = useMainStore(state => state)
     const [isRequesting, setIsRequesting] = useState(false)
+
     useEffect(() => {
-        let vh = window.innerHeight * 0.01
-        // Then we set the value in the --vh custom property to the root of the document
-        document.documentElement.style.setProperty('--vh', `${vh}px`)
-
-        // We listen to the resize event
-        window.addEventListener('resize', () => {
-            // We execute the same script as before
-            let vh = Math.min(document?.documentElement?.clientHeight || window.innerHeight, window.innerHeight) * 0.01
-            console.log(`resizing, new view height`, vh)
-            document.documentElement.style.setProperty('--vh', `${vh}px`)
-        })
-    }, [])
-
+        handleGetConversation({ conversationID: 1 })
+    })
     const handleSendQuestion = async (question: string) => {
         setIsRequesting(true)
         await handleGetAIResponse({
@@ -71,6 +61,20 @@ const Main = () => {
 }
 
 const MainPage = () => {
+    useEffect(() => {
+        let vh = window.innerHeight * 0.01
+        // Then we set the value in the --vh custom property to the root of the document
+        document.documentElement.style.setProperty('--vh', `${vh}px`)
+        console.log(`user useEffect`)
+        // We listen to the resize event
+        window.addEventListener('resize', () => {
+            // We execute the same script as before
+            let vh = Math.min(document?.documentElement?.clientHeight || window.innerHeight, window.innerHeight) * 0.01
+            console.log(`resizing, new view height`, vh)
+            document.documentElement.style.setProperty('--vh', `${vh}px`)
+        })
+    }, [])
+
     return (
         <MainStoreProvider>
             <Main></Main>

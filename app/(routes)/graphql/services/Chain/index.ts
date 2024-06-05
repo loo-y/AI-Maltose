@@ -1,12 +1,12 @@
 import _ from 'lodash'
 // import { Claude } from '../Claude'
 import { ChainType } from '../../utils/constants'
-const { Claude, ClaudeStream } = require('../Claude')
-const { Groq } = require('../Groq')
-const { GeminiPro } = require('../GeminiPro')
-const { Lingyiwanwu } = require('../Lingyiwanwu')
-const { Ernie } = require('../Ernie')
-const { Moonshot } = require('../Moonshot')
+const { Claude, ClaudeStream } = require('../AIService/Claude')
+const { Groq } = require('../AIService/Groq')
+const { GeminiPro } = require('../AIService/GeminiPro')
+const { Lingyiwanwu } = require('../AIService/Lingyiwanwu')
+const { Ernie } = require('../AIService/Ernie')
+const { Moonshot } = require('../AIService/Moonshot')
 
 const typeDefinitions = `
     scalar JSON

@@ -10,7 +10,7 @@ const typeDefinitions = `
 
     input UserArgs {
         "ConversationID"
-        conversationID: number
+        conversationID: Int
     }
 `
 

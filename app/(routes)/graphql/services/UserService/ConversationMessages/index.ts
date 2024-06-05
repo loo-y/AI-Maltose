@@ -6,7 +6,7 @@ import { Repeater } from 'graphql-yoga'
 const typeDefinitions = `
     scalar JSON
     type User {
-        conversationMessages: [JSON]
+        ConversationMessages: [JSON]
     }
 `
 
