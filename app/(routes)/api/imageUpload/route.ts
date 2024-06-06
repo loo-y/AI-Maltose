@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { imageHost } from '../utils/constants'
 import { imageIDEncrypt } from '../utils/tools'
+
+export const runtime = 'edge'
+
 export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'GET request not allowed' }, { status: 405 })
 }

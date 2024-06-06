@@ -1,6 +1,9 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { imageHost } from '../../utils/constants'
 import { imageIDDecrypt } from '../../utils/tools'
+
+export const runtime = 'edge'
+
 export async function GET(request: NextRequest, { params }: { params: { imageID: string } }) {
     const { imageID } = params || {}
     console.log(`imageID`, imageID)

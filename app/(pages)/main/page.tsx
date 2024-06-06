@@ -14,6 +14,8 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import ImageUploadButton from '@/app/modules/ImageUploadButton'
 import { handleGetAIResponse, handleGetConversation } from '@/app/shared/handlers'
 
+export const runtime = 'edge'
+
 const Main = () => {
     const { currentConversationID, updateCurrentConversation } = useMainStore(state => state)
     const [isFetching, setIsFetching] = useState(false)

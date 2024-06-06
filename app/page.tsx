@@ -2,6 +2,8 @@ import MainPage from '@/app/(pages)/main/page'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 
+export const runtime = 'edge'
+
 export default function Home() {
     const { userId } = auth()
     console.log(`page userId`, userId)
