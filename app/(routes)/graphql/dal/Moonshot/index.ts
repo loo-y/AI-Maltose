@@ -1,6 +1,14 @@
 // import 'dotenv/config'
 import DataLoader from 'dataloader'
-import { ICommonDalArgs, IMessage, Roles } from '../../types'
+import {
+    ICommonDalArgs,
+    IMessage,
+    Roles,
+    SystemMessage,
+    UserMessage,
+    AssistantMessage,
+    IChatMessage,
+} from '../../types'
 import OpenAI from 'openai'
 import _ from 'lodash'
 import { generationConfig } from '../../utils/constants'
@@ -14,11 +22,25 @@ const availableFunctions: Record<string, any> = {
     get_internet_serch_result: getInternetSerchResult,
 }
 
-const convertMessages = (messages: ICommonDalArgs['messages']): { history: IMessage[] } => {
+const convertMessages = (messages: ICommonDalArgs['messages']): { history: IChatMessage[] } => {
     let history = _.map(messages, message => {
-        return {
-            role: message.role == Roles.model ? Roles.assistant : message.role,
-            content: message.content,
+        const { role, content } = message || {}
+        switch (role) {
+            case Roles.system:
+                return {
+                    role: Roles.system,
+                    content: content,
+                } as SystemMessage
+            case Roles.user:
+                return {
+                    role: Roles.user,
+                    content: content,
+                } as UserMessage
+            default:
+                return {
+                    role: Roles.assistant,
+                    content: content,
+                } as AssistantMessage
         }
     })
     return {

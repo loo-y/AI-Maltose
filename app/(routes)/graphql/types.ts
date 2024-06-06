@@ -1,6 +1,14 @@
-import { IChatMessage, Roles, SystemMessage, UserMessage, AssistantMessage } from '@/app/shared/interface'
+import {
+    IChatMessage,
+    Roles,
+    SystemMessage,
+    UserMessage,
+    AssistantMessage,
+    TextMessage,
+    ImageUrlMessage,
+} from '@/app/shared/interface'
 export { Roles }
-export type { IChatMessage, SystemMessage, UserMessage, AssistantMessage }
+export type { IChatMessage, SystemMessage, UserMessage, AssistantMessage, TextMessage, ImageUrlMessage }
 
 export interface IMessage {
     role: Roles

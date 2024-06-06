@@ -1,11 +1,11 @@
-import { IMessage, Roles } from '../types'
+import { IMessage, Roles, IChatMessage } from '../types'
 import _ from 'lodash'
 import DuckDuckGoSearch from '../lib/duckduckgoSearch'
 
-export const mergeMessages = (messages: IMessage[] | undefined): IMessage[] => {
-    const mergedMessages: IMessage[] = []
+export const mergeMessages = (messages: IChatMessage[] | undefined): IChatMessage[] => {
+    const mergedMessages: IChatMessage[] = []
     let previousRole: Roles | undefined
-    let previousContent = ''
+    let previousContent: any = ''
 
     if (!messages) {
         return []

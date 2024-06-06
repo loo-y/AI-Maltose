@@ -1,6 +1,6 @@
 // import 'dotenv/config'
 import DataLoader from 'dataloader'
-import { ICommonDalArgs, Roles, IClaudeMessage } from '../../types'
+import { ICommonDalArgs, Roles, IClaudeMessage, TextMessage } from '../../types'
 import Anthropic from '@anthropic-ai/sdk'
 import _ from 'lodash'
 import { generationConfig } from '../../utils/constants'
@@ -16,15 +16,16 @@ const DEFAULT_MODEL_NAME = 'claude-3-haiku-20240307'
 const convertMessages = (messages: ICommonDalArgs['messages']): { history: IClaudeMessage[] } => {
     const mergedMessages = mergeMessages(messages)
     let history = _.map(mergedMessages, message => {
+        const { content, role } = message
+        const fixedContent =
+            role == Roles.user
+                ? typeof content == `string`
+                    ? content
+                    : (content?.[0] as TextMessage)?.text || ''
+                : content || ''
         return {
-            role:
-                message.role == Roles.model
-                    ? Roles.assistant
-                    : message.role == Roles.system
-                      ? Roles.user
-                      : message.role,
-            content: [{ type: 'text', text: message.content }],
-            // content: message.content,
+            role: role == Roles.model ? Roles.assistant : role == Roles.system ? Roles.user : role,
+            content: [{ type: 'text', text: fixedContent }],
         }
     })
     return {
