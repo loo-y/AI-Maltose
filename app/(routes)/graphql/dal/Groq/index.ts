@@ -1,17 +1,25 @@
 import Groq from 'groq-sdk'
 import DataLoader from 'dataloader'
-import { ICommonDalArgs, IMessage, Roles } from '../../types'
+import { ICommonDalArgs, IMessage, Roles, TextMessage } from '../../types'
 import _ from 'lodash'
 import { generationConfig } from '../../utils/constants'
 import { getInternetSerchResult } from '../../utils/tools'
+import { searchWebSystemMessage, searchWebTool } from '../../utils/constants'
 
 const DEFAULT_MODEL_NAME = `llama3-70b-8192` // 'mixtral-8x7b-32768'
 
 const convertMessages = (messages: ICommonDalArgs['messages']) => {
     let history = _.map(messages, message => {
+        const { content, role } = message
+        const fixedContent =
+            role == Roles.user
+                ? typeof content == `string`
+                    ? content
+                    : (content?.[0] as TextMessage)?.text || ''
+                : content || ''
         return {
-            role: message.role == Roles.model ? Roles.assistant : message.role,
-            content: message.content,
+            role: (role == Roles.model ? Roles.assistant : role) as Roles,
+            content: fixedContent,
         }
     })
     const currentMessage = messages?.at(-1)?.content
@@ -30,6 +38,7 @@ const fetchGroq = async (ctx: TBaseContext, params: Record<string, any>, options
         maxOutputTokens,
         completeHandler,
         streamHandler,
+        searchWeb,
     } = params || {}
     const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
     const API_KEY = apiKey || env?.GROQ_API_KEY || ''
@@ -43,18 +52,18 @@ const fetchGroq = async (ctx: TBaseContext, params: Record<string, any>, options
         apiKey: API_KEY,
     })
 
-    history.unshift({
-        role: Roles.system,
-        content: `你是一个具有联网功能的智能助手，如果用户的提问的内容可以通过联网获取更新信息，你就一定会使用 get_internet_serch_result tool 来获取相关联网资料，再根据资料结合用户的提问来回答。`,
-    })
+    if (searchWeb) {
+        history.unshift(searchWebSystemMessage)
+    }
 
     let attachedMessage = currentMessage
 
     console.log(`isStream`, isStream)
 
-    if (history?.at(-1)?.content && attachedMessage) {
-        history!.at(-1)!.content = attachedMessage
-    }
+    // TODO 忘记这段代码的作用了...先注释
+    // if (history?.at(-1)?.content && attachedMessage) {
+    //     history!.at(-1)!.content = attachedMessage
+    // }
 
     console.log(`history`, history)
 

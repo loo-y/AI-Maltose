@@ -1,6 +1,6 @@
 // import 'dotenv/config'
 import DataLoader from 'dataloader'
-import { IGeminiProDalArgs, Roles } from '../../types'
+import { IGeminiProDalArgs, Roles, TextMessage } from '../../types'
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai'
 import _ from 'lodash'
 import { mergeMessages } from '../../utils/tools'
@@ -31,19 +31,21 @@ const safetySettings = [
 const convertMessages = (messages: IGeminiProDalArgs['messages']) => {
     const mergedMessages = mergeMessages(messages)
     let history = _.map(mergedMessages, message => {
+        const { role, content } = message || {}
+        const fixedContent =
+            role == Roles.user
+                ? typeof content == `string`
+                    ? content
+                    : (content?.[0] as TextMessage)?.text || ''
+                : content || ''
         return {
-            role:
-                message.role == Roles.assistant
-                    ? Roles.model
-                    : message.role == Roles.system
-                      ? Roles.model
-                      : message.role,
-            parts: [{ text: message.content }],
+            role: role == Roles.assistant ? Roles.model : role == Roles.system ? Roles.model : role,
+            parts: [{ text: fixedContent }],
         }
     })
 
-    history.splice(-1)
-    let message = mergedMessages?.at(-1)?.content
+    const last = history.splice(-1)
+    let message = last?.[0]?.parts[0].text || ''
     return {
         history: history,
         message,
