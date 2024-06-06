@@ -5,9 +5,9 @@ import _ from 'lodash'
 interface IChatInputProps {
     maxRows?: number
     onSendQuestion: (question: string) => void
-    isRequesting?: boolean
+    isFetching?: boolean
 }
-const Chatinput = ({ maxRows = 5, isRequesting = false, onSendQuestion }: IChatInputProps) => {
+const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInputProps) => {
     const [isComposing, setIsComposing] = useState(false)
     const [inputValue, setInputValue] = useState<string>('')
     const [inputRows, setInputRows] = useState<number>(1)
@@ -80,7 +80,7 @@ const Chatinput = ({ maxRows = 5, isRequesting = false, onSendQuestion }: IChatI
                     <div className="flex flex-grow flex-row  border-0 pl-5 gap-1 ">
                         <div className="flex my-1 flex-row flex-grow ml-2 mb-3 items-center">
                             <textarea
-                                disabled={isRequesting ? true : undefined}
+                                disabled={isFetching ? true : undefined}
                                 id={`chat-input`}
                                 value={inputValue}
                                 ref={inputRef}
@@ -103,7 +103,7 @@ const Chatinput = ({ maxRows = 5, isRequesting = false, onSendQuestion }: IChatI
                                     onClick={handleSendQuestion}
                                 >
                                     <img
-                                        src={isRequesting ? '/images/icons/stop.svg' : '/images/icons/arrow-up.svg'}
+                                        src={isFetching ? '/images/icons/stop.svg' : '/images/icons/arrow-up.svg'}
                                         className="h-9 w-9"
                                     />
                                 </div>

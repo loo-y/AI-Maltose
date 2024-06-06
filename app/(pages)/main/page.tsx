@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useMainStore } from './providers'
 import { MainStoreProvider } from './providers'
 import _ from 'lodash'
@@ -9,24 +9,65 @@ import Chatinput from '@/app/modules/ChatInput'
 import ConversationBox from '@/app/modules/ConversationBox'
 import { sleep } from '../../shared/util'
 import { fetchAIGraphql } from '@/app/shared/fetches'
-import { IChatMessage, Roles } from '@/app/shared/interface'
+import { IChatMessage, Roles, IHistory } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import ImageUploadButton from '@/app/modules/ImageUploadButton'
 import { handleGetAIResponse, handleGetConversation } from '@/app/shared/handlers'
 
 const Main = () => {
-    const { isloading, updateIsLoading } = useMainStore(state => state)
-    const [isRequesting, setIsRequesting] = useState(false)
+    const { currentConversationID, updateCurrentConversation } = useMainStore(state => state)
+    const [isFetching, setIsFetching] = useState(false)
+    const [history, setHistory] = useState<IHistory>([])
 
+    // useEffect(() => {
+    //     handleGetConversation({ conversationID: 1 })
+    // }, [])
+
+    // 变更选中的对话时，移除 fetching 状态
     useEffect(() => {
-        handleGetConversation({ conversationID: 1 })
-    })
+        setIsFetching(false)
+        // 变更对话ID时，重新获取服务端的聊天记录
+        if (currentConversationID > 0) {
+            handleGetConversation({ conversationID: 1 }).then(historyFromServer => {
+                setHistory(historyFromServer)
+            })
+        }
+    }, [])
+
+    const handleChangeConversation = useCallback((conversationID: number) => {
+        setIsFetching(false)
+        // 变更对话ID时，重新获取服务端的聊天记录
+        if (conversationID > 0) {
+            handleGetConversation({ conversationID }).then(historyFromServer => {
+                setHistory(historyFromServer)
+            })
+            updateCurrentConversation(conversationID)
+        }
+    }, [])
+
     const handleSendQuestion = async (question: string) => {
-        setIsRequesting(true)
+        setIsFetching(true)
         await handleGetAIResponse({
             messages: [{ role: Roles.user, content: question }],
+            onStream: (content: any) => {
+                console.log(`stream result`, content)
+                if (content && !content.includes(`__{{streamCompleted}}__`)) {
+                    setHistory(_history => {
+                        const newHistory = [..._history]
+                        if (newHistory?.at(-1)?.role !== Roles.assistant) {
+                            newHistory.push({
+                                role: Roles.assistant,
+                                content,
+                            })
+                        } else {
+                            newHistory!.at(-1)!.content += content
+                        }
+                        return newHistory
+                    })
+                }
+            },
         })
-        setIsRequesting(false)
+        setIsFetching(false)
     }
 
     return (
@@ -50,11 +91,11 @@ const Main = () => {
                         </SignedIn>
                     </div>
                 </div>
-                <ConversationBox />
+                <ConversationBox history={history} isFetching={isFetching} />
             </div>
             <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
                 <ImageUploadButton />
-                <Chatinput isRequesting={isRequesting} onSendQuestion={handleSendQuestion} />
+                <Chatinput isFetching={isFetching} onSendQuestion={handleSendQuestion} />
             </div>
         </div>
     )

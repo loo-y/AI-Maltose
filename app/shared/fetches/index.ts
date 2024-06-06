@@ -147,7 +147,8 @@ export const fetchUploadImage = async (imageBlob: Blob) => {
     }
 }
 
-export const fetchUserInfoGraphql = async ({ conversationID }: { conversationID: number }) => {
+export const fetchUserInfoGraphql = async (params?: { conversationID: number }) => {
+    const { conversationID } = params || {}
     const options = await getCommonOptions({})
     const body = {
         operationName: `GetUserQuery`,

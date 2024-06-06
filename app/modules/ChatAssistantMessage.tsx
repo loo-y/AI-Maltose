@@ -8,9 +8,10 @@ import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/
 
 interface IChatAssistantMessageProps {
     chatMessage: AssistantMessage
+    isFetching?: boolean
 }
 
-const ChatAssistantMessage = ({ chatMessage }: IChatAssistantMessageProps) => {
+const ChatAssistantMessage = ({ chatMessage, isFetching }: IChatAssistantMessageProps) => {
     const { content, provider, role } = chatMessage || {}
 
     return (
@@ -27,59 +28,67 @@ const ChatAssistantMessage = ({ chatMessage }: IChatAssistantMessageProps) => {
                             </div>
                         </div>
                         <div className="flex w-full flex-col gap-1 juice:empty:hidden juice:first:pt-[3px] text-gray-600">
-                            <div className="markdown prose w-full break-words dark:prose-invert light">
-                                <ReactMarkdown
-                                    components={{
-                                        code(props) {
-                                            const { children, className, node, ...rest } = props
-                                            const match = /language-(\w+)/.exec(className || '')
-                                            const codeName = match?.[1] || ''
-                                            return match ? (
-                                                <div className="text-sm leading-4 my-3 overflow-hidden overflow-x-scroll break-all break-words flex gap-0 flex-col">
-                                                    <div className="flex items-center relative bg-gray-950 text-gray-300 text-token-text-secondary bg-token-main-surface-secondary px-4 py-2 text-xs font-sans justify-between rounded-t-md">
-                                                        <span>{codeName}</span>
-                                                        <div className="flex items-center">
-                                                            <span className="" data-state="closed">
-                                                                <button className="flex gap-1 items-center">
-                                                                    <img
-                                                                        src="/images/icons/copy-code.svg"
-                                                                        alt="copy code"
-                                                                        className="w-3 h-3 text-gray-300"
-                                                                    />
-                                                                    Copy code
-                                                                </button>
-                                                            </span>
+                            {isFetching ? (
+                                <div className="flex flex-row items-center flex-grow justify-start gap-1">
+                                    <div className=" svg-image flex min-w-12 h-12 w-12 overflow-hidden items-center justify-center ">
+                                        <img src={'/images/three-dots-loading.svg'} className="h-10 w-10 " />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="markdown prose w-full break-words dark:prose-invert light">
+                                    <ReactMarkdown
+                                        components={{
+                                            code(props) {
+                                                const { children, className, node, ...rest } = props
+                                                const match = /language-(\w+)/.exec(className || '')
+                                                const codeName = match?.[1] || ''
+                                                return match ? (
+                                                    <div className="text-sm leading-4 my-3 overflow-hidden overflow-x-scroll break-all break-words flex gap-0 flex-col">
+                                                        <div className="flex items-center relative bg-gray-950 text-gray-300 text-token-text-secondary bg-token-main-surface-secondary px-4 py-2 text-xs font-sans justify-between rounded-t-md">
+                                                            <span>{codeName}</span>
+                                                            <div className="flex items-center">
+                                                                <span className="" data-state="closed">
+                                                                    <button className="flex gap-1 items-center">
+                                                                        <img
+                                                                            src="/images/icons/copy-code.svg"
+                                                                            alt="copy code"
+                                                                            className="w-3 h-3 text-gray-300"
+                                                                        />
+                                                                        Copy code
+                                                                    </button>
+                                                                </span>
+                                                            </div>
                                                         </div>
+                                                        {/* @ts-ignore */}
+                                                        <SyntaxHighlighter
+                                                            {...rest}
+                                                            PreTag="pre"
+                                                            language={codeName}
+                                                            wrapLines={true}
+                                                            wrapLongLines={true}
+                                                            style={vscDarkPlus}
+                                                            className={`rounded-b-md !mt-0`}
+                                                        >
+                                                            {String(children)?.replace(/\n$/, '')}
+                                                        </SyntaxHighlighter>
                                                     </div>
-                                                    {/* @ts-ignore */}
-                                                    <SyntaxHighlighter
+                                                ) : (
+                                                    <code
                                                         {...rest}
-                                                        PreTag="pre"
-                                                        language={codeName}
-                                                        wrapLines={true}
-                                                        wrapLongLines={true}
-                                                        style={vscDarkPlus}
-                                                        className={`rounded-b-md !mt-0`}
+                                                        className={`${className || ''} text-sm leading-5 font-bold text-black`}
                                                     >
-                                                        {String(children)?.replace(/\n$/, '')}
-                                                    </SyntaxHighlighter>
-                                                </div>
-                                            ) : (
-                                                <code
-                                                    {...rest}
-                                                    className={`${className || ''} text-sm leading-5 font-bold text-black`}
-                                                >
-                                                    {`\``}
-                                                    {children}
-                                                    {`\``}
-                                                </code>
-                                            )
-                                        },
-                                    }}
-                                >
-                                    {content}
-                                </ReactMarkdown>
-                            </div>
+                                                        {`\``}
+                                                        {children}
+                                                        {`\``}
+                                                    </code>
+                                                )
+                                            },
+                                        }}
+                                    >
+                                        {content}
+                                    </ReactMarkdown>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
