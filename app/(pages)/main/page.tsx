@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useMainStore } from './providers'
 import { MainStoreProvider } from './providers'
 import _ from 'lodash'
@@ -17,8 +17,9 @@ import { handleGetAIResponse, handleGetConversation } from '@/app/shared/handler
 const Main = () => {
     const { currentConversationID, updateCurrentConversation } = useMainStore(state => state)
     const [isFetching, setIsFetching] = useState(false)
+    const [waitingForResponse, setWaitingForResponse] = useState(false)
     const [history, setHistory] = useState<IHistory>([])
-
+    const conversationContainerRef = useRef<HTMLDivElement>(null)
     // useEffect(() => {
     //     handleGetConversation({ conversationID: 1 })
     // }, [])
@@ -34,6 +35,14 @@ const Main = () => {
         }
     }, [])
 
+    const scrollToEnd = useCallback(() => {
+        if (conversationContainerRef.current) {
+            const theElement = conversationContainerRef.current as HTMLElement
+            theElement.scrollTo(0, theElement.scrollHeight)
+            console.log(`theElement.scrollHeight`, theElement.scrollHeight)
+        }
+    }, [isFetching])
+
     const handleChangeConversation = useCallback((conversationID: number) => {
         setIsFetching(false)
         // 变更对话ID时，重新获取服务端的聊天记录
@@ -46,10 +55,22 @@ const Main = () => {
     }, [])
 
     const handleSendQuestion = async (question: string) => {
+        setWaitingForResponse(true)
         setIsFetching(true)
+        setHistory(_history => {
+            return [
+                ..._history,
+                {
+                    role: Roles.user,
+                    content: question,
+                },
+            ]
+        })
+        scrollToEnd()
         await handleGetAIResponse({
-            messages: [{ role: Roles.user, content: question }],
+            messages: [...history, { role: Roles.user, content: question }],
             onStream: (content: any) => {
+                setWaitingForResponse(false)
                 console.log(`stream result`, content)
                 if (content && !content.includes(`__{{streamCompleted}}__`)) {
                     setHistory(_history => {
@@ -64,15 +85,18 @@ const Main = () => {
                         }
                         return newHistory
                     })
+                    scrollToEnd()
+                } else if (content.includes(`__{{streamCompleted}}__`)) {
+                    setIsFetching(false)
+                    setWaitingForResponse(false)
                 }
             },
         })
-        setIsFetching(false)
     }
 
     return (
         <div className="flex flex-col w-full h-full focus-visible:outline-0">
-            <div className="flex-1 overflow-hidden overflow-y-scroll">
+            <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>
                 <div className="absolute flex flex-row  h-14 w-full items-center justify-between">
                     <div className="topleft ml-4">
                         <Drawer direction="left">
@@ -91,7 +115,7 @@ const Main = () => {
                         </SignedIn>
                     </div>
                 </div>
-                <ConversationBox history={history} isFetching={isFetching} />
+                <ConversationBox history={history} isFetching={isFetching} waiting={waitingForResponse} />
             </div>
             <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
                 <ImageUploadButton />

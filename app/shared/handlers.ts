@@ -15,7 +15,7 @@ export const handleUploadImage = async (imageBlob: Blob): Promise<string | null>
 export const handleGetAIResponse = async ({
     messages,
     onStream,
-    maxTokens = 256,
+    maxTokens = 2048,
 }: {
     messages: IChatMessage[]
     onStream?: (arg: any) => void

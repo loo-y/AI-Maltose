@@ -7,6 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "pages:build": "npx @cloudflare/next-on-pages",
+    "preview": "npm run pages:build && wrangler pages dev",
+    "deploy": "npm run pages:build && wrangler pages deploy",
     "eslint": "./node_modules/.bin/eslint \"app/**/*.{js,jsx,ts,tsx}\" --ignore-pattern \"app/lib/\" --ignore-pattern \"app/shared/\"",
     "check-types": "tsc --noemit",
     "eslint:commit": "git diff --cached --name-only | grep -E 'app.*\\.[jt]sx?$' | xargs ./node_modules/.bin/eslint --quiet",
@@ -76,6 +79,7 @@
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.11.3",
+    "@cloudflare/workers-types": "^4.20240605.0",
     "@types/lodash": "^4.17.0",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -95,6 +99,7 @@
     "ts-node-dev": "2.0.0",
     "typescript": "^5",
     "webpack": "^5.91.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "wrangler": "^3.51.2"
   }
 }

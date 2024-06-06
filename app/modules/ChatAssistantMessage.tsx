@@ -7,16 +7,16 @@ import { Prism as SyntaxHighlighter, PrismLight as SyntaxHighlighterLight } from
 import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 interface IChatAssistantMessageProps {
-    chatMessage: AssistantMessage
-    isFetching?: boolean
+    chatMessage?: AssistantMessage
+    waiting?: boolean
 }
 
-const ChatAssistantMessage = ({ chatMessage, isFetching }: IChatAssistantMessageProps) => {
+const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessageProps) => {
     const { content, provider, role } = chatMessage || {}
 
     return (
         <div className="w-full">
-            <div className="py-2 px-3 text-base m-auto md:px-5 lg:px-1 xl:px-5">
+            <div className="py-2 px-3 text-base m-auto md:px-5 lg:px-1 xl:px-5 mb-3">
                 <div className="mx-auto flex flex-1 gap-3 md:gap-6 md:max-w-[50rem] w-full justify-start px-4">
                     <div className="flex relative flex-row gap-3">
                         <div className="provider-icon flex-shrink-0 flex flex-col relative items-end">
@@ -28,14 +28,14 @@ const ChatAssistantMessage = ({ chatMessage, isFetching }: IChatAssistantMessage
                             </div>
                         </div>
                         <div className="flex w-full flex-col gap-1 juice:empty:hidden juice:first:pt-[3px] text-gray-600">
-                            {isFetching ? (
-                                <div className="flex flex-row items-center flex-grow justify-start gap-1">
-                                    <div className=" svg-image flex min-w-12 h-12 w-12 overflow-hidden items-center justify-center ">
-                                        <img src={'/images/three-dots-loading.svg'} className="h-10 w-10 " />
+                            {waiting && !content ? (
+                                <div className="flex flex-row items-center flex-grow justify-start gap-1 -mr-1">
+                                    <div className=" svg-image flex min-w-12 h-10 w-10 overflow-hidden items-center justify-center ">
+                                        <img src={'/images/icons/three-dots-loading.svg'} className="h-8 w-8 " />
                                     </div>
                                 </div>
                             ) : (
-                                <div className="markdown prose w-full break-words dark:prose-invert light">
+                                <div className="markdown prose w-full break-words dark:prose-invert light mt-1">
                                     <ReactMarkdown
                                         components={{
                                             code(props) {
@@ -75,7 +75,7 @@ const ChatAssistantMessage = ({ chatMessage, isFetching }: IChatAssistantMessage
                                                 ) : (
                                                     <code
                                                         {...rest}
-                                                        className={`${className || ''} text-sm leading-5 font-bold text-black`}
+                                                        className={`${className || ''} text-sm leading-5 font-bold text-black whitespace-pre-wrap`}
                                                     >
                                                         {`\``}
                                                         {children}
