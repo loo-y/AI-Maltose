@@ -67,8 +67,10 @@ const Main = () => {
             ]
         })
         scrollToEnd()
+        // 只取最后5条
+        const lastQuestMessages = _.takeRight([...history, { role: Roles.user, content: question }], 5)
         await handleGetAIResponse({
-            messages: [...history, { role: Roles.user, content: question }],
+            messages: lastQuestMessages,
             onStream: (content: any) => {
                 setWaitingForResponse(false)
                 console.log(`stream result`, content)
