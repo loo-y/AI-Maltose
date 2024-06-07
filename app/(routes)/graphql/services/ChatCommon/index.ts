@@ -10,7 +10,26 @@ const typeDefinitions = `
 
     input Message {
         role: String!
+        content: UserContent!
+    }
+
+    union UserContent = String | [TextImageContent]
+
+    union TextImageContent = TextContentInput | ImageUrlInput
+
+    input TextContentInput {
+        type: String!
         content: String!
+    }
+
+    input ImageUrlInput {
+        type: String!
+        imageUrl: ImageUrlDetailsInput
+    }
+
+    input ImageUrlDetailsInput {
+        url: String!
+        detail: String
     }
 
     input ChatArgs {
