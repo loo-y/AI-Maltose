@@ -52,19 +52,19 @@ const fetchOpenai = async (ctx: TBaseContext, params: Record<string, any>, optio
         baseUrl,
     } = params || {}
     const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
-    let API_KEY = '',  baseURL = undefined, modelUse = '';
+    let API_KEY = '',  BASE_URL = undefined, modelUse = '';
     if(apiKey && modelName){
         API_KEY = apiKey || '';
         modelUse = modelName;
-        baseURL = baseUrl || undefined;
+        BASE_URL = baseUrl || undefined;
     }else if(modelName){
         API_KEY = env?.OPENAI_API_KEY || '';
         modelUse = modelName;
-        baseURL = baseUrl || undefined;
+        BASE_URL = baseUrl || undefined;
     }else if(env.OPENAI_API_KEY){
         API_KEY = env.OPENAI_API_KEY || '';
         modelUse = env.OPENAI_API_MODEL || DEFAULT_MODEL_NAME;
-        baseURL = env.OPENAI_API_BASE_URL || undefined;
+        BASE_URL = env.OPENAI_API_BASE_URL || undefined;
     }
     console.log(`modelName: ${modelName}, modelUse: ${modelUse}`)
     console.log(`env.OPENAI_API_MODEL: ${env.OPENAI_API_MODEL}`)
@@ -77,7 +77,7 @@ const fetchOpenai = async (ctx: TBaseContext, params: Record<string, any>, optio
     const { history } = convertMessages(messages)
     const openai = new OpenAI({
         apiKey: API_KEY,
-        baseURL: baseUrl,
+        baseURL: BASE_URL,
     })
 
     let tools: any[] = []
