@@ -1,9 +1,8 @@
 import { SignUp } from '@clerk/nextjs'
 import { useSearchParams, redirect } from 'next/navigation'
 
-export default function Page() {
-    const searchParams = useSearchParams()
-    const clerkTicket = searchParams.get('__clerk_ticket')
+export default function Page({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+    const clerkTicket = searchParams?.['__clerk_ticket']
     if (!clerkTicket) {
         redirect('/signin')
         return
