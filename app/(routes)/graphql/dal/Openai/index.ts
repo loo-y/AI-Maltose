@@ -54,15 +54,15 @@ const fetchOpenai = async (ctx: TBaseContext, params: Record<string, any>, optio
     const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
     let API_KEY = '',  baseURL = undefined, modelUse = DEFAULT_MODEL_NAME;
     if(apiKey && modelName){
-        API_KEY = apiKey;
+        API_KEY = apiKey || '';
         modelUse = modelName;
         baseURL = baseUrl || undefined;
     }else if(modelName){
-        API_KEY = env?.OPENAI_API_KEY;
+        API_KEY = env?.OPENAI_API_KEY || '';
         modelUse = modelName;
         baseURL = baseUrl || undefined;
     }else if(env.OPENAI_API_KEY){
-        API_KEY = env.OPENAI_API_KEY;
+        API_KEY = env.OPENAI_API_KEY || '';
         modelUse = env.OPENAI_API_MODEL || DEFAULT_MODEL_NAME;
         baseURL = env.OPENAI_API_BASE_URL || undefined;
     }
