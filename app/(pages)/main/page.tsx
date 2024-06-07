@@ -108,30 +108,34 @@ const Main = () => {
     }
 
     return (
-        <div className="flex flex-col w-full h-full focus-visible:outline-0">
-            <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>
-                <div className="absolute flex flex-row  h-14 w-full items-center justify-between">
-                    <div className="topleft ml-4">
-                        <Drawer direction="left">
-                            <DrawerTrigger>Open</DrawerTrigger>
-                            <DrawerContent
-                                direction="left"
-                                className="bg-transparent rounded-tl-none rounded-r-xl h-full w-[280px] fixed bottom-0 left-0 !right-auto z-[9999] overflow-hidden"
-                            >
-                                <Sidebar />
-                            </DrawerContent>
-                        </Drawer>
+        <div className="w-full flex flex-row h-full focus-visible:outline-0">
+            {/* TODO : 侧边栏 */}
+            <div className="sidebar h-full w-[280px] bg-gray-100 z-[9999] overflow-hidden hidden"></div>
+            <div className="flex flex-1 flex-col relative h-full focus-visible:outline-0">
+                <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>
+                    <div className="absolute flex flex-row h-14 w-full items-center justify-between">
+                        <div className="topleft ml-4">
+                            {/* <Drawer direction="left">
+                                <DrawerTrigger>Open</DrawerTrigger>
+                                <DrawerContent
+                                    direction="left"
+                                    className="bg-transparent rounded-tl-none rounded-r-xl h-full w-[280px] fixed bottom-0 left-0 !right-auto z-[9999] overflow-hidden"
+                                >
+                                    <Sidebar />
+                                </DrawerContent>
+                            </Drawer> */}
+                        </div>
+                        <div className="topright signmodule mr-4">
+                            <SignedIn>
+                                <UserButton />
+                            </SignedIn>
+                        </div>
                     </div>
-                    <div className="topright signmodule mr-4">
-                        <SignedIn>
-                            <UserButton />
-                        </SignedIn>
-                    </div>
+                    <ConversationBox history={history} isFetching={isFetching} waiting={waitingForResponse} />
                 </div>
-                <ConversationBox history={history} isFetching={isFetching} waiting={waitingForResponse} />
-            </div>
-            <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
-                <Chatinput isFetching={isFetching} onSendQuestion={handleSendQuestion} />
+                <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
+                    <Chatinput isFetching={isFetching} onSendQuestion={handleSendQuestion} />
+                </div>
             </div>
         </div>
     )
