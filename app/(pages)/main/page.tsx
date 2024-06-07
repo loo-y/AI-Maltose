@@ -9,7 +9,7 @@ import Chatinput from '@/app/modules/ChatInput'
 import ConversationBox from '@/app/modules/ConversationBox'
 import { sleep } from '../../shared/util'
 import { fetchAIGraphql } from '@/app/shared/fetches'
-import { IChatMessage, Roles, IHistory, ImageUrlMessage } from '@/app/shared/interface'
+import { IChatMessage, Roles, IHistory, ImageUrlMessage, TextMessage, UserMessage } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { handleGetAIResponse, handleGetConversation } from '@/app/shared/handlers'
 
@@ -56,25 +56,30 @@ const Main = () => {
     const handleSendQuestion = async (question: string, imageList?: string[]) => {
         setWaitingForResponse(true)
         setIsFetching(true)
+        console.log(`imageList`, imageList)
+        const userContent = _.isEmpty(imageList)
+            ? question
+            : [
+                  { type: 'text', text: question } as TextMessage,
+                  ..._.map(imageList, imgSrc => {
+                      return { type: 'image_url', image_url: { url: imgSrc } } as ImageUrlMessage
+                  }),
+              ]
         setHistory(_history => {
             return [
                 ..._history,
                 {
                     role: Roles.user,
-                    content: _.isEmpty(imageList)
-                        ? question
-                        : [
-                              { type: 'text', text: question },
-                              ..._.map(imageList, imgSrc => {
-                                  return { type: 'image_url', image_url: { url: imgSrc } } as ImageUrlMessage
-                              }),
-                          ],
+                    content: userContent,
                 },
             ]
         })
         scrollToEnd()
         // 只取最后5条
-        const lastQuestMessages = _.takeRight([...history, { role: Roles.user, content: question }], 5)
+        const lastQuestMessages = _.takeRight(
+            [...history, { role: Roles.user, content: userContent } as UserMessage],
+            5
+        )
         await handleGetAIResponse({
             messages: lastQuestMessages,
             onStream: (content: any) => {

@@ -56,6 +56,7 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
     }
     const handleSendQuestion = () => {
         const question = _.trim(inputValue)
+        console.log(`imageList`, imageList)
         if (question) {
             onSendQuestion(_.trim(inputValue), imageList)
             setInputValue('')
@@ -78,8 +79,8 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
     const handleImageUploaded = (newImageSrc: string | null) => {
         if (!newImageSrc) return
         setImageList(oldList => {
-            const newList = [...oldList]
-            return newList.concat(newImageSrc)
+            const newList = [...oldList, `https://${location.host}/api/imageShow/${newImageSrc}`]
+            return newList
         })
     }
     return (
