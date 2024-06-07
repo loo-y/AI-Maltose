@@ -27,10 +27,6 @@ export const handleGetAIResponse = async ({
                 messages: messages,
                 isStream: onStream ? true : false,
                 queryOpenAI: true,
-                openAIParams: {
-                    baseUrl: `https://openrouter.ai/api/v1`,
-                    model: `mistralai/mistral-7b-instruct:free`,
-                },
                 maxTokens,
                 streamHandler: (streamResult: { content: string; status?: boolean }) => {
                     console.log('streamHandler', streamResult)
