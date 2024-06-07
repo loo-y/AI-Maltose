@@ -1,7 +1,8 @@
 'use client'
-import React, { useState, ChangeEvent, KeyboardEvent, useRef } from 'react'
+import React, { useState, ChangeEvent, KeyboardEvent, useRef, MouseEvent } from 'react'
 import _ from 'lodash'
 import ImageUploadButton from '@/app/modules/ImageUploadButton'
+import ChatImagePreview from './ChatImagePreview'
 
 interface IChatInputProps {
     maxRows?: number
@@ -62,6 +63,7 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
             setInputValue('')
             setInputRows(1)
         }
+        setImageList([])
     }
 
     const handleFocus = () => {
@@ -83,6 +85,14 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
             return newList
         })
     }
+
+    const handleDeleteImage = (imageSrc: string) => {
+        setImageList(oldList => {
+            const newList = _.filter(oldList, item => item !== imageSrc)
+            return newList
+        })
+    }
+
     return (
         <div className="__chatinput__ relative h-full ">
             <div className="max-w-[50rem] w-full flex flex-col mx-auto">
@@ -91,23 +101,40 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
                         <div className="flex flex-row justify-start items-end my-2 -ml-1rem gap-1">
                             <ImageUploadButton uploadCallback={handleImageUploaded} />
                         </div>
-                        <div className="flex my-1 flex-row flex-grow ml-2 mb-3 items-center">
-                            <textarea
-                                disabled={isFetching ? true : undefined}
-                                id={`chat-input`}
-                                value={inputValue}
-                                ref={inputRef}
-                                onChange={handleInputChange}
-                                onKeyDown={handleKeyDown}
-                                rows={inputRows}
-                                style={{ resize: 'none' }}
-                                onCompositionStart={handleCompositionStart}
-                                onCompositionEnd={handleCompositionEnd}
-                                className="block flex-grow  bg-transparent outline-none pt-2 w-full leading-6"
-                                placeholder="Type your messeage here..."
-                                onBlur={handleBlur}
-                                onFocus={handleFocus}
-                            ></textarea>
+                        <div className="flex flex-col gap-2 w-full flex-grow">
+                            {_.isEmpty(imageList) ? null : (
+                                <div className="flex flex-row gap-2 h-fit mt-3">
+                                    {_.map(imageList, (imageItem, imageIndex) => {
+                                        return (
+                                            <ThumbnailDisplay
+                                                key={`inputImageList_${imageIndex}`}
+                                                imageUrl={imageItem}
+                                                onDelete={() => {
+                                                    handleDeleteImage(imageItem)
+                                                }}
+                                            />
+                                        )
+                                    })}
+                                </div>
+                            )}
+                            <div className="flex my-1 flex-row gap-2 flex-grow ml-2 mb-3 items-center">
+                                <textarea
+                                    disabled={isFetching ? true : undefined}
+                                    id={`chat-input`}
+                                    value={inputValue}
+                                    ref={inputRef}
+                                    onChange={handleInputChange}
+                                    onKeyDown={handleKeyDown}
+                                    rows={inputRows}
+                                    style={{ resize: 'none' }}
+                                    onCompositionStart={handleCompositionStart}
+                                    onCompositionEnd={handleCompositionEnd}
+                                    className="block flex-grow  bg-transparent outline-none pt-2 w-full leading-6"
+                                    placeholder="Type your messeage here..."
+                                    onBlur={handleBlur}
+                                    onFocus={handleFocus}
+                                ></textarea>
+                            </div>
                         </div>
                         <div className="flex flex-row justify-end items-end my-2 mr-[0.4rem] gap-1">
                             <div className=" items-center flex">
@@ -131,3 +158,86 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
 }
 
 export default Chatinput
+
+const ThumbnailDisplay: React.FC<{ imageUrl: string; onDelete: () => void }> = ({ imageUrl, onDelete }) => {
+    const [hovered, setHovered] = useState(true)
+    const [openPreview, setOpenPreview] = useState(false)
+    const thumbnailRef = useRef(null)
+    const imagePreviewRef = useRef(null)
+
+    const handleMouseEnter = () => {
+        // setHovered(true)
+    }
+
+    const handleMouseLeave = () => {
+        // setHovered(false)
+    }
+
+    const handleDelete = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+        onDelete()
+    }
+
+    const handleClickThumbnail = () => {
+        setOpenPreview(true)
+    }
+    const handleClosePreview = () => {
+        setOpenPreview(false)
+    }
+
+    const handleUnactiveClose = () => {
+        if (imagePreviewRef?.current) {
+            console.log(`handleUnactiveClose`)
+            const imagePreviewElement = imagePreviewRef.current as HTMLDivElement
+            setTimeout(() => {
+                imagePreviewElement.click()
+                imagePreviewElement.focus()
+                console.log(`imagePreviewElement`, imagePreviewElement)
+            }, 100)
+        }
+    }
+
+    const handleImageClick = (event: MouseEvent<HTMLImageElement>) => {
+        event.preventDefault()
+        event.stopPropagation()
+    }
+
+    return (
+        <>
+            <div
+                className="w-12 h-full min-h-12 relative rounded-lg bg-contain bg-no-repeat bg-center border border-transparent bg-transparent cursor-zoom-in"
+                style={{ backgroundImage: `url(${imageUrl})` }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onClick={handleClickThumbnail}
+                ref={thumbnailRef}
+            >
+                {hovered && (
+                    <button
+                        className="absolute -top-2 -right-2 p-1 bg-gray-600 text-white rounded-full"
+                        onClick={handleDelete}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            className="w-2 h-2"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        </svg>
+                    </button>
+                )}
+            </div>
+            <div className="">
+                <ChatImagePreview imageUrl={imageUrl} isOpen={openPreview} closeCallback={handleClosePreview} />
+            </div>
+        </>
+    )
+}
