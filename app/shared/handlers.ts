@@ -6,8 +6,8 @@ import { IChatMessage, Roles, IHistory } from './interface'
 export const handleUploadImage = async (imageBlob: Blob): Promise<string | null> => {
     const result = await fetchUploadImage(imageBlob)
     const { data, status } = result || {}
-    if (status && data?.src) {
-        return data.src
+    if (status && data?.imageID) {
+        return data.imageID
     }
     return null
 }

@@ -43,7 +43,8 @@ const ImageUploadButton = ({ uploadCallback }: { uploadCallback: (imageSrc: stri
             // const formData = new FormData();
             // formData.append('file', file);
             const blob = new Blob([file], { type: file.type })
-            const imageUrl = await handleUploadImage(blob)
+            const imageID = await handleUploadImage(blob)
+            const imageUrl = `https://${location.host}/api/imageShow/${imageID}`
             console.log(`imageUrl`, imageUrl)
             uploadCallback(imageUrl)
         }

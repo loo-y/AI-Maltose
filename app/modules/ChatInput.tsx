@@ -79,7 +79,7 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
     const handleImageUploaded = (newImageSrc: string | null) => {
         if (!newImageSrc) return
         setImageList(oldList => {
-            const newList = [...oldList, `https://${location.host}/api/imageShow/${newImageSrc}`]
+            const newList = [...oldList, newImageSrc]
             return newList
         })
     }
