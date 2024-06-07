@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 const typeDefinitions = `
     scalar JSON
     type Query {
@@ -10,20 +12,13 @@ const typeDefinitions = `
 
     input Message {
         role: String!
-        content: UserContent!
+        content: String
+        contentArray: [UserContent]
     }
 
-    union UserContent = String | [TextImageContent]
-
-    union TextImageContent = TextContentInput | ImageUrlInput
-
-    input TextContentInput {
+    input UserContent {
         type: String!
-        content: String!
-    }
-
-    input ImageUrlInput {
-        type: String!
+        text: String
         imageUrl: ImageUrlDetailsInput
     }
 
@@ -46,12 +41,29 @@ const resolvers = {
     Query: {
         chat: async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
             const chatArgs = args.params
+            const { messages } = chatArgs || {}
+            const fixedMessages = _.map(messages, m => {
+                const { content, contentArray, ...other } = m
+                if (_.isEmpty(contentArray)) {
+                    return {
+                        ...other,
+                        content,
+                    }
+                }
+                return {
+                    ...other,
+                    content: contentArray,
+                }
+            })
             console.log(`context.user`, context.userId)
+
             if (!context.userId) {
                 throw new Error('Unauthorized')
             }
+
             return {
                 ...chatArgs,
+                messages: fixedMessages,
             }
         },
     },

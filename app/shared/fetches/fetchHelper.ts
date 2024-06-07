@@ -1,4 +1,5 @@
 import { IGrahpqlAIFetchProps } from '../interface'
+import _ from 'lodash'
 
 export const getGraphqlAIMashupBody = ({
     prompt,
@@ -30,14 +31,25 @@ export const getGraphqlAIMashupBody = ({
         queryList = [],
         variables: Record<string, any> = {
             params: {
-                messages: messages
-                    ? messages
-                    : [
+                messages: _.isEmpty(messages)
+                    ? [
                           {
                               role: 'user',
-                              content: prompt,
+                              content: [{ type: 'text', text: prompt }],
                           },
-                      ],
+                      ]
+                    : _.map(messages, m => {
+                          if (_.isString(m.content)) {
+                              return {
+                                  role: m.role,
+                                  content: m.content,
+                              }
+                          }
+                          return {
+                              role: m.role,
+                              contentArray: m.content,
+                          }
+                      }),
                 maxTokens: maxTokens || 512,
             },
         }

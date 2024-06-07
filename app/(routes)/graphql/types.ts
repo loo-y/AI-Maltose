@@ -46,6 +46,8 @@ export interface IAzureOpenaiArgs extends ICommonDalArgs {
 
 export interface IOpenaiArgs extends ICommonDalArgs {
     baseUrl?: string
+
+    messages?: IChatMessage[]
 }
 
 export interface IWorkersAIArgs extends ICommonDalArgs {
