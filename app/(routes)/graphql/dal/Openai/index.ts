@@ -52,7 +52,7 @@ const fetchOpenai = async (ctx: TBaseContext, params: Record<string, any>, optio
         baseUrl,
     } = params || {}
     const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
-    let API_KEY = '',  baseURL = undefined, modelUse = DEFAULT_MODEL_NAME;
+    let API_KEY = '',  baseURL = undefined, modelUse = '';
     if(apiKey && modelName){
         API_KEY = apiKey || '';
         modelUse = modelName;
@@ -66,7 +66,10 @@ const fetchOpenai = async (ctx: TBaseContext, params: Record<string, any>, optio
         modelUse = env.OPENAI_API_MODEL || DEFAULT_MODEL_NAME;
         baseURL = env.OPENAI_API_BASE_URL || undefined;
     }
-    
+    console.log(`modelName: ${modelName}, modelUse: ${modelUse}`)
+    console.log(`env.OPENAI_API_MODEL: ${env.OPENAI_API_MODEL}`)
+    console.log(`env.OPENAI_API_BASE_URL: ${env.OPENAI_API_BASE_URL}`)
+
     const max_tokens = maxOutputTokens || generationConfig.maxOutputTokens
     if (_.isEmpty(messages) || !API_KEY) {
         return 'there is no messages or api key of Openai'
