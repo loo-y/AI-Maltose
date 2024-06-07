@@ -19,7 +19,7 @@ const typeDefinitions = `
     input UserContent {
         type: String!
         text: String
-        imageUrl: ImageUrlDetailsInput
+        image_url: ImageUrlDetailsInput
     }
 
     input ImageUrlDetailsInput {
