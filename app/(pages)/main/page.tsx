@@ -9,9 +9,8 @@ import Chatinput from '@/app/modules/ChatInput'
 import ConversationBox from '@/app/modules/ConversationBox'
 import { sleep } from '../../shared/util'
 import { fetchAIGraphql } from '@/app/shared/fetches'
-import { IChatMessage, Roles, IHistory } from '@/app/shared/interface'
+import { IChatMessage, Roles, IHistory, ImageUrlMessage } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
-import ImageUploadButton from '@/app/modules/ImageUploadButton'
 import { handleGetAIResponse, handleGetConversation } from '@/app/shared/handlers'
 
 const Main = () => {
@@ -54,7 +53,7 @@ const Main = () => {
         }
     }, [])
 
-    const handleSendQuestion = async (question: string) => {
+    const handleSendQuestion = async (question: string, imageList?: string[]) => {
         setWaitingForResponse(true)
         setIsFetching(true)
         setHistory(_history => {
@@ -62,7 +61,14 @@ const Main = () => {
                 ..._history,
                 {
                     role: Roles.user,
-                    content: question,
+                    content: _.isEmpty(imageList)
+                        ? question
+                        : [
+                              { type: 'text', text: question },
+                              ..._.map(imageList, imgSrc => {
+                                  return { type: 'image_url', image_url: { url: imgSrc } } as ImageUrlMessage
+                              }),
+                          ],
                 },
             ]
         })
@@ -120,7 +126,6 @@ const Main = () => {
                 <ConversationBox history={history} isFetching={isFetching} waiting={waitingForResponse} />
             </div>
             <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
-                <ImageUploadButton />
                 <Chatinput isFetching={isFetching} onSendQuestion={handleSendQuestion} />
             </div>
         </div>

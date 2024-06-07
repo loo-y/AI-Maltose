@@ -1,10 +1,11 @@
 'use client'
 import React, { useState, ChangeEvent, KeyboardEvent, useRef } from 'react'
 import _ from 'lodash'
+import ImageUploadButton from '@/app/modules/ImageUploadButton'
 
 interface IChatInputProps {
     maxRows?: number
-    onSendQuestion: (question: string) => void
+    onSendQuestion: (question: string, imagList?: string[]) => void
     isFetching?: boolean
 }
 const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInputProps) => {
@@ -12,6 +13,7 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
     const [inputValue, setInputValue] = useState<string>('')
     const [inputRows, setInputRows] = useState<number>(1)
     const inputRef = useRef<HTMLTextAreaElement>(null)
+    const [imageList, setImageList] = useState<string[]>([])
 
     const handleCompositionStart = () => {
         setIsComposing(true)
@@ -55,7 +57,7 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
     const handleSendQuestion = () => {
         const question = _.trim(inputValue)
         if (question) {
-            onSendQuestion(_.trim(inputValue))
+            onSendQuestion(_.trim(inputValue), imageList)
             setInputValue('')
             setInputRows(1)
         }
@@ -73,11 +75,21 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
         }, 50)
     }
 
+    const handleImageUploaded = (newImageSrc: string | null) => {
+        if (!newImageSrc) return
+        setImageList(oldList => {
+            const newList = [...oldList]
+            return newList.concat(newImageSrc)
+        })
+    }
     return (
         <div className="__chatinput__ relative h-full ">
             <div className="max-w-[50rem] w-full flex flex-col mx-auto">
                 <div className="overflow-y-scroll overflow-x-hidden rounded-3xl bg-gray-100 flex flex-row gap-1 flex-grow  mx-4 text-gray-600 max-h-52">
                     <div className="flex flex-grow flex-row  border-0 pl-5 gap-1 ">
+                        <div className="flex flex-row justify-start items-end my-2 -ml-1rem gap-1">
+                            <ImageUploadButton uploadCallback={handleImageUploaded} />
+                        </div>
                         <div className="flex my-1 flex-row flex-grow ml-2 mb-3 items-center">
                             <textarea
                                 disabled={isFetching ? true : undefined}

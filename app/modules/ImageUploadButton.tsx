@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { handleUploadImage } from '@/app/shared/handlers'
 
-const ImageUploadButton = () => {
+const ImageUploadButton = ({ uploadCallback }: { uploadCallback: (imageSrc: string | null) => void }) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [alertText, setAlertText] = useState('')
 
@@ -22,7 +22,7 @@ const ImageUploadButton = () => {
         inputRef.current?.click()
     }
 
-    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file) {
             const fileInput = inputRef.current as HTMLInputElement
@@ -43,7 +43,8 @@ const ImageUploadButton = () => {
             // const formData = new FormData();
             // formData.append('file', file);
             const blob = new Blob([file], { type: file.type })
-            handleUploadImage(blob)
+            const imageUrl = await handleUploadImage(blob)
+            uploadCallback(imageUrl)
         }
     }
 
