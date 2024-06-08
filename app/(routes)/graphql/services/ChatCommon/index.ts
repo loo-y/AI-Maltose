@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { addConversationMessage } from '../../dal/Supabase/queries'
 
 const typeDefinitions = `
     scalar JSON
@@ -30,6 +31,8 @@ const typeDefinitions = `
     input ChatArgs {
         "Request Message List"
         messages: [Message]
+        "Conversation ID"
+        conversationID: Int
         "Max Tokens"
         maxTokens: Int
         "Need Search Internet"
@@ -41,7 +44,7 @@ const resolvers = {
     Query: {
         chat: async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
             const chatArgs = args.params
-            const { messages } = chatArgs || {}
+            const { messages, conversationID } = chatArgs || {}
             const fixedMessages = _.map(messages, m => {
                 const { content, contentArray, ...other } = m
                 if (_.isEmpty(contentArray)) {
@@ -59,6 +62,17 @@ const resolvers = {
 
             if (!context.userId) {
                 throw new Error('Unauthorized')
+            }
+
+            const lastMessage = _.last(fixedMessages)
+            // 最后一条用户的提问内容
+            if (lastMessage?.role == 'user') {
+                await addConversationMessage({
+                    conversation_id: conversationID,
+                    role: `user`,
+                    userid: context.userId,
+                    content: lastMessage?.content,
+                })
             }
 
             return {

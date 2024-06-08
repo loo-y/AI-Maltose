@@ -2,6 +2,7 @@ import { createSchema, createYoga } from 'graphql-yoga'
 import { schema } from './schema'
 import { useDeferStream } from '@graphql-yoga/plugin-defer-stream'
 import { auth, currentUser } from '@clerk/nextjs/server'
+import { getUser } from './dal/Supabase/queries'
 
 // vercel edge runtime
 export const runtime = 'edge'
@@ -10,13 +11,24 @@ const { handleRequest } = createYoga({
     schema,
     context: async () => {
         const { userId } = auth()
-        let emailAddres = ''
+
+        let emailAddres = '',
+            userName = '',
+            balance = 0
         if (userId) {
             const user = await currentUser()
             console.log(`user`, user)
             emailAddres = user?.emailAddresses?.[0]?.emailAddress || ''
+            userName = user?.username || ''
+
+            const userInfo = await getUser({
+                userid: userId,
+            })
+
+            balance = userInfo?.balance || balance
         }
-        return { userId, emailAddres }
+
+        return { userId, emailAddres, userName, balance }
     },
     plugins: [useDeferStream()],
     // While using Next.js file convention for routing, we need to configure Yoga to use the correct endpoint
