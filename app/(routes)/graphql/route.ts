@@ -2,8 +2,8 @@ import { createSchema, createYoga } from 'graphql-yoga'
 import { schema } from './schema'
 import { useDeferStream } from '@graphql-yoga/plugin-defer-stream'
 import { auth, currentUser } from '@clerk/nextjs/server'
-import { getUser } from './dal/Supabase/queries'
-
+import { getUser, createUser } from './dal/Supabase/queries'
+import _ from 'lodash'
 // vercel edge runtime
 export const runtime = 'edge'
 
@@ -24,8 +24,18 @@ const { handleRequest } = createYoga({
             const userInfo = await getUser({
                 userid: userId,
             })
-
             balance = userInfo?.balance || balance
+
+            // TODO 这段内容应该在 SignUp 回调里面，临时处理一下
+            if (_.isEmpty(userInfo)) {
+                balance = 100
+                await createUser({
+                    username: userName,
+                    userid: userId,
+                    email: emailAddres,
+                    balance,
+                })
+            }
         }
 
         return { userId, emailAddres, userName, balance }
