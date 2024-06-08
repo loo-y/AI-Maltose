@@ -2,6 +2,7 @@
 import OpenaiDal from '../../../dal/Openai'
 import _ from 'lodash'
 import { Repeater } from 'graphql-yoga'
+import { addConversationMessage } from '../../../dal/Supabase/queries'
 
 const typeDefinitions = `
     scalar JSON
@@ -45,7 +46,7 @@ export const Openai = async (parent: TParent, args: Record<string, any>, context
 
 export const OpenaiStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const xvalue = new Repeater<String>(async (push, stop) => {
-        const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb } = parent || {}
+        const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb, conversationID } = parent || {}
         const openaiArgs = args?.params || {}
         const { messages: appendMessages, apiKey, model, maxTokens, baseUrl } = openaiArgs || {}
         const maxTokensUse = maxTokens || baseMaxTokens
@@ -63,7 +64,15 @@ export const OpenaiStream = async (parent: TParent, args: Record<string, any>, c
                     isStream: true,
                     searchWeb,
                     baseUrl,
-                    completeHandler: ({ content, status }) => {
+                    completeHandler: async ({ content, status }) => {
+                        if (content && status) {
+                            await addConversationMessage({
+                                conversation_id: conversationID,
+                                role: 'ai',
+                                aiid: 'openai',
+                                content: content,
+                            })
+                        }
                         stop()
                     },
                     streamHandler: ({ token, status }) => {

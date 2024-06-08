@@ -45,6 +45,7 @@ export type IHistory = IChatMessage[]
 export interface IGrahpqlAIFetchProps {
     prompt?: string
     messages?: IChatMessage[]
+    conversationID?: number
     maxTokens?: number
     isStream?: boolean
     queryQwen?: boolean
@@ -67,4 +68,5 @@ export interface IGrahpqlAIFetchProps {
     lingyiwanwuParams?: Record<string, any>
     streamHandler?: (data: any) => void
     completeHandler?: (data: any) => void
+    nonStreamHandler?: (data: any) => void
 }

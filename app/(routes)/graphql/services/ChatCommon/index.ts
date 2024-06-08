@@ -1,10 +1,14 @@
 import _ from 'lodash'
-import { addConversationMessage } from '../../dal/Supabase/queries'
+import { addConversationMessage, createConversation } from '../../dal/Supabase/queries'
 
 const typeDefinitions = `
     scalar JSON
     type Query {
         chat(params: ChatArgs): Chat
+    }
+
+    type Chat {
+        BasicInfo: JSON
     }
 
     type ChatResult {
@@ -64,11 +68,17 @@ const resolvers = {
                 throw new Error('Unauthorized')
             }
 
+            let currentConversationID = conversationID
+
             const lastMessage = _.last(fixedMessages)
             // 最后一条用户的提问内容
             if (lastMessage?.role == 'user') {
+                if (!conversationID) {
+                    currentConversationID = await createConversation({ userid: context.userId })
+                }
+
                 await addConversationMessage({
-                    conversation_id: conversationID,
+                    conversation_id: currentConversationID,
                     role: `user`,
                     userid: context.userId,
                     content: lastMessage?.content,
@@ -78,6 +88,17 @@ const resolvers = {
             return {
                 ...chatArgs,
                 messages: fixedMessages,
+                conversationID: currentConversationID,
+            }
+        },
+    },
+    Chat: {
+        BasicInfo: (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+            const { messages: baseMessages, maxTokens, conversationID } = parent || {}
+
+            return {
+                conversationID,
+                maxTokens,
             }
         },
     },

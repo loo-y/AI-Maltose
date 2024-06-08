@@ -28,7 +28,7 @@ const Main = () => {
         setIsFetching(false)
         // 变更对话ID时，重新获取服务端的聊天记录
         if (currentConversationID > 0) {
-            handleGetConversation({ conversationID: 1 }).then(historyFromServer => {
+            handleGetConversation({ conversationID: currentConversationID }).then(historyFromServer => {
                 setHistory(historyFromServer)
             })
         }
@@ -80,8 +80,19 @@ const Main = () => {
             [...history, { role: Roles.user, content: userContent } as UserMessage],
             5
         )
+        console.log(`currentConversationID===>`, currentConversationID)
         await handleGetAIResponse({
             messages: lastQuestMessages,
+            conversationID: currentConversationID,
+            onNonStream: (data: Record<string, any>) => {
+                const { chat } = data || {}
+                const { BasicInfo } = chat || {}
+                console.log(`BasicInfo`, BasicInfo)
+                console.log(`BasicInfo.conversationID`, BasicInfo?.conversationID)
+                if (BasicInfo?.conversationID) {
+                    updateCurrentConversation(BasicInfo.conversationID)
+                }
+            },
             onStream: (content: any) => {
                 setWaitingForResponse(false)
                 console.log(`stream result`, content)

@@ -25,17 +25,6 @@ const { handleRequest } = createYoga({
                 userid: userId,
             })
             balance = userInfo?.balance || balance
-
-            // TODO 这段内容应该在 SignUp 回调里面，临时处理一下
-            if (_.isEmpty(userInfo)) {
-                balance = 100
-                await createUser({
-                    username: userName,
-                    userid: userId,
-                    email: emailAddres,
-                    balance,
-                })
-            }
         }
 
         return { userId, emailAddres, userName, balance }

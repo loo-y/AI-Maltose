@@ -4,6 +4,7 @@ import _ from 'lodash'
 export const getGraphqlAIMashupBody = ({
     prompt,
     messages,
+    conversationID,
     maxTokens,
     name,
     isStream,
@@ -31,6 +32,7 @@ export const getGraphqlAIMashupBody = ({
         queryList = [],
         variables: Record<string, any> = {
             params: {
+                conversationID: conversationID || 0,
                 messages: _.isEmpty(messages)
                     ? [
                           {
@@ -147,6 +149,7 @@ export const getGraphqlAIMashupBody = ({
     }
     const query = `query ${queryName}(${paramsList.join(', ')}) {
         chat(params: $params) {
+            BasicInfo            
             ${queryList.join('\n            ')}
         }
       }`

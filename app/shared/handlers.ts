@@ -14,17 +14,22 @@ export const handleUploadImage = async (imageBlob: Blob): Promise<string | null>
 
 export const handleGetAIResponse = async ({
     messages,
+    conversationID,
     onStream,
+    onNonStream,
     maxTokens = 2048,
 }: {
     messages: IChatMessage[]
+    conversationID: number
     onStream?: (arg: any) => void
+    onNonStream?: (arg: any) => void
     maxTokens?: number
 }) => {
     return Promise.race([
         new Promise((resolve, reject) =>
             fetchAIGraphql({
                 messages: messages,
+                conversationID,
                 isStream: onStream ? true : false,
                 queryOpenAI: true,
                 maxTokens,
@@ -35,10 +40,17 @@ export const handleGetAIResponse = async ({
                         typeof onStream == `function` && onStream(content || ``)
                     }
                 },
+                nonStreamHandler: (data: Record<string, any>) => {
+                    console.log(`data nonStreamHandler`, data)
+                    typeof onNonStream == `function` && onNonStream(data)
+                },
                 completeHandler: (value: string) => {
                     typeof onStream == `function` && onStream(`__{{streamCompleted}}__`)
-                    resolve(true)
+                    // resolve(true)
                 },
+            }).then(res => {
+                console.log(`fetchAIGraphql===>`, res)
+                resolve(res)
             })
         ),
         sleep(10),

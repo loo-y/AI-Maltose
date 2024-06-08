@@ -54,14 +54,14 @@ export const fetchAIGraphql = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =
 
 const fetchAIGraphqlStream = async (paramsForAIGraphql: IGrahpqlAIFetchProps) => {
     const abortController = new AbortController()
-    const { streamHandler, completeHandler, ...rest } = paramsForAIGraphql || {}
+    const { streamHandler, nonStreamHandler, completeHandler, ...rest } = paramsForAIGraphql || {}
     const body = getGraphqlAIMashupBody({
         ...rest,
         name: `GetAiGraphqlQuery`,
     })
     try {
         const options = await getCommonOptions({ userToken: 'test' })
-        await fetchEventSource(graphqlUrl, {
+        return await fetchEventSource(graphqlUrl, {
             ...options,
             method: 'POST',
             body: JSON.stringify(body),
@@ -69,7 +69,18 @@ const fetchAIGraphqlStream = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =>
                 console.log(ev.data)
                 const data: string | Record<string, any> = ev?.data || {}
                 try {
-                    const { hasNext, incremental } = (typeof data == `object` ? data : JSON.parse(data)) || {}
+                    const {
+                        hasNext,
+                        incremental,
+                        data: insideData,
+                    } = (typeof data == `object` ? data : JSON.parse(data)) || {}
+                    if (insideData?.chat) {
+                        typeof nonStreamHandler == `function` &&
+                            nonStreamHandler({
+                                chat: insideData.chat,
+                                status: true,
+                            })
+                    }
                     if (incremental) {
                         _.map(incremental || [], (_incremental: { items: string[]; path: (string | Number)[] }) => {
                             const { items, path } = _incremental || {}
