@@ -64,12 +64,12 @@ export const OpenaiStream = async (parent: TParent, args: Record<string, any>, c
                     isStream: true,
                     searchWeb,
                     baseUrl,
-                    completeHandler: async ({ content, status }) => {
+                    completeHandler: async ({ content, status, model }) => {
                         if (content && status) {
                             await addConversationMessage({
                                 conversation_id: conversationID,
                                 role: 'ai',
-                                aiid: 'openai',
+                                aiid: `openai_${model || ''}`,
                                 content: content,
                             })
                         }

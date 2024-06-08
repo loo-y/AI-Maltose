@@ -114,6 +114,7 @@ const fetchOpenai = async (ctx: TBaseContext, params: Record<string, any>, optio
                 }
             }
             completeHandler({
+                model: modelUse,
                 content: content,
                 status: true,
             })
@@ -121,6 +122,7 @@ const fetchOpenai = async (ctx: TBaseContext, params: Record<string, any>, optio
             console.log(`Openai error`, e)
 
             completeHandler({
+                model: modelUse,
                 content: '',
                 status: false,
             })
