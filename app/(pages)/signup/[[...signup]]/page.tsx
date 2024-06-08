@@ -10,7 +10,7 @@ export default function Page({ searchParams }: { searchParams: { [key: string]: 
 
     return (
         <div className="signmodule flex w-fit mx-auto my-10">
-            <SignUp />
+            <SignUp fallbackRedirectUrl={'/after_signup'} />
         </div>
     )
 }
