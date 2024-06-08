@@ -69,10 +69,13 @@ export const addConversationMessage = async (messageData: {
         return false
     }
 
+    // 用于标记多条类型消息在同一个消息里
+    const messageid = Date.now().toString()
     const msgData = {
         conversation_id: currentConversationId,
         sender_type: role,
         sender_id: userid || aiid,
+        messageid,
     }
     const insertMessages = _.isString(content)
         ? [

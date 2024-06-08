@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS conversations (
     conversation_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     userid TEXT,
     topic TEXT,
-    cleared_message_id INTEGER,
+    cleared_messageid TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userid) REFERENCES users(userid)
 );
@@ -36,6 +36,7 @@ SELECT userid FROM users WHERE username = 'user1';
 -- 创建 messages 表
 CREATE TABLE IF NOT EXISTS messages (
     message_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    messageid TEXT,
     conversation_id INTEGER,
     sender_type TEXT NOT NULL CHECK (sender_type IN ('user', 'ai')),
     sender_id INTEGER, -- 用户或 AI 的 ID
