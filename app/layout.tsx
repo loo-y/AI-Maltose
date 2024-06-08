@@ -4,8 +4,8 @@ import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 
 export const metadata: Metadata = {
-    title: 'AI Mashup',
-    description: 'AI Mashup',
+    title: 'AI Maltose',
+    description: 'AI Maltose',
     appleWebApp: true,
 }
 
