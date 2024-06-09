@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { sleep } from './util'
-import { fetchAIGraphql, fetchUploadImage, fetchUserInfoGraphql } from './fetches'
+import { fetchAIGraphql, fetchUploadImage, fetchUserInfoGraphql, fetchConversationMessagesGraphql } from './fetches'
 import { IChatMessage, Roles, IHistory } from './interface'
 
 export const handleUploadImage = async (imageBlob: Blob): Promise<string | null> => {
@@ -59,13 +59,42 @@ export const handleGetAIResponse = async ({
 
 // get messages and info by single conversation
 export const handleGetConversationHistory = async ({ conversationID }: { conversationID: number }) => {
-    return conversationMock
+    const result = await fetchConversationMessagesGraphql({ conversationID })
+    const { data, status } = result || {}
+    console.log(`data.user.Histories`, data.user.Histories)
+    if (status && data?.user?.Histories?.[0]) {
+        const groupedData = _.groupBy(data.user.Histories[0], `messageid`)
+        const groupedArray = _.values(
+            _.mapValues(groupedData, (group, key) => {
+                return _.sortBy(group, item => _.findIndex(data, item))
+            })
+        )
+
+        const chatMessages: IChatMessage[] = _.map(groupedArray, items => {
+            const { sender_type, content } = items?.[0] || {}
+            const isAssistant = sender_type === `ai`
+            return {
+                role: isAssistant ? Roles.assistant : Roles.user,
+                content: isAssistant
+                    ? content
+                    : _.map(items, item => {
+                          const { content_type, content } = item || {}
+                          if (content_type === `image_url`) {
+                              return { type: 'image_url', image_url: content }
+                          }
+                          return { type: 'text', text: content }
+                      }),
+            }
+        })
+        return chatMessages
+    }
+    return []
 }
 
 export const handleGetUserInfo = async () => {
     const ressult = await fetchUserInfoGraphql()
     const { data, status } = ressult || {}
-    console.log(`handleGetUserInfo`, ressult)
+
     if (status && data?.user) {
         return data.user
     }

@@ -57,9 +57,11 @@ const resolvers = {
                         content,
                     }
                 }
+                const textContent = _.find(contentArray, c => c.type == 'text')?.text || ''
+                const hasImage = _.find(contentArray, c => c.type == 'image_url')
                 return {
                     ...other,
-                    content: contentArray,
+                    content: hasImage ? contentArray : textContent,
                 }
             })
             console.log(`context.user`, context.userId)

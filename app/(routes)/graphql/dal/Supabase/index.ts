@@ -57,13 +57,13 @@ const loaderConversationsHistory = (ctx: TBaseContext, args: { userid: string },
                         keys.map(key =>
                             getconversationMessages({
                                 ctx,
-                                ...ctx.loaderGeminiProArgs[key],
+                                ...ctx.loaderConversationsHistoryArgs[key],
                             })
                         )
                     )
                     return conversationsHistoryList
                 } catch (e) {
-                    console.log(`[loaderGeminiPro] error: ${e}`)
+                    console.log(`[loaderConversationsHistory] error: ${e}`)
                 }
                 return new Array(keys.length || 1).fill({ status: false })
             },

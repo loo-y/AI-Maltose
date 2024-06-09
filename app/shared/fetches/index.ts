@@ -161,10 +161,11 @@ export const fetchUploadImage = async (imageBlob: Blob) => {
 export const fetchUserInfoGraphql = async (params?: { conversationID: number }) => {
     const { conversationID } = params || {}
     const options = await getCommonOptions({})
+    const operationName = `GetUserQuery`
     const body = {
-        operationName: `GetUserQuery`,
+        operationName,
         query: `
-            query GetUserQuery($params: UserArgs){
+            query ${operationName}($params: UserArgs){
                 user(params: $params) {
                     BasicInfo
                 }
@@ -173,6 +174,44 @@ export const fetchUserInfoGraphql = async (params?: { conversationID: number }) 
         variables: {
             params: {
                 conversationID,
+            },
+        },
+    }
+    try {
+        const response = await fetch(graphqlUrl, {
+            ...options,
+            body: JSON.stringify(body),
+        })
+        const data = await response.json()
+        return {
+            data: data.data,
+            status: true,
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            content: String(e),
+            status: false,
+        }
+    }
+}
+
+export const fetchConversationMessagesGraphql = async (params?: { conversationID: number }) => {
+    const { conversationID } = params || {}
+    const options = await getCommonOptions({})
+    const operationName = `GetConversationMessagesQuery`
+    const body = {
+        operationName,
+        query: `
+            query ${operationName}($params: UserArgs){
+                user(params: $params) {
+                    Histories
+                }
+            }
+        `,
+        variables: {
+            params: {
+                conversationIDs: [conversationID],
             },
         },
     }

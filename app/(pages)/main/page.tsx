@@ -18,7 +18,7 @@ const Main = () => {
     const [isFetching, setIsFetching] = useState(false)
     const [waitingForResponse, setWaitingForResponse] = useState(false)
     const [history, setHistory] = useState<IHistory>([])
-    const [conversationList, setConversationList] = useState<{ id: number; topic: string }[]>([])
+    const [conversationList, setConversationList] = useState<{ conversation_id: number; topic: string }[]>([])
     const conversationContainerRef = useRef<HTMLDivElement>(null)
     // useEffect(() => {
     //     handleGetConversation({ conversationID: 1 })
@@ -100,7 +100,13 @@ const Main = () => {
                 if (ChatInfo?.conversationID) {
                     updateCurrentConversation(ChatInfo.conversationID)
                     setConversationList(_conversationList => {
-                        return [..._conversationList, { id: ChatInfo.conversationID, topic: ChatInfo.topic }]
+                        if (_.find(_conversationList, { conversation_id: ChatInfo.conversationID })) {
+                            return _conversationList
+                        }
+                        return [
+                            ..._conversationList,
+                            { conversation_id: ChatInfo.conversationID, topic: ChatInfo.topic },
+                        ]
                     })
                 }
             },
@@ -133,7 +139,7 @@ const Main = () => {
         <div className="w-full flex flex-row h-full focus-visible:outline-0">
             {/* TODO : 侧边栏 */}
             <div className="sidebar h-full w-[280px] bg-gray-100 z-[9999] overflow-hidden hidden md:block md:translate-x-0 transform -translate-x-full transition-transform duration-500 ease-in-out">
-                <Sidebar conversationList={conversationList} />
+                <Sidebar conversationList={conversationList} onSelectConversation={handleChangeConversation} />
             </div>
             <div className="flex flex-1 flex-col relative h-full focus-visible:outline-0">
                 <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>

@@ -14,6 +14,7 @@ import AzureOpenai from './AIService/AzureOpenai'
 import WorkersAI from './AIService/WorkersAI'
 import User from './User'
 import BasicInfo from './UserService/BasicInfo'
+import Histories from './UserService/Histories'
 import ConversationMessages from './UserService/ConversationMessages'
 
 const serviceList = [
@@ -32,6 +33,7 @@ const serviceList = [
     WorkersAI,
     User,
     BasicInfo,
+    Histories,
     ConversationMessages,
 ]
 
