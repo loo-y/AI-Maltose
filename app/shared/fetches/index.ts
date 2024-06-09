@@ -40,13 +40,13 @@ export const fetchAIGraphql = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =
         })
         const data = await response.json()
         return {
-            content: data.data,
+            data: data.data,
             status: true,
         }
     } catch (e) {
         console.log(e)
         return {
-            content: String(e),
+            data: String(e),
             status: false,
         }
     }

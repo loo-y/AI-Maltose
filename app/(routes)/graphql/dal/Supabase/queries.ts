@@ -74,8 +74,6 @@ export const addConversationMessage = async (messageData: {
         currentConversationId = await createConversation({ userid })
     }
 
-    console.log(`currentConversationId`, currentConversationId)
-
     if (!currentConversationId) {
         return false
     }
@@ -152,4 +150,28 @@ export const getUserConversations = async ({ ctx, userid }: { userid: string; ct
         })
     }
     return []
+}
+
+export const updateConversationTopic = async ({
+    conversation_id,
+    topic,
+    userid,
+}: {
+    conversation_id: number
+    topic: string
+    userid: string
+    ctx?: TBaseContext
+}) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('conversations')
+        .update({ topic })
+        .eq('conversation_id', conversation_id)
+        .eq('userid', userid)
+        .select()
+
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return data
+    }
+    return {}
 }

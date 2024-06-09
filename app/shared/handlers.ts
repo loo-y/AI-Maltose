@@ -18,16 +18,19 @@ export const handleGetAIResponse = async ({
     onStream,
     onNonStream,
     maxTokens = 2048,
+    isTopic,
 }: {
     messages: IChatMessage[]
     conversationID: number
     onStream?: (arg: any) => void
     onNonStream?: (arg: any) => void
     maxTokens?: number
+    isTopic?: boolean
 }) => {
     return Promise.race([
         new Promise((resolve, reject) =>
             fetchAIGraphql({
+                isTopic,
                 messages: messages,
                 conversationID,
                 isStream: onStream ? true : false,
@@ -52,7 +55,7 @@ export const handleGetAIResponse = async ({
                 console.log(`fetchAIGraphql===>`, res)
                 resolve(res)
             })
-        ),
+        ) as Promise<any>,
         sleep(10),
     ])
 }

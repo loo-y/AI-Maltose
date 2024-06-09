@@ -2,7 +2,7 @@
 import OpenaiDal from '../../../dal/Openai'
 import _ from 'lodash'
 import { Repeater } from 'graphql-yoga'
-import { addConversationMessage } from '../../../dal/Supabase/queries'
+import { addConversationMessage, updateConversationTopic } from '../../../dal/Supabase/queries'
 
 const typeDefinitions = `
     scalar JSON
@@ -24,7 +24,14 @@ const typeDefinitions = `
     }
 `
 export const Openai = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
-    const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb } = parent || {}
+    const {
+        messages: baseMessages,
+        maxTokens: baseMaxTokens,
+        searchWeb,
+        conversationID,
+        isTopic,
+        userid,
+    } = parent || {}
     const openaiArgs = args?.params || {}
     const { messages: appendMessages, apiKey, model, maxTokens, baseUrl } = openaiArgs || {}
     const maxTokensUse = maxTokens || baseMaxTokens
@@ -41,12 +48,34 @@ export const Openai = async (parent: TParent, args: Record<string, any>, context
             key
         )
     ).load(key)
+
+    if (text) {
+        if (isTopic) {
+            await updateConversationTopic({ conversation_id: conversationID, topic: text, userid: userid })
+        } else {
+            await addConversationMessage({
+                conversation_id: conversationID,
+                role: 'ai',
+                userid,
+                aiid: `openai_${model || ''}`,
+                content: text,
+            })
+        }
+    }
+
     return { text }
 }
 
 export const OpenaiStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const xvalue = new Repeater<String>(async (push, stop) => {
-        const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb, conversationID, userid } = parent || {}
+        const {
+            messages: baseMessages,
+            maxTokens: baseMaxTokens,
+            searchWeb,
+            conversationID,
+            userid,
+            isTopic,
+        } = parent || {}
         const openaiArgs = args?.params || {}
         const { messages: appendMessages, apiKey, model, maxTokens, baseUrl } = openaiArgs || {}
         const maxTokensUse = maxTokens || baseMaxTokens
@@ -65,7 +94,7 @@ export const OpenaiStream = async (parent: TParent, args: Record<string, any>, c
                     searchWeb,
                     baseUrl,
                     completeHandler: async ({ content, status, model }) => {
-                        if (content && status) {
+                        if (content && status && !isTopic) {
                             await addConversationMessage({
                                 conversation_id: conversationID,
                                 role: 'ai',

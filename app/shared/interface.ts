@@ -44,6 +44,7 @@ export type IHistory = IChatMessage[]
 
 export interface IGrahpqlAIFetchProps {
     prompt?: string
+    isTopic?: boolean
     messages?: IChatMessage[]
     conversationID?: number
     maxTokens?: number

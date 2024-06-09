@@ -41,6 +41,8 @@ const typeDefinitions = `
         maxTokens: Int
         "Need Search Internet"
         searchWeb: Boolean
+        "Is Topic"
+        isTopic: Boolean
     }
 `
 
@@ -48,7 +50,7 @@ const resolvers = {
     Query: {
         chat: async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
             const chatArgs = args.params
-            const { messages, conversationID } = chatArgs || {}
+            const { messages, conversationID, isTopic } = chatArgs || {}
             const fixedMessages = _.map(messages, m => {
                 const { content, contentArray, ...other } = m
                 if (_.isEmpty(contentArray)) {
@@ -74,7 +76,7 @@ const resolvers = {
 
             const lastMessage = _.last(fixedMessages)
             // 最后一条用户的提问内容
-            if (lastMessage?.role == 'user') {
+            if (lastMessage?.role == 'user' && !isTopic) {
                 if (!conversationID) {
                     currentConversationID = await createConversation({ userid: context.userId })
                 }

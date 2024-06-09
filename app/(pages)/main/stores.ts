@@ -3,7 +3,10 @@ import { createStore } from 'zustand/vanilla'
 type MainState = {
     isloading?: boolean
     userInfo: Record<string, any>
-    currentConversationID: number
+    currentConversation: {
+        id: number
+        topic?: string
+    }
     conversations: {
         id: number
         topic: string
@@ -12,7 +15,7 @@ type MainState = {
 
 type MainActions = {
     updateIsLoading: (loading: boolean) => void
-    updateCurrentConversation: (cID: number) => void
+    updateCurrentConversation: (prams: { id?: number; topic?: string }) => void
 }
 
 export type MainStore = MainState & MainActions
@@ -21,7 +24,10 @@ const defaultInitState: MainState = {
     isloading: false,
     userInfo: {},
     conversations: [],
-    currentConversationID: 0,
+    currentConversation: {
+        id: 0,
+        topic: '',
+    },
 }
 
 export const initMainStore = (): MainState => {
@@ -32,10 +38,13 @@ export const createMainStore = (initState: MainState = defaultInitState) => {
     return createStore<MainStore>()(set => {
         return {
             ...initState,
-            updateCurrentConversation: (cID: number) => {
+            updateCurrentConversation: ({ id = 0, topic = '' }) => {
                 return set(state => {
                     return {
-                        currentConversationID: cID,
+                        currentConversation: {
+                            id: id || state.currentConversation.id,
+                            topic: topic || state.currentConversation.topic,
+                        },
                     }
                 })
             },

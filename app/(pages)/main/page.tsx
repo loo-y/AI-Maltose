@@ -14,7 +14,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } from '@/app/shared/handlers'
 
 const Main = () => {
-    const { currentConversationID, updateCurrentConversation } = useMainStore(state => state)
+    const { currentConversation, updateCurrentConversation } = useMainStore(state => state)
     const [isFetching, setIsFetching] = useState(false)
     const [waitingForResponse, setWaitingForResponse] = useState(false)
     const [history, setHistory] = useState<IHistory>([])
@@ -35,8 +35,8 @@ const Main = () => {
         })
 
         // 变更对话ID时，重新获取服务端的聊天记录
-        if (currentConversationID > 0) {
-            handleGetConversationHistory({ conversationID: currentConversationID }).then(historyFromServer => {
+        if (currentConversation?.id > 0) {
+            handleGetConversationHistory({ conversationID: currentConversation.id }).then(historyFromServer => {
                 setHistory(historyFromServer)
             })
         }
@@ -56,10 +56,39 @@ const Main = () => {
         if (conversationID > 0) {
             handleGetConversationHistory({ conversationID }).then(historyFromServer => {
                 setHistory(historyFromServer)
+                updateCurrentConversation({ id: conversationID })
             })
-            updateCurrentConversation(conversationID)
         }
     }, [])
+
+    const handleUpdateTopic = async () => {
+        if (!currentConversation.topic && currentConversation?.id && history.length >= 4) {
+            const topicMessages = _.take(history, 4)
+            const topicResult = await handleGetAIResponse({
+                messages: [
+                    ...topicMessages,
+                    { role: Roles.user, content: `请根据上面的对话，总结出话题，限定一句话。` } as UserMessage,
+                ],
+                conversationID: currentConversation.id,
+                isTopic: true,
+            })
+            const chatResult = topicResult?.data?.chat || {}
+            console.log(`chatResult`, topicResult, chatResult)
+            const topic = _.find(_.values(chatResult), 'text')?.text || ``
+            if (topic) {
+                updateCurrentConversation({ topic })
+                setConversationList(_conversationList => {
+                    const newConversationList = _.map(_conversationList, item => {
+                        if (item.conversation_id === currentConversation.id) {
+                            return { ...item, topic }
+                        }
+                        return item
+                    })
+                    return newConversationList
+                })
+            }
+        }
+    }
 
     const handleSendQuestion = async (question: string, imageList?: string[]) => {
         setWaitingForResponse(true)
@@ -82,30 +111,32 @@ const Main = () => {
                 },
             ]
         })
-        scrollToEnd()
+        setTimeout(() => scrollToEnd(), 100)
+        handleUpdateTopic()
+
         // 只取最后5条
         const lastQuestMessages = _.takeRight(
             [...history, { role: Roles.user, content: userContent } as UserMessage],
             5
         )
-        console.log(`currentConversationID===>`, currentConversationID)
+        console.log(`currentConversation===>`, currentConversation)
         await handleGetAIResponse({
             messages: lastQuestMessages,
-            conversationID: currentConversationID,
+            conversationID: currentConversation?.id || 0,
             onNonStream: (data: Record<string, any>) => {
                 const { chat } = data || {}
                 const { ChatInfo } = chat || {}
                 console.log(`ChatInfo`, ChatInfo)
                 console.log(`ChatInfo.conversationID`, ChatInfo?.conversationID)
                 if (ChatInfo?.conversationID) {
-                    updateCurrentConversation(ChatInfo.conversationID)
+                    updateCurrentConversation({ id: ChatInfo.conversationID })
                     setConversationList(_conversationList => {
                         if (_.find(_conversationList, { conversation_id: ChatInfo.conversationID })) {
                             return _conversationList
                         }
                         return [
-                            ..._conversationList,
                             { conversation_id: ChatInfo.conversationID, topic: ChatInfo.topic },
+                            ..._conversationList,
                         ]
                     })
                 }
