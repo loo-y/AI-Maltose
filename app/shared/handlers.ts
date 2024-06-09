@@ -58,13 +58,13 @@ export const handleGetAIResponse = async ({
 }
 
 // get messages and info by single conversation
-export const handleGetConversation = async ({ conversationID }: { conversationID: number }) => {
+export const handleGetConversationHistory = async ({ conversationID }: { conversationID: number }) => {
     return conversationMock
 }
 
 export const handleGetUserInfo = async () => {
     const ressult = await fetchUserInfoGraphql()
-    console.log(`userInfo`, ressult)
+    console.log(`handleGetUserInfo`, ressult)
     return ressult
 }
 

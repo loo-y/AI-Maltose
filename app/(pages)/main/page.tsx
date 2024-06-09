@@ -11,7 +11,7 @@ import { sleep } from '../../shared/util'
 import { fetchAIGraphql } from '@/app/shared/fetches'
 import { IChatMessage, Roles, IHistory, ImageUrlMessage, TextMessage, UserMessage } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
-import { handleGetAIResponse, handleGetConversation } from '@/app/shared/handlers'
+import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } from '@/app/shared/handlers'
 
 const Main = () => {
     const { currentConversationID, updateCurrentConversation } = useMainStore(state => state)
@@ -26,9 +26,13 @@ const Main = () => {
     // 变更选中的对话时，移除 fetching 状态
     useEffect(() => {
         setIsFetching(false)
+        handleGetUserInfo().then(userInfo => {
+            console.log(`userInfo`, userInfo)
+        })
+
         // 变更对话ID时，重新获取服务端的聊天记录
         if (currentConversationID > 0) {
-            handleGetConversation({ conversationID: currentConversationID }).then(historyFromServer => {
+            handleGetConversationHistory({ conversationID: currentConversationID }).then(historyFromServer => {
                 setHistory(historyFromServer)
             })
         }
@@ -46,7 +50,7 @@ const Main = () => {
         setIsFetching(false)
         // 变更对话ID时，重新获取服务端的聊天记录
         if (conversationID > 0) {
-            handleGetConversation({ conversationID }).then(historyFromServer => {
+            handleGetConversationHistory({ conversationID }).then(historyFromServer => {
                 setHistory(historyFromServer)
             })
             updateCurrentConversation(conversationID)
@@ -86,11 +90,11 @@ const Main = () => {
             conversationID: currentConversationID,
             onNonStream: (data: Record<string, any>) => {
                 const { chat } = data || {}
-                const { BasicInfo } = chat || {}
-                console.log(`BasicInfo`, BasicInfo)
-                console.log(`BasicInfo.conversationID`, BasicInfo?.conversationID)
-                if (BasicInfo?.conversationID) {
-                    updateCurrentConversation(BasicInfo.conversationID)
+                const { ChatInfo } = chat || {}
+                console.log(`ChatInfo`, ChatInfo)
+                console.log(`ChatInfo.conversationID`, ChatInfo?.conversationID)
+                if (ChatInfo?.conversationID) {
+                    updateCurrentConversation(ChatInfo.conversationID)
                 }
             },
             onStream: (content: any) => {
@@ -121,7 +125,7 @@ const Main = () => {
     return (
         <div className="w-full flex flex-row h-full focus-visible:outline-0">
             {/* TODO : 侧边栏 */}
-            <div className="sidebar h-full w-[280px] bg-gray-100 z-[9999] overflow-hidden hidden"></div>
+            <div className="sidebar h-full w-[280px] bg-gray-100 z-[9999] overflow-hidden hidden md:block md:translate-x-0 transform -translate-x-full transition-transform duration-500 ease-in-out"></div>
             <div className="flex flex-1 flex-col relative h-full focus-visible:outline-0">
                 <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>
                     <div className="absolute flex flex-row h-14 w-full items-center justify-between">

@@ -5,8 +5,8 @@ const typeDefinitions = `
     }
 
     input UserArgs {
-        "ConversationID"
-        conversationID: Int
+        "ConversationID List"
+        conversationIDs: [Int]
     }
 `
 

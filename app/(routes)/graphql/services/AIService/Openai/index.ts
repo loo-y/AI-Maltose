@@ -46,7 +46,7 @@ export const Openai = async (parent: TParent, args: Record<string, any>, context
 
 export const OpenaiStream = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
     const xvalue = new Repeater<String>(async (push, stop) => {
-        const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb, conversationID } = parent || {}
+        const { messages: baseMessages, maxTokens: baseMaxTokens, searchWeb, conversationID, userid } = parent || {}
         const openaiArgs = args?.params || {}
         const { messages: appendMessages, apiKey, model, maxTokens, baseUrl } = openaiArgs || {}
         const maxTokensUse = maxTokens || baseMaxTokens
@@ -69,6 +69,7 @@ export const OpenaiStream = async (parent: TParent, args: Record<string, any>, c
                             await addConversationMessage({
                                 conversation_id: conversationID,
                                 role: 'ai',
+                                userid,
                                 aiid: `openai_${model || ''}`,
                                 content: content,
                             })

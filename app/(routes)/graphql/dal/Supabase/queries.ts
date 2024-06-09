@@ -1,12 +1,23 @@
 import { createClient } from './server'
 import _ from 'lodash'
 
-export const getUser = async ({ userid }: { userid: string }) => {
+export const getUser = async ({ userid }: { ctx?: TBaseContext; userid: string }) => {
     const supabase = createClient()
 
     const { data } = await supabase.from('users').select('*').eq('userid', userid)
-
-    return data?.[0] || {}
+    const user = data?.[0] || {}
+    const { balance, email, username } = user || {}
+    let conversations: Record<string, any>[] = []
+    if (user?.userid) {
+        conversations = await getUserConversations({ userid: user.userid })
+    }
+    return {
+        balance,
+        email,
+        username,
+        userid,
+        conversations,
+    }
 }
 
 export const createUser = async (userData: { username: string; userid: string; email: string; balance?: number }) => {
@@ -50,7 +61,7 @@ export const createConversation = async ({ userid }: { userid: string }) => {
 export const addConversationMessage = async (messageData: {
     conversation_id: number
     role: string
-    userid?: string
+    userid: string
     aiid?: string
     content: string | Record<string, any>[]
 }) => {
@@ -74,7 +85,8 @@ export const addConversationMessage = async (messageData: {
     const msgData = {
         conversation_id: currentConversationId,
         sender_type: role,
-        sender_id: userid || aiid,
+        sender_id: role == 'user' ? userid : aiid,
+        userid: userid,
         messageid,
     }
     const insertMessages = _.isString(content)
@@ -102,4 +114,42 @@ export const addConversationMessage = async (messageData: {
 
     console.log(`addConversationMessage error`, error)
     return false
+}
+
+export const getconversationMessages = async ({
+    conversation_id,
+    userid,
+    ctx,
+}: {
+    ctx?: TBaseContext
+    conversation_id: number
+    userid: string
+}) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversation_id)
+        .eq('userid', userid)
+        .order('created_at', { ascending: true })
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return data
+    }
+    return []
+}
+
+export const getUserConversations = async ({ ctx, userid }: { userid: string; ctx?: TBaseContext }) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from('conversations').select('*').eq('userid', userid)
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return _.map(data, d => {
+            return {
+                conversation_id: d.conversation_id,
+                created_at: d.created_at,
+                topic: d.topic,
+                cleared_messageid: d.cleared_messageid,
+            }
+        })
+    }
+    return []
 }

@@ -8,7 +8,7 @@ const typeDefinitions = `
     }
 
     type Chat {
-        BasicInfo: JSON
+        ChatInfo: JSON
     }
 
     type ChatResult {
@@ -88,12 +88,13 @@ const resolvers = {
             return {
                 ...chatArgs,
                 messages: fixedMessages,
+                userid: context.userId,
                 conversationID: currentConversationID,
             }
         },
     },
     Chat: {
-        BasicInfo: (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+        ChatInfo: (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
             const { messages: baseMessages, maxTokens, conversationID } = parent || {}
 
             return {

@@ -149,7 +149,7 @@ export const getGraphqlAIMashupBody = ({
     }
     const query = `query ${queryName}(${paramsList.join(', ')}) {
         chat(params: $params) {
-            BasicInfo            
+            ChatInfo            
             ${queryList.join('\n            ')}
         }
       }`

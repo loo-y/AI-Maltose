@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS messages (
     message_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     messageid TEXT,
     conversation_id INTEGER,
+    userid TEXT NOT NULL,
     sender_type TEXT NOT NULL CHECK (sender_type IN ('user', 'ai')),
     sender_id INTEGER, -- 用户或 AI 的 ID
     content TEXT,
@@ -47,11 +48,11 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 -- 插入 messages 表的示例数据
-INSERT INTO messages (conversation_id, sender_type, sender_id, content, content_type)
+INSERT INTO messages (conversation_id, userid, messageid, sender_type, sender_id, content, content_type)
 VALUES
-(1, 'user', 1, 'Hello, world!', 'text'),
-(1, 'user', 1, 'http://example.com/image1.jpg', 'image'),
-(1, 'user', 1, 'http://example.com/image2.jpg', 'image');
+(1, '111','user1', 'user', 1, 'Hello, world!', 'text'),
+(1, '111','user1','user', 1, 'http://example.com/image1.jpg', 'image'),
+(1, '111','user1','user', 1, 'http://example.com/image2.jpg', 'image');
 
 
 
