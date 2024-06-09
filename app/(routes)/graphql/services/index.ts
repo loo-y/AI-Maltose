@@ -15,7 +15,6 @@ import WorkersAI from './AIService/WorkersAI'
 import User from './User'
 import BasicInfo from './UserService/BasicInfo'
 import Histories from './UserService/Histories'
-import ConversationMessages from './UserService/ConversationMessages'
 
 const serviceList = [
     Chain,
@@ -34,7 +33,6 @@ const serviceList = [
     User,
     BasicInfo,
     Histories,
-    ConversationMessages,
 ]
 
 export default {
