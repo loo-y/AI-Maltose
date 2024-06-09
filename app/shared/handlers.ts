@@ -64,8 +64,13 @@ export const handleGetConversationHistory = async ({ conversationID }: { convers
 
 export const handleGetUserInfo = async () => {
     const ressult = await fetchUserInfoGraphql()
+    const { data, status } = ressult || {}
     console.log(`handleGetUserInfo`, ressult)
-    return ressult
+    if (status && data?.user) {
+        return data.user
+    }
+
+    return null
 }
 
 const conversationMock: IHistory = [
