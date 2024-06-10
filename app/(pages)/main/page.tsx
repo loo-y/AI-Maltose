@@ -31,14 +31,14 @@ const Main = () => {
             console.log(`userInfo`, userInfo)
             const { BasicInfo } = userInfo || {}
             const { conversations } = BasicInfo || {}
-            setConversationList(conversations)
+            // 倒排序
+            setConversationList(_.orderBy(conversations, ['conversation_id'], ['desc']))
         })
 
         // 变更对话ID时，重新获取服务端的聊天记录
         if (currentConversation?.id > 0) {
             handleGetConversationHistory({ conversationID: currentConversation.id }).then(historyFromServer => {
-                // 倒排序
-                setHistory(_.orderBy(historyFromServer, ['conversation_id'], ['desc']))
+                setHistory(historyFromServer)
             })
         }
     }, [])
