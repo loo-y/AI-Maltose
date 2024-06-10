@@ -63,6 +63,8 @@ CREATE TABLE IF NOT EXISTS ai_bots (
     ainame TEXT NOT NULL,
     api_url TEXT,
     api_key TEXT,
+    api_model_name TEXT,
+    query_type TEXT, -- 调用的接口类型
     userid TEXT, -- 属于哪个用户
     is_custom BOOLEAN DEFAULT FALSE
 );

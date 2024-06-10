@@ -7,13 +7,20 @@ import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/
 import Sidebar from '@/app/modules/Sidebar'
 import Chatinput from '@/app/modules/ChatInput'
 import ConversationBox from '@/app/modules/ConversationBox'
+import AISelection from '@/app/modules/AISelection'
 import { sleep } from '../../shared/util'
 import { fetchAIGraphql } from '@/app/shared/fetches'
 import { IChatMessage, Roles, IHistory, ImageUrlMessage, TextMessage, UserMessage } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
-import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } from '@/app/shared/handlers'
+import {
+    handleGetAIResponse,
+    handleGetUserInfo,
+    handleGetConversationHistory,
+    handleGetAIBots,
+} from '@/app/shared/handlers'
 
-const Main = () => {
+const Main = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
+    console.log(`aiBots`, aiBots)
     const mainState = useMainStore(state => state)
     let { currentConversation, updateCurrentConversation } = mainState
     const [isFetching, setIsFetching] = useState(false)
@@ -218,6 +225,9 @@ const Main = () => {
                                     </div>
                                 </>
                             )}
+                            <div className="flex items-center justify-center">
+                                <AISelection aiBots={aiBots} />
+                            </div>
                             {/* <Drawer direction="left">
                                 <DrawerTrigger>Open</DrawerTrigger>
                                 <DrawerContent
@@ -244,7 +254,7 @@ const Main = () => {
     )
 }
 
-const MainPage = () => {
+const MainPage = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
     useEffect(() => {
         let vh = window.innerHeight * 0.01
         // Then we set the value in the --vh custom property to the root of the document
@@ -261,7 +271,7 @@ const MainPage = () => {
 
     return (
         <MainStoreProvider>
-            <Main></Main>
+            <Main aiBots={aiBots}></Main>
         </MainStoreProvider>
     )
 }

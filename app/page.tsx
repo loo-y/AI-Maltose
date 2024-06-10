@@ -1,8 +1,9 @@
 import MainPage from '@/app/(pages)/main/page'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { handleGetAIBots } from '@/app/shared/handlers'
 
-export default function Home() {
+export default async function Home() {
     const { userId } = auth()
     console.log(`page userId`, userId)
     if (!userId) {
@@ -10,9 +11,10 @@ export default function Home() {
         redirect('/signin')
         return null
     }
+    const AIBots = await handleGetAIBots()
     return (
         <main className="main h-full overflow-hidden">
-            <MainPage />
+            <MainPage aiBots={AIBots} />
         </main>
     )
 }
