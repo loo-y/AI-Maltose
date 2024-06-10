@@ -14,7 +14,7 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
     const [inputValue, setInputValue] = useState<string>('')
     const [inputRows, setInputRows] = useState<number>(1)
     const inputRef = useRef<HTMLTextAreaElement>(null)
-    const [imageList, setImageList] = useState<{ imageUrl: string; isLoading: boolean }[]>([])
+    const [imageList, setImageList] = useState<{ imageId: number; imageUrl: string; isLoading: boolean }[]>([])
 
     const handleCompositionStart = () => {
         setIsComposing(true)
@@ -81,12 +81,12 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
         }, 50)
     }
 
-    const handleImageUploaded = async (newImageSrc: string | null) => {
-        if (!newImageSrc) return
+    const handleImageUploaded = async (imageItem: { imageId: number; imageUrl: string }) => {
+        if (_.isEmpty(imageItem)) return
         await new Promise((resolve, reject) => {
             const img = new Image()
             // 设置图片的 src 属性
-            img.src = newImageSrc
+            img.src = imageItem.imageUrl
             // 设置图片的样式，使其不可见
             img.style.display = 'none'
 
@@ -98,8 +98,8 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
 
         setImageList(oldList => {
             const newList = _.map(oldList, item => {
-                if (item.isLoading) {
-                    return { ...item, imageUrl: newImageSrc, isLoading: false }
+                if (item.isLoading && item.imageId == imageItem.imageId) {
+                    return { ...item, imageUrl: imageItem.imageUrl, isLoading: false }
                 }
                 return item
             })
@@ -108,17 +108,17 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
         })
     }
 
-    const handleImageUploading = (newImageSrc: string | null) => {
-        if (!newImageSrc) return
+    const handleImageUploading = (newImage: { imageId: number; imageUrl: string }) => {
+        if (_.isEmpty(newImage)) return
         setImageList(oldList => {
-            const newList = [...oldList, { imageUrl: newImageSrc, isLoading: true }]
+            const newList = [...oldList, { imageUrl: newImage.imageUrl, imageId: newImage.imageId, isLoading: true }]
             return newList
         })
     }
 
-    const handleDeleteImage = (imageItem: { imageUrl: string; isLoading: boolean }) => {
+    const handleDeleteImage = (imageItem: { imageId: number; imageUrl: string; isLoading: boolean }) => {
         setImageList(oldList => {
-            const newList = _.filter(oldList, item => item.imageUrl !== imageItem?.imageUrl)
+            const newList = _.filter(oldList, item => item.imageId !== imageItem?.imageId)
             return newList
         })
     }

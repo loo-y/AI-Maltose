@@ -18,8 +18,8 @@ const ImageUploadButton = ({
     uploadCallback,
     completedCallback,
 }: {
-    uploadCallback: (imageSrc: string | null) => void
-    completedCallback: (imageSrc: string | null) => void
+    uploadCallback: (image: { imageId: number; imageUrl: string }) => void
+    completedCallback: (image: { imageId: number; imageUrl: string }) => void
 }) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [alertText, setAlertText] = useState('')
@@ -49,10 +49,14 @@ const ImageUploadButton = ({
             // const formData = new FormData();
             // formData.append('file', file);
             const reader = new FileReader()
+            const imageId = Date.now()
             reader.onload = () => {
                 const base64Data = reader.result as string
                 console.log('Base64 data:', base64Data)
-                uploadCallback(base64Data)
+                uploadCallback({
+                    imageId,
+                    imageUrl: base64Data,
+                })
             }
             reader.readAsDataURL(file)
 
@@ -61,7 +65,7 @@ const ImageUploadButton = ({
             const imageID = await handleUploadImage(blob)
             const imageUrl = `${location.protocol}//${location.host}/api/imageShow/${imageID}`
             console.log(`imageUrl`, imageUrl)
-            completedCallback(imageUrl)
+            completedCallback({ imageId, imageUrl })
         }
     }
 
