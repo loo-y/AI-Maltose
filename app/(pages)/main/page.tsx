@@ -38,7 +38,7 @@ const Main = () => {
         if (currentConversation?.id > 0) {
             handleGetConversationHistory({ conversationID: currentConversation.id }).then(historyFromServer => {
                 // 倒排序
-                setHistory(_.orderBy(historyFromServer, [_.identity], ['desc']))
+                setHistory(_.orderBy(historyFromServer, ['conversation_id'], ['desc']))
             })
         }
     }, [])
