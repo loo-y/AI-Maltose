@@ -14,7 +14,13 @@ import {
 } from '@/components/ui/alert-dialog'
 import { handleUploadImage } from '@/app/shared/handlers'
 
-const ImageUploadButton = ({ uploadCallback }: { uploadCallback: (imageSrc: string | null) => void }) => {
+const ImageUploadButton = ({
+    uploadCallback,
+    completedCallback,
+}: {
+    uploadCallback: (imageSrc: string | null) => void
+    completedCallback: (imageSrc: string | null) => void
+}) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [alertText, setAlertText] = useState('')
 
@@ -42,11 +48,20 @@ const ImageUploadButton = ({ uploadCallback }: { uploadCallback: (imageSrc: stri
 
             // const formData = new FormData();
             // formData.append('file', file);
+            const reader = new FileReader()
+            reader.onload = () => {
+                const base64Data = reader.result as string
+                console.log('Base64 data:', base64Data)
+                uploadCallback(base64Data)
+            }
+            reader.readAsDataURL(file)
+
             const blob = new Blob([file], { type: file.type })
+            fileInput.value = ''
             const imageID = await handleUploadImage(blob)
             const imageUrl = `${location.protocol}//${location.host}/api/imageShow/${imageID}`
             console.log(`imageUrl`, imageUrl)
-            uploadCallback(imageUrl)
+            completedCallback(imageUrl)
         }
     }
 

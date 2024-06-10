@@ -14,7 +14,7 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
     const [inputValue, setInputValue] = useState<string>('')
     const [inputRows, setInputRows] = useState<number>(1)
     const inputRef = useRef<HTMLTextAreaElement>(null)
-    const [imageList, setImageList] = useState<string[]>([])
+    const [imageList, setImageList] = useState<{ imageUrl: string; isLoading: boolean }[]>([])
 
     const handleCompositionStart = () => {
         setIsComposing(true)
@@ -59,7 +59,10 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
         const question = _.trim(inputValue)
         console.log(`imageList`, imageList)
         if (question) {
-            onSendQuestion(_.trim(inputValue), imageList)
+            onSendQuestion(
+                _.trim(inputValue),
+                _.map(imageList, imgItem => imgItem.imageUrl)
+            )
             setInputValue('')
             setInputRows(1)
         }
@@ -78,17 +81,44 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
         }, 50)
     }
 
-    const handleImageUploaded = (newImageSrc: string | null) => {
+    const handleImageUploaded = async (newImageSrc: string | null) => {
         if (!newImageSrc) return
+        await new Promise((resolve, reject) => {
+            const img = new Image()
+            // 设置图片的 src 属性
+            img.src = newImageSrc
+            // 设置图片的样式，使其不可见
+            img.style.display = 'none'
+
+            // 当图片加载完成时执行回调函数
+            img.onload = () => {
+                resolve(true)
+            }
+        })
+
         setImageList(oldList => {
-            const newList = [...oldList, newImageSrc]
+            const newList = _.map(oldList, item => {
+                if (item.isLoading) {
+                    return { ...item, imageUrl: newImageSrc, isLoading: false }
+                }
+                return item
+            })
+
             return newList
         })
     }
 
-    const handleDeleteImage = (imageSrc: string) => {
+    const handleImageUploading = (newImageSrc: string | null) => {
+        if (!newImageSrc) return
         setImageList(oldList => {
-            const newList = _.filter(oldList, item => item !== imageSrc)
+            const newList = [...oldList, { imageUrl: newImageSrc, isLoading: true }]
+            return newList
+        })
+    }
+
+    const handleDeleteImage = (imageItem: { imageUrl: string; isLoading: boolean }) => {
+        setImageList(oldList => {
+            const newList = _.filter(oldList, item => item.imageUrl !== imageItem?.imageUrl)
             return newList
         })
     }
@@ -99,7 +129,10 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
                 <div className="overflow-y-scroll overflow-x-hidden rounded-3xl bg-gray-100 flex flex-row gap-1 flex-grow  mx-4 text-gray-600 max-h-52">
                     <div className="flex flex-grow flex-row  border-0 pl-5 gap-1 ">
                         <div className="flex flex-row justify-start items-end my-2 -ml-1rem gap-1">
-                            <ImageUploadButton uploadCallback={handleImageUploaded} />
+                            <ImageUploadButton
+                                completedCallback={handleImageUploaded}
+                                uploadCallback={handleImageUploading}
+                            />
                         </div>
                         <div className="flex flex-col gap-2 w-full flex-grow">
                             {_.isEmpty(imageList) ? null : (
@@ -108,7 +141,8 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
                                         return (
                                             <ThumbnailDisplay
                                                 key={`inputImageList_${imageIndex}`}
-                                                imageUrl={imageItem}
+                                                imageUrl={imageItem?.imageUrl}
+                                                isLoading={imageItem?.isLoading}
                                                 onDelete={() => {
                                                     handleDeleteImage(imageItem)
                                                 }}
@@ -159,7 +193,11 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
 
 export default Chatinput
 
-const ThumbnailDisplay: React.FC<{ imageUrl: string; onDelete: () => void }> = ({ imageUrl, onDelete }) => {
+const ThumbnailDisplay: React.FC<{ imageUrl: string; isLoading: boolean; onDelete: () => void }> = ({
+    imageUrl,
+    isLoading,
+    onDelete,
+}) => {
     const [hovered, setHovered] = useState(true)
     const [openPreview, setOpenPreview] = useState(false)
     const thumbnailRef = useRef(null)
@@ -213,6 +251,11 @@ const ThumbnailDisplay: React.FC<{ imageUrl: string; onDelete: () => void }> = (
                 onClick={handleClickThumbnail}
                 ref={thumbnailRef}
             >
+                {isLoading && (
+                    <div className="w-full h-full flex items-center justify-center flex-col bg-opacity-50 bg-gray-500 ">
+                        <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-gray-500"></div>
+                    </div>
+                )}
                 {hovered && (
                     <button
                         className="absolute -top-2 -right-2 p-1 bg-gray-600 text-white rounded-full"

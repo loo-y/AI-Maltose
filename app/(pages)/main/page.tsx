@@ -169,7 +169,7 @@ const Main = () => {
     return (
         <div className="w-full flex flex-row h-full focus-visible:outline-0">
             {/* TODO : 侧边栏 */}
-            <div className="sidebar h-full w-[280px] bg-gray-100 z-[9999] overflow-hidden hidden md:block md:translate-x-0 transform -translate-x-full transition-transform duration-500 ease-in-out">
+            <div className="sidebar h-full w-[280px] bg-gray-100 overflow-hidden hidden md:block md:translate-x-0 transform -translate-x-full transition-transform duration-500 ease-in-out">
                 <Sidebar conversationList={conversationList} onSelectConversation={handleChangeConversation} />
             </div>
             <div className="flex flex-1 flex-col relative h-full focus-visible:outline-0">
