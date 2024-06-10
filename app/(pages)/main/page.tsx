@@ -14,12 +14,14 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } from '@/app/shared/handlers'
 
 const Main = () => {
-    const { currentConversation, updateCurrentConversation } = useMainStore(state => state)
+    const mainState = useMainStore(state => state)
+    let { currentConversation, updateCurrentConversation } = mainState
     const [isFetching, setIsFetching] = useState(false)
     const [waitingForResponse, setWaitingForResponse] = useState(false)
     const [history, setHistory] = useState<IHistory>([])
     const [conversationList, setConversationList] = useState<{ conversation_id: number; topic: string }[]>([])
     const conversationContainerRef = useRef<HTMLDivElement>(null)
+    const [hideSidebar, setHideSidebar] = useState(false)
     // useEffect(() => {
     //     handleGetConversation({ conversationID: 1 })
     // }, [])
@@ -36,7 +38,7 @@ const Main = () => {
         })
 
         // 变更对话ID时，重新获取服务端的聊天记录
-        if (currentConversation?.id > 0) {
+        if (currentConversation?.id && currentConversation.id > 0) {
             handleGetConversationHistory({ conversationID: currentConversation.id }).then(historyFromServer => {
                 setHistory(historyFromServer)
             })
@@ -50,6 +52,17 @@ const Main = () => {
             console.log(`theElement.scrollHeight`, theElement.scrollHeight)
         }
     }, [isFetching])
+
+    const handleToggleSidebar = () => {
+        setHideSidebar(!hideSidebar)
+    }
+
+    const handleCreateNewConversation = () => {
+        updateCurrentConversation({ id: 0 })
+        setHistory([])
+        // refresh
+        console.log(`currentConversation`, currentConversation)
+    }
 
     const handleChangeConversation = useCallback((conversationID: number) => {
         setIsFetching(false)
@@ -167,16 +180,44 @@ const Main = () => {
         })
     }
 
+    const sidebarHideClass = `md:hidden`
+    const sidebarShowClass = `w-[280px]`
+    const rightFullClass = `w-full`
+    const rightNormalClass = `flex-1`
     return (
-        <div className="w-full flex flex-row h-full focus-visible:outline-0">
-            {/* TODO : 侧边栏 */}
-            <div className="sidebar h-full w-[280px] bg-gray-100 overflow-hidden hidden md:block md:translate-x-0 transform -translate-x-full transition-transform duration-500 ease-in-out">
-                <Sidebar conversationList={conversationList} onSelectConversation={handleChangeConversation} />
+        <div className="w-full flex flex-row h-full focus-visible:outline-0 transition-all duration-500">
+            <div
+                className={`sidebar h-full bg-gray-100 overflow-hidden hidden md:block transition-transform duration-500 ease-in-out ${hideSidebar ? sidebarHideClass : sidebarShowClass}`}
+            >
+                <Sidebar
+                    conversationList={conversationList}
+                    onSelectConversation={handleChangeConversation}
+                    onToggleSidebar={handleToggleSidebar}
+                    onCreateNewConversation={handleCreateNewConversation}
+                />
             </div>
-            <div className="flex flex-1 flex-col relative h-full focus-visible:outline-0">
+            <div
+                className={`flex flex-col relative h-full focus-visible:outline-0 transition-transform duration-500 ease-in-out ${hideSidebar ? rightFullClass : rightNormalClass}`}
+            >
                 <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>
                     <div className="absolute flex flex-row h-14 w-full items-center justify-between">
-                        <div className="topleft ml-4">
+                        <div className="topleft ml-4 flex flex-row">
+                            {hideSidebar && (
+                                <>
+                                    <div
+                                        className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center"
+                                        onClick={handleToggleSidebar}
+                                    >
+                                        <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
+                                    </div>
+                                    <div
+                                        className=" cursor-pointer hover:bg-gray-200 w-9 h-9 pt-[2px] rounded-lg flex items-center justify-center"
+                                        onClick={handleCreateNewConversation}
+                                    >
+                                        <img src="/images/icons/create-new.svg" className="w-6 h-6" />
+                                    </div>
+                                </>
+                            )}
                             {/* <Drawer direction="left">
                                 <DrawerTrigger>Open</DrawerTrigger>
                                 <DrawerContent

@@ -4,20 +4,47 @@ import React from 'react'
 const Sidebar = ({
     conversationList,
     onSelectConversation,
+    onToggleSidebar,
+    onCreateNewConversation,
 }: {
     conversationList?: {
         conversation_id: number
         topic: string
     }[]
     onSelectConversation?: (conversationID: number) => void
+    onToggleSidebar?: () => void
+    onCreateNewConversation?: () => void
 }) => {
     const handleSelectConversation = (conversationID: number) => {
         typeof onSelectConversation == `function` && onSelectConversation(conversationID)
     }
+
+    const handleToggleSidebar = () => {
+        typeof onToggleSidebar == `function` && onToggleSidebar()
+    }
+
+    const handleCreateNewConversation = () => {
+        typeof onCreateNewConversation == `function` && onCreateNewConversation()
+    }
     return (
         <div className="flex flex-col bg-gray-100 w-full h-full">
-            <div className="m-3">
-                <div className="h-10 my-2"></div>
+            <div className="m-3 mt-0">
+                <div className="h-14 flex items-center ml-1 mb-2">
+                    <div className="flex flex-row justify-between w-full">
+                        <div
+                            className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center"
+                            onClick={handleToggleSidebar}
+                        >
+                            <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
+                        </div>
+                        <div
+                            className=" cursor-pointer hover:bg-gray-200 w-9 h-9 pt-[2px] rounded-lg flex items-center justify-center"
+                            onClick={handleCreateNewConversation}
+                        >
+                            <img src="/images/icons/create-new.svg" className="w-6 h-6" />
+                        </div>
+                    </div>
+                </div>
                 <div className="conversation_list flex flex-col gap-1 text-gray-600 text-base text-[15px]">
                     {_.map(conversationList, (conversationItem, index) => {
                         console.log(`conversationItem`, conversationItem)

@@ -1,10 +1,11 @@
+import { isNumber } from 'lodash'
 import { createStore } from 'zustand/vanilla'
 
 type MainState = {
     isloading?: boolean
     userInfo: Record<string, any>
     currentConversation: {
-        id: number
+        id?: number
         topic?: string
     }
     conversations: {
@@ -38,11 +39,11 @@ export const createMainStore = (initState: MainState = defaultInitState) => {
     return createStore<MainStore>()(set => {
         return {
             ...initState,
-            updateCurrentConversation: ({ id = 0, topic = '' }) => {
+            updateCurrentConversation: ({ id, topic = '' }: { id?: number; topic?: string }) => {
                 return set(state => {
                     return {
                         currentConversation: {
-                            id: id || state.currentConversation.id,
+                            id: isNumber(id) ? id : state.currentConversation.id,
                             topic: topic || state.currentConversation.topic,
                         },
                     }
