@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react'
 import { IHistory, Roles, IChatMessage, UserMessage, TextMessage, ImageUrlMessage } from '../shared/interface'
 import _ from 'lodash'
+import ChatImagePreview from './ChatImagePreview'
+
 interface IChatUserMessageProps {
     chatMessage: UserMessage
 }
@@ -37,6 +39,14 @@ const ObjectContent = ({ content }: { content: (TextMessage | ImageUrlMessage)[]
         (message: TextMessage | ImageUrlMessage) => message.type === 'image_url' && message.image_url?.url
     ) as ImageUrlMessage[]
     const textContent = _.map(textContentList, (message: TextMessage) => message.text).join('\n')
+
+    const [openPreview, setOpenPreview] = useState(false)
+    const [previewImageUrl, setPreviewImageUrl] = useState('')
+    const handleClosePreview = () => {
+        setOpenPreview(false)
+        setPreviewImageUrl('')
+    }
+
     return (
         <div className="objectcontent gap-1 flex flex-col">
             {!_.isEmpty(imageContentList) ? (
@@ -47,6 +57,10 @@ const ObjectContent = ({ content }: { content: (TextMessage | ImageUrlMessage)[]
                             <div
                                 key={`imageContentList-${index}`}
                                 className=" w-32 h-32 rounded-lg cursor-pointer overflow-hidden"
+                                onClick={() => {
+                                    setPreviewImageUrl(url)
+                                    setOpenPreview(true)
+                                }}
                             >
                                 <img src={url} alt={detail || ''} className="object-cover w-full h-full" />
                             </div>
@@ -61,6 +75,7 @@ const ObjectContent = ({ content }: { content: (TextMessage | ImageUrlMessage)[]
                     </div>
                 </div>
             ) : null}
+            <ChatImagePreview imageUrl={previewImageUrl} isOpen={openPreview} closeCallback={handleClosePreview} />
         </div>
     )
 }
