@@ -83,7 +83,7 @@ export const handleGetConversationHistory = async ({ conversationID }: { convers
                     : _.map(items, item => {
                           const { content_type, content } = item || {}
                           if (content_type === `image_url`) {
-                              return { type: 'image_url', image_url: content }
+                              return { type: 'image_url', image_url: { url: content } }
                           }
                           return { type: 'text', text: content }
                       }),
