@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, ChangeEvent, KeyboardEvent, useRef, MouseEvent } from 'react'
+import React, { useState, ChangeEvent, KeyboardEvent, useRef, MouseEvent, useEffect } from 'react'
 import _ from 'lodash'
 import ImageUploadButton from '@/app/modules/ImageUploadButton'
 import ChatImagePreview from './ChatImagePreview'
@@ -15,6 +15,14 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
     const [inputRows, setInputRows] = useState<number>(1)
     const inputRef = useRef<HTMLTextAreaElement>(null)
     const [imageList, setImageList] = useState<{ imageId: number; imageUrl: string; isLoading: boolean }[]>([])
+
+    useEffect(() => {
+        if (!isFetching) {
+            setTimeout(() => {
+                inputRef.current?.focus()
+            }, 100)
+        }
+    }, [isFetching])
 
     const handleCompositionStart = () => {
         setIsComposing(true)

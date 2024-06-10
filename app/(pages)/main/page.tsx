@@ -37,7 +37,8 @@ const Main = () => {
         // 变更对话ID时，重新获取服务端的聊天记录
         if (currentConversation?.id > 0) {
             handleGetConversationHistory({ conversationID: currentConversation.id }).then(historyFromServer => {
-                setHistory(historyFromServer)
+                // 倒排序
+                setHistory(_.orderBy(historyFromServer, [_.identity], ['desc']))
             })
         }
     }, [])
