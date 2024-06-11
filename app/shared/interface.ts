@@ -43,6 +43,7 @@ export enum Roles {
 export type IHistory = IChatMessage[]
 
 export interface IGrahpqlAIFetchProps {
+    aiid?: string
     prompt?: string
     isTopic?: boolean
     messages?: IChatMessage[]
@@ -70,4 +71,12 @@ export interface IGrahpqlAIFetchProps {
     streamHandler?: (data: any) => void
     completeHandler?: (data: any) => void
     nonStreamHandler?: (data: any) => void
+}
+
+export type AI_BOT_TYPE = {
+    id: string
+    name: string
+    queryType: string
+    isCustom: boolean
+    imageCapability: boolean
 }

@@ -10,16 +10,19 @@ import ConversationBox from '@/app/modules/ConversationBox'
 import AISelection from '@/app/modules/AISelection'
 import { sleep } from '../../shared/util'
 import { fetchAIGraphql } from '@/app/shared/fetches'
-import { IChatMessage, Roles, IHistory, ImageUrlMessage, TextMessage, UserMessage } from '@/app/shared/interface'
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import {
-    handleGetAIResponse,
-    handleGetUserInfo,
-    handleGetConversationHistory,
-    handleGetAIBots,
-} from '@/app/shared/handlers'
+    IChatMessage,
+    Roles,
+    IHistory,
+    ImageUrlMessage,
+    TextMessage,
+    UserMessage,
+    AI_BOT_TYPE,
+} from '@/app/shared/interface'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
+import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } from '@/app/shared/handlers'
 
-const Main = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
+const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     console.log(`aiBots`, aiBots)
     const mainState = useMainStore(state => state)
     let { currentConversation, updateCurrentConversation } = mainState
@@ -83,9 +86,10 @@ const Main = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
     }, [])
 
     const handleUpdateTopic = async () => {
-        if (!currentConversation.topic && currentConversation?.id && history.length >= 4) {
-            const topicMessages = _.take(history, 4)
+        if (!currentConversation.topic && currentConversation?.id && history.length >= 3) {
+            const topicMessages = _.take(history, 3)
             const topicResult = await handleGetAIResponse({
+                aiid: currentConversation.aiBotIDs?.[0] || '',
                 messages: [
                     ...topicMessages,
                     { role: Roles.user, content: `请根据上面的对话，总结出话题，限定一句话。` } as UserMessage,
@@ -135,13 +139,31 @@ const Main = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
         setTimeout(() => scrollToEnd(), 100)
         handleUpdateTopic()
 
+        const {
+            queryType,
+            imageCapability,
+            id: aiid,
+        } = _.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] }) || {}
         // 只取最后5条
-        const lastQuestMessages = _.takeRight(
-            [...history, { role: Roles.user, content: userContent } as UserMessage],
-            5
-        )
+        let lastQuestMessages = _.takeRight([...history, { role: Roles.user, content: userContent } as UserMessage], 5)
+
+        // 没有图片处理能力时，只取文本
+        if (!imageCapability) {
+            lastQuestMessages = _.map(lastQuestMessages, m => {
+                const { role, content } = m
+                return {
+                    role,
+                    content: _.isString(content)
+                        ? content
+                        : (_.find(content, c => c.type == `text`) as TextMessage)?.text || '',
+                }
+            })
+        }
         console.log(`currentConversation===>`, currentConversation)
+
         await handleGetAIResponse({
+            aiid,
+            queryType: queryType,
             messages: lastQuestMessages,
             conversationID: currentConversation?.id || 0,
             onNonStream: (data: Record<string, any>) => {
@@ -247,14 +269,18 @@ const Main = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
                     <ConversationBox history={history} isFetching={isFetching} waiting={waitingForResponse} />
                 </div>
                 <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
-                    <Chatinput isFetching={isFetching} onSendQuestion={handleSendQuestion} />
+                    <Chatinput
+                        isFetching={isFetching}
+                        onSendQuestion={handleSendQuestion}
+                        imageCapability={_.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] })?.imageCapability}
+                    />
                 </div>
             </div>
         </div>
     )
 }
 
-const MainPage = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
+const MainPage = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     useEffect(() => {
         let vh = window.innerHeight * 0.01
         // Then we set the value in the --vh custom property to the root of the document

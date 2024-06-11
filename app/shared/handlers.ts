@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { sleep } from './util'
 import { fetchAIGraphql, fetchUploadImage, fetchUserInfoGraphql, fetchConversationMessagesGraphql } from './fetches'
-import { IChatMessage, Roles, IHistory } from './interface'
+import { IChatMessage, Roles, AI_BOT_TYPE } from './interface'
 
 export const handleUploadImage = async (imageBlob: Blob): Promise<string | null> => {
     const result = await fetchUploadImage(imageBlob)
@@ -19,6 +19,8 @@ export const handleGetAIResponse = async ({
     onNonStream,
     maxTokens = 2048,
     isTopic,
+    queryType,
+    aiid,
 }: {
     messages: IChatMessage[]
     conversationID: number
@@ -26,15 +28,18 @@ export const handleGetAIResponse = async ({
     onNonStream?: (arg: any) => void
     maxTokens?: number
     isTopic?: boolean
+    queryType?: string
+    aiid?: string
 }) => {
     return Promise.race([
         new Promise((resolve, reject) =>
             fetchAIGraphql({
+                aiid,
                 isTopic,
                 messages: messages,
                 conversationID,
                 isStream: onStream ? true : false,
-                queryOpenAI: true,
+                [queryType || 'queryOpenAI']: true,
                 maxTokens,
                 streamHandler: (streamResult: { content: string; status?: boolean }) => {
                     console.log('streamHandler', streamResult)
@@ -105,7 +110,7 @@ export const handleGetUserInfo = async () => {
     return null
 }
 
-export const handleGetAIBots = async () => {
+export const handleGetAIBots = async (): Promise<AI_BOT_TYPE[]> => {
     return aibotMock
 }
 
@@ -117,10 +122,11 @@ const aibotMock = [
         isCustom: false, // is_custom
         imageCapability: true, // image_capability
     },
-    // {
-    //     id: `gemini_pro_1.5`,
-    //     name: `Gemini Pro 1.5`,
-    //     queryType: `queryOpenAI`,
-    //     isCustom: false,
-    // },
+    {
+        id: `siliconflow_qwen2_72b_instruct`,
+        name: `Qwen2 72B Instruct`,
+        queryType: `queryOpenAI`,
+        isCustom: false,
+        imageCapability: false,
+    },
 ]

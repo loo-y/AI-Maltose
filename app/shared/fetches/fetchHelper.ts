@@ -3,6 +3,7 @@ import _ from 'lodash'
 
 export const getGraphqlAIMashupBody = ({
     prompt,
+    aiid,
     isTopic,
     messages,
     conversationID,
@@ -33,6 +34,7 @@ export const getGraphqlAIMashupBody = ({
         queryList = [],
         variables: Record<string, any> = {
             params: {
+                aiid,
                 isTopic,
                 conversationID: conversationID || 0,
                 messages: _.isEmpty(messages)

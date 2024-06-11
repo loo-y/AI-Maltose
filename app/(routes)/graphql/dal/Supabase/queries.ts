@@ -175,3 +175,25 @@ export const updateConversationTopic = async ({
     }
     return {}
 }
+
+export const getAIBots = async ({ userid, aiid }: { userid?: string; aiid?: string; ctx?: TBaseContext }) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('ai_bots')
+        .select('*')
+        .or('is_custom.eq.true', 'userid.eq.' + (userid || null))
+
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        if (aiid) {
+            const selectedAI = _.find(data, d => d.aiid == aiid)
+            if (selectedAI) {
+                return [selectedAI]
+            }
+            return []
+        }
+
+        return data
+    }
+
+    return []
+}

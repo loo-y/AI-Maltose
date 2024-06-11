@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { addConversationMessage, createConversation } from '../../dal/Supabase/queries'
+import { addConversationMessage, createConversation, getAIBots } from '../../dal/Supabase/queries'
 
 const typeDefinitions = `
     scalar JSON
@@ -43,6 +43,8 @@ const typeDefinitions = `
         searchWeb: Boolean
         "Is Topic"
         isTopic: Boolean
+        "AIBot ID"
+        aiid: String
     }
 `
 
@@ -50,7 +52,7 @@ const resolvers = {
     Query: {
         chat: async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
             const chatArgs = args.params
-            const { messages, conversationID, isTopic } = chatArgs || {}
+            const { messages, conversationID, isTopic, aiid } = chatArgs || {}
             const fixedMessages = _.map(messages, m => {
                 const { content, contentArray, ...other } = m
                 if (_.isEmpty(contentArray)) {
@@ -89,11 +91,26 @@ const resolvers = {
                 })
             }
 
+            let api_key, api_url, api_model_name
+            if (aiid) {
+                const aiBots = await getAIBots({
+                    userid: context.userId,
+                    aiid,
+                })
+                const aiBot = aiBots?.[0] || {}
+                api_key = aiBot?.api_key
+                api_url = aiBot?.api_url
+                api_model_name = aiBot?.api_model_name
+            }
+
             return {
                 ...chatArgs,
                 messages: fixedMessages,
                 userid: context.userId,
                 conversationID: currentConversationID,
+                api_key,
+                api_url,
+                api_model_name,
             }
         },
     },

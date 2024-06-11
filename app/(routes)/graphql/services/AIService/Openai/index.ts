@@ -31,6 +31,9 @@ export const Openai = async (parent: TParent, args: Record<string, any>, context
         conversationID,
         isTopic,
         userid,
+        api_key,
+        api_url,
+        api_model_name,
     } = parent || {}
     const openaiArgs = args?.params || {}
     const { messages: appendMessages, apiKey, model, maxTokens, baseUrl } = openaiArgs || {}
@@ -44,7 +47,14 @@ export const Openai = async (parent: TParent, args: Record<string, any>, context
     const text: any = await (
         await OpenaiDal.loader(
             context,
-            { messages, apiKey, model, maxOutputTokens: maxTokensUse, searchWeb, baseUrl },
+            {
+                messages,
+                apiKey: api_key || apiKey,
+                model: api_model_name || model,
+                maxOutputTokens: maxTokensUse,
+                searchWeb,
+                baseUrl: api_url || baseUrl,
+            },
             key
         )
     ).load(key)
@@ -75,6 +85,9 @@ export const OpenaiStream = async (parent: TParent, args: Record<string, any>, c
             conversationID,
             userid,
             isTopic,
+            api_key,
+            api_url,
+            api_model_name,
         } = parent || {}
         const openaiArgs = args?.params || {}
         const { messages: appendMessages, apiKey, model, maxTokens, baseUrl } = openaiArgs || {}
@@ -87,12 +100,12 @@ export const OpenaiStream = async (parent: TParent, args: Record<string, any>, c
                 context,
                 {
                     messages,
-                    apiKey,
-                    model,
+                    apiKey: api_key || apiKey,
+                    model: api_model_name || model,
                     maxOutputTokens: maxTokensUse,
                     isStream: true,
                     searchWeb,
-                    baseUrl,
+                    baseUrl: api_url || baseUrl,
                     completeHandler: async ({ content, status, model }) => {
                         if (content && status && !isTopic) {
                             await addConversationMessage({

@@ -24,7 +24,7 @@ type MainState = {
 
 type MainActions = {
     updateIsLoading: (loading: boolean) => void
-    updateCurrentConversation: (prams: { id?: number; topic?: string }) => void
+    updateCurrentConversation: (prams: { id?: number; topic?: string; aiBotIDs?: string[] }) => void
 }
 
 export type MainStore = MainState & MainActions

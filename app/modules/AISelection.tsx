@@ -9,7 +9,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mainState: MainStore }) => {
-    const { currentConversation } = mainState || {}
+    const { currentConversation, updateCurrentConversation } = mainState || {}
     const { id, aiBotIDs } = currentConversation || {}
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState('')
@@ -25,6 +25,7 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
             // setValue(currentValue === value ? '' : currentValue)
             // 不可反选
             setValue(currentValue)
+            updateCurrentConversation({ aiBotIDs: [currentValue] })
         }
         setOpen(false)
     }

@@ -5,11 +5,12 @@ import ImageUploadButton from '@/app/modules/ImageUploadButton'
 import ChatImagePreview from './ChatImagePreview'
 
 interface IChatInputProps {
+    imageCapability?: boolean
     maxRows?: number
     onSendQuestion: (question: string, imagList?: string[]) => void
     isFetching?: boolean
 }
-const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInputProps) => {
+const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion, imageCapability = true }: IChatInputProps) => {
     const [isComposing, setIsComposing] = useState(false)
     const [inputValue, setInputValue] = useState<string>('')
     const [inputRows, setInputRows] = useState<number>(1)
@@ -136,12 +137,14 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion }: IChatInp
             <div className="max-w-[50rem] w-full flex flex-col mx-auto">
                 <div className="overflow-y-scroll overflow-x-hidden rounded-3xl bg-gray-100 flex flex-row gap-1 flex-grow  mx-4 text-gray-600 max-h-52">
                     <div className="flex flex-grow flex-row  border-0 pl-5 gap-1 ">
-                        <div className="flex flex-row justify-start items-end my-2 -ml-1rem gap-1">
-                            <ImageUploadButton
-                                completedCallback={handleImageUploaded}
-                                uploadCallback={handleImageUploading}
-                            />
-                        </div>
+                        {imageCapability ? (
+                            <div className="flex flex-row justify-start items-end my-2 -ml-1rem gap-1">
+                                <ImageUploadButton
+                                    completedCallback={handleImageUploaded}
+                                    uploadCallback={handleImageUploading}
+                                />
+                            </div>
+                        ) : null}
                         <div className="flex flex-col gap-2 w-full flex-grow">
                             {_.isEmpty(imageList) ? null : (
                                 <div className="flex flex-row gap-2 h-fit mt-3">
