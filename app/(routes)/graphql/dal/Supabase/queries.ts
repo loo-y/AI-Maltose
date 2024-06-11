@@ -178,21 +178,29 @@ export const updateConversationTopic = async ({
 
 export const getAIBots = async ({ userid, aiid }: { userid?: string; aiid?: string; ctx?: TBaseContext }) => {
     const supabase = createClient()
-    const { data, error } = await supabase
-        .from('ai_bots')
-        .select('*')
-        .or('is_custom.eq.true', 'userid.eq.' + (userid || null))
-
+    const combinedData = []
+    const { data, error } = await supabase.from('ai_bots').select('*').eq('is_custom', false)
     if (_.isEmpty(error) && !_.isEmpty(data)) {
+        combinedData.push(...data)
+    }
+    if (userid) {
+        const { data: userselfData } = await supabase.from('ai_bots').select('*').eq('userid', userid)
+
+        if (!_.isEmpty(userselfData)) {
+            combinedData.push(...userselfData)
+        }
+    }
+
+    if (!_.isEmpty(combinedData)) {
         if (aiid) {
-            const selectedAI = _.find(data, d => d.aiid == aiid)
+            const selectedAI = _.find(combinedData, d => d.aiid == aiid)
             if (selectedAI) {
                 return [selectedAI]
             }
             return []
         }
 
-        return data
+        return combinedData
     }
 
     return []

@@ -129,4 +129,11 @@ const aibotMock = [
         isCustom: false,
         imageCapability: false,
     },
+    {
+        id: `siliconflow_glm4_9b_chat`,
+        name: `GLM4 9B Chat`,
+        queryType: `queryOpenAI`,
+        isCustom: false,
+        imageCapability: false,
+    },
 ]
