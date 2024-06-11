@@ -1,16 +1,33 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import _ from 'lodash'
+import type { MainStore } from '@/app/(pages)/main/stores'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
-const AISelection = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
+const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mainState: MainStore }) => {
+    const { currentConversation } = mainState || {}
+    const { id, aiBotIDs } = currentConversation || {}
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState('')
 
+    useEffect(() => {
+        if (currentConversation?.aiBotIDs?.[0]) {
+            setValue(currentConversation.aiBotIDs[0])
+        }
+    }, [currentConversation])
+
+    const handleSelectAI = (currentValue: string) => {
+        if (!id && !_.includes(aiBotIDs, currentValue)) {
+            // setValue(currentValue === value ? '' : currentValue)
+            // 不可反选
+            setValue(currentValue)
+        }
+        setOpen(false)
+    }
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
@@ -35,14 +52,7 @@ const AISelection = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
                                 const { id, name } = aibot
                                 return (
                                     <React.Fragment key={`aibot_select_${index}`}>
-                                        <CommandItem
-                                            key={id}
-                                            value={id}
-                                            onSelect={currentValue => {
-                                                setValue(currentValue === value ? '' : currentValue)
-                                                setOpen(false)
-                                            }}
-                                        >
+                                        <CommandItem key={id} value={id} onSelect={handleSelectAI}>
                                             {name}
                                             <CheckIcon
                                                 className={cn(

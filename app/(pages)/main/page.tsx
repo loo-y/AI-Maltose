@@ -226,7 +226,7 @@ const Main = ({ aiBots }: { aiBots: Record<string, any>[] }) => {
                                 </>
                             )}
                             <div className="flex items-center justify-center">
-                                <AISelection aiBots={aiBots} />
+                                <AISelection aiBots={aiBots} mainState={mainState} />
                             </div>
                             {/* <Drawer direction="left">
                                 <DrawerTrigger>Open</DrawerTrigger>

@@ -113,8 +113,9 @@ const aibotMock = [
     {
         id: `openai_gpt-4o`,
         name: `GPT-4o`,
-        queryType: `queryOpenAI`,
-        isCustom: false,
+        queryType: `queryOpenAI`, // query_type
+        isCustom: false, // is_custom
+        imageCapability: true, // image_capability
     },
     // {
     //     id: `gemini_pro_1.5`,

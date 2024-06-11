@@ -1,17 +1,25 @@
 import { isNumber } from 'lodash'
 import { createStore } from 'zustand/vanilla'
 
+type ConversationType = {
+    id?: number
+    topic?: string
+    aiBotIDs?: string[]
+}
+type AIBotType = {
+    id: string
+    name: string
+    queryType: string
+    isCustom: boolean
+    imageCapability: boolean
+}
+
 type MainState = {
     isloading?: boolean
     userInfo: Record<string, any>
-    currentConversation: {
-        id?: number
-        topic?: string
-    }
-    conversations: {
-        id: number
-        topic: string
-    }[]
+    currentConversation: ConversationType
+    conversations: ConversationType[]
+    aiBotList: AIBotType[]
 }
 
 type MainActions = {
@@ -23,6 +31,7 @@ export type MainStore = MainState & MainActions
 
 const defaultInitState: MainState = {
     isloading: false,
+    aiBotList: [],
     userInfo: {},
     conversations: [],
     currentConversation: {
@@ -39,12 +48,13 @@ export const createMainStore = (initState: MainState = defaultInitState) => {
     return createStore<MainStore>()(set => {
         return {
             ...initState,
-            updateCurrentConversation: ({ id, topic = '' }: { id?: number; topic?: string }) => {
+            updateCurrentConversation: ({ id, topic = '', aiBotIDs }: ConversationType) => {
                 return set(state => {
                     return {
                         currentConversation: {
                             id: isNumber(id) ? id : state.currentConversation.id,
                             topic: topic || state.currentConversation.topic,
+                            aiBotIDs: aiBotIDs || state.currentConversation.aiBotIDs,
                         },
                     }
                 })
