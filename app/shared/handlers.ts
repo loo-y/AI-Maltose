@@ -123,6 +123,20 @@ const aibotMock = [
         imageCapability: true, // image_capability
     },
     {
+        id: `gemini_pro_1.5`,
+        name: `Gemini Pro 1.5`,
+        queryType: `queryOpenAI`,
+        isCustom: false,
+        imageCapability: true,
+    },
+    {
+        id: `gemini_flash_1.5`,
+        name: `Gemini Flash 1.5`,
+        queryType: `queryOpenAI`,
+        isCustom: false,
+        imageCapability: true,
+    },
+    {
         id: `siliconflow_qwen2_72b_instruct`,
         name: `Qwen2 72B Instruct`,
         queryType: `queryOpenAI`,
