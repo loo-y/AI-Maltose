@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mainState: MainStore }) => {
     const { currentConversation, updateCurrentConversation } = mainState || {}
     const { id, aiBotIDs } = currentConversation || {}
-    const selected = id || aiBotIDs?.[0]
+    const selected = id && aiBotIDs?.[0]
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState('')
 
