@@ -20,7 +20,7 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
             const defaultValue = aiBots?.[0]?.id
             if (defaultValue) {
                 setValue(defaultValue)
-                updateCurrentConversation({ aiBotIDs: [defaultValue] })
+                updateCurrentConversation({ ...currentConversation, aiBotIDs: [defaultValue] })
             }
         }
     }, [])
@@ -36,7 +36,7 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
             // setValue(currentValue === value ? '' : currentValue)
             // 不可反选
             setValue(currentValue)
-            updateCurrentConversation({ aiBotIDs: [currentValue] })
+            updateCurrentConversation({ ...currentConversation, aiBotIDs: [currentValue] })
         }
         setOpen(false)
     }

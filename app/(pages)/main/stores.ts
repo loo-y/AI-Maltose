@@ -52,9 +52,9 @@ export const createMainStore = (initState: MainState = defaultInitState) => {
                 return set(state => {
                     return {
                         currentConversation: {
-                            id: isNumber(id) ? id : state.currentConversation.id,
-                            topic: topic || state.currentConversation.topic,
-                            aiBotIDs: aiBotIDs || state.currentConversation.aiBotIDs,
+                            id: isNumber(id) ? id : 0,
+                            topic: topic || '',
+                            aiBotIDs: aiBotIDs || [],
                         },
                     }
                 })

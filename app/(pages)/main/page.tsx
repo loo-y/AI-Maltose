@@ -70,7 +70,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     }
 
     const handleCreateNewConversation = () => {
-        updateCurrentConversation({ id: 0 })
+        updateCurrentConversation({ ...currentConversation, id: 0 })
         setHistory([])
         // refresh
         console.log(`currentConversation`, currentConversation)
@@ -124,7 +124,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
             console.log(`chatResult`, topicResult, chatResult)
             const topic = _.find(_.values(chatResult), 'text')?.text || ``
             if (topic) {
-                updateCurrentConversation({ topic })
+                updateCurrentConversation({ ...currentConversation, topic })
                 setConversationList(_conversationList => {
                     const newConversationList = _.map(_conversationList, item => {
                         if (item.conversation_id === currentConversation.id) {
@@ -196,7 +196,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 console.log(`ChatInfo`, ChatInfo)
                 console.log(`ChatInfo.conversationID`, ChatInfo?.conversationID)
                 if (ChatInfo?.conversationID) {
-                    updateCurrentConversation({ id: ChatInfo.conversationID })
+                    updateCurrentConversation({ ...currentConversation, id: ChatInfo.conversationID })
                     setConversationList(_conversationList => {
                         if (_.find(_conversationList, { conversation_id: ChatInfo.conversationID })) {
                             return _conversationList
