@@ -250,7 +250,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 className={`flex flex-col relative h-full focus-visible:outline-0 transition-transform duration-500 ease-in-out ${hideSidebar ? rightFullClass : rightNormalClass}`}
             >
                 <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>
-                    <div className="absolute flex flex-row h-14 w-full items-center justify-between z-1 bg-white">
+                    <div className="absolute flex flex-row h-14 w-full items-center justify-between z-10 bg-white">
                         <div className="topleft ml-4 flex flex-row">
                             {hideSidebar && (
                                 <>
