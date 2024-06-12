@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mainState: MainStore }) => {
     const { currentConversation, updateCurrentConversation } = mainState || {}
     const { id, aiBotIDs } = currentConversation || {}
+    const selected = !id && !aiBotIDs?.[0]
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState('')
 
@@ -29,6 +30,22 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
         }
         setOpen(false)
     }
+
+    if (selected) {
+        return (
+            <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className=" w-52 justify-start border-none h-9 hover:bg-transparent p-0 pt-1"
+            >
+                <div className="flex flex-row items-center justify-start hover:bg-gray-100 px-4 py-2 rounded-md">
+                    {_.find(aiBots, aibot => aibot.id === id)?.name || ''}
+                </div>
+            </Button>
+        )
+    }
+
     return (
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
