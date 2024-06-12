@@ -16,6 +16,16 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
     const [value, setValue] = useState('')
 
     useEffect(() => {
+        if (!value) {
+            const defaultValue = aiBots?.[0]?.id
+            if (defaultValue) {
+                setValue(defaultValue)
+                updateCurrentConversation({ aiBotIDs: [defaultValue] })
+            }
+        }
+    }, [])
+
+    useEffect(() => {
         if (currentConversation?.aiBotIDs?.[0]) {
             setValue(currentConversation.aiBotIDs[0])
         }

@@ -102,16 +102,20 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     )
 
     const handleUpdateTopic = async (history: IHistory) => {
-        if (!currentConversation.topic && currentConversation?.id && history.length >= 3) {
+        console.log(`handleUpdateTopic`, currentConversation.topic, currentConversation?.id, history.length)
+        if (!currentConversation.topic && currentConversation?.id && history.length >= 2) {
             const { queryType, id: aiid } = _.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] }) || {}
 
-            const topicMessages = _.take(history, 3)
+            const topicMessages = _.take(history, 2)
             const topicResult = await handleGetAIResponse({
                 aiid: aiid || '',
                 queryType: queryType,
                 messages: [
                     ...topicMessages,
-                    { role: Roles.user, content: `请根据上面的对话，总结出话题，限定一句话。` } as UserMessage,
+                    {
+                        role: Roles.user,
+                        content: `请根据上面的对话，以用户的第一人称视角总结出话题，限定一句话。不需要出现"话题是"之类的前缀。`,
+                    } as UserMessage,
                 ],
                 conversationID: currentConversation.id,
                 isTopic: true,
@@ -146,15 +150,6 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                       return { type: 'image_url', image_url: { url: imgSrc } } as ImageUrlMessage
                   }),
               ]
-        setHistory(_history => {
-            return [
-                ..._history,
-                {
-                    role: Roles.user,
-                    content: userContent,
-                },
-            ]
-        })
         setTimeout(() => {
             scrollToEnd()
             handleUpdateTopic(history)
@@ -167,7 +162,15 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
         } = _.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] }) || {}
         // 只取最后5条
         let lastQuestMessages = _.takeRight([...history, { role: Roles.user, content: userContent } as UserMessage], 5)
-
+        setHistory(_history => {
+            return [
+                ..._history,
+                {
+                    role: Roles.user,
+                    content: userContent,
+                },
+            ]
+        })
         // 没有图片处理能力时，只取文本
         if (!imageCapability) {
             lastQuestMessages = _.map(lastQuestMessages, m => {
