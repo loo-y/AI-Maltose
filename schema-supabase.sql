@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS ai_bots (
     api_url TEXT,
     api_key TEXT,
     api_model_name TEXT,
+    api_account TEXT,
+    token_price FLOAT, -- 此ai的调用token单价
     query_type TEXT, -- 调用的接口类型
     image_capability BOOLEAN DEFAULT TRUE,
     userid TEXT, -- 属于哪个用户

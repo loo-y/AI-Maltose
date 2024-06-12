@@ -6,7 +6,7 @@ import { generationConfig } from '../../utils/constants'
 import { fetchEventStream } from '../../utils/tools'
 
 const DEFAULT_MODEL_NAME = '@cf/meta/llama-3-8b-instruct'
-const baseUrl = `https://api.cloudflare.com/client/v4/accounts/`
+const defaultBaseUrl = `https://api.cloudflare.com/client/v4/accounts/`
 const defaultErrorInfo = `currently the mode is not supported`
 
 const convertMessages = (messages: IWorkersAIArgs['messages']) => {
@@ -36,11 +36,14 @@ const fetchWorkersAI = async (ctx: TBaseContext, params: Record<string, any>, op
         isStream,
         completeHandler,
         streamHandler,
+        baseUrl,
     } = params || {}
     const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
+
     const API_KEY = apiKey || env?.WORKERSAI_API_KEY || ''
     const ACCOUNT_ID = accountID || env?.WORKERSAI_ACCOUNT_ID || ''
-    const modelUse = modelName || DEFAULT_MODEL_NAME
+    const modelUse = modelName || env.WORKERSAI_API_MODEL || DEFAULT_MODEL_NAME
+    const BASE_URL = baseUrl || env.WORKERSAI_API_BASE_URL || defaultBaseUrl || undefined
     const max_tokens = maxOutputTokens || generationConfig.maxOutputTokens
     if (_.isEmpty(messages) || !API_KEY || !ACCOUNT_ID) {
         return 'there is no messages or api key of WorkersAI'
@@ -65,7 +68,7 @@ const fetchWorkersAI = async (ctx: TBaseContext, params: Record<string, any>, op
         body: JSON.stringify(body),
     }
 
-    const requestUrl = `${baseUrl}${ACCOUNT_ID}/ai/run/${modelUse}`
+    const requestUrl = `${BASE_URL}${ACCOUNT_ID}/ai/run/${modelUse}`
 
     console.log(`requestUrl`, requestUrl)
     if (isStream) {

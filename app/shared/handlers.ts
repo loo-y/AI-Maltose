@@ -136,4 +136,11 @@ const aibotMock = [
         isCustom: false,
         imageCapability: false,
     },
+    {
+        id: `cf_llama3_8b_instruct`,
+        name: `Llama3 8B Instruct`,
+        queryType: `queryWorkersAI`,
+        isCustom: false,
+        imageCapability: false,
+    },
 ]

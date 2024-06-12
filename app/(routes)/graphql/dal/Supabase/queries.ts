@@ -46,15 +46,45 @@ export const addBalanceForUser = async (userData: { userid: string; balance: num
     return false
 }
 
-export const createConversation = async ({ userid }: { userid: string }) => {
+export const createConversation = async ({ userid, aiid }: { userid: string; aiid?: string }) => {
     const supabase = createClient()
     const { data, error } = await supabase.from('conversations').insert([{ userid }]).select()
 
     console.log(`createConversation===>`, data, error)
-    if (_.isEmpty(error) && !_.isEmpty(data)) {
-        return data?.[0]?.conversation_id
+    const conversation_id = data?.[0]?.conversation_id || 0
+
+    if (conversation_id && aiid) {
+        // 插入 conversation ai
+        await addAIForconversation({
+            conversationid: conversation_id,
+            aiid,
+        })
     }
-    return 0
+
+    return conversation_id
+}
+
+const addAIForconversation = async ({
+    conversationid,
+    userid,
+    aiid,
+}: {
+    conversationid: number
+    userid?: string
+    aiid?: string
+}) => {
+    const supabase = createClient()
+    if (!conversationid || !aiid) return false
+    const { data, error } = await supabase.from('conversation_ai').select('*').eq('conversation_id', conversationid)
+    if (data?.[0]?.conversation_id) return true
+    const { data: insertResult, error: insertError } = await supabase.from('conversation_ai').insert([
+        {
+            conversation_id: conversationid,
+            aiid: aiid,
+        },
+    ])
+
+    return true
 }
 
 // add message by conversation id
@@ -71,7 +101,7 @@ export const addConversationMessage = async (messageData: {
     let currentConversationId = conversation_id
     // 如果是新对话，创建一条记录
     if (!conversation_id && userid) {
-        currentConversationId = await createConversation({ userid })
+        currentConversationId = await createConversation({ userid, aiid })
     }
 
     if (!currentConversationId) {
@@ -140,12 +170,20 @@ export const getUserConversations = async ({ ctx, userid }: { userid: string; ct
     const supabase = createClient()
     const { data, error } = await supabase.from('conversations').select('*').eq('userid', userid)
     if (_.isEmpty(error) && !_.isEmpty(data)) {
+        const { data: aiList } = await supabase
+            .from('conversation_ai')
+            .select('conversation_id, aiid')
+            .in('conversation_id', _.map(data, 'conversation_id'))
+
         return _.map(data, d => {
             return {
                 conversation_id: d.conversation_id,
                 created_at: d.created_at,
                 topic: d.topic,
                 cleared_messageid: d.cleared_messageid,
+                AIBotsIDs: _.filter(aiList, ai => {
+                    return ai.conversation_id == d.conversation_id
+                }),
             }
         })
     }

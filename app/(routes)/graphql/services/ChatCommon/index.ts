@@ -80,7 +80,7 @@ const resolvers = {
             // 最后一条用户的提问内容
             if (lastMessage?.role == 'user' && !isTopic) {
                 if (!conversationID) {
-                    currentConversationID = await createConversation({ userid: context.userId })
+                    currentConversationID = await createConversation({ userid: context.userId, aiid })
                 }
 
                 await addConversationMessage({
@@ -91,7 +91,7 @@ const resolvers = {
                 })
             }
 
-            let api_key, api_url, api_model_name
+            let api_key, api_url, api_model_name, api_account
             if (aiid) {
                 const aiBots = await getAIBots({
                     userid: context.userId,
@@ -101,6 +101,7 @@ const resolvers = {
                 api_key = aiBot?.api_key
                 api_url = aiBot?.api_url
                 api_model_name = aiBot?.api_model_name
+                api_account = aiBot?.api_account
             }
 
             return {
@@ -111,6 +112,8 @@ const resolvers = {
                 api_key,
                 api_url,
                 api_model_name,
+                api_account,
+                aiid,
             }
         },
     },

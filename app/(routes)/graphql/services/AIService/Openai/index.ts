@@ -34,6 +34,7 @@ export const Openai = async (parent: TParent, args: Record<string, any>, context
         api_key,
         api_url,
         api_model_name,
+        aiid,
     } = parent || {}
     const openaiArgs = args?.params || {}
     const { messages: appendMessages, apiKey, model, maxTokens, baseUrl } = openaiArgs || {}
@@ -67,7 +68,7 @@ export const Openai = async (parent: TParent, args: Record<string, any>, context
                 conversation_id: conversationID,
                 role: 'ai',
                 userid,
-                aiid: `openai_${model || ''}`,
+                aiid,
                 content: text,
             })
         }
@@ -88,6 +89,7 @@ export const OpenaiStream = async (parent: TParent, args: Record<string, any>, c
             api_key,
             api_url,
             api_model_name,
+            aiid,
         } = parent || {}
         const openaiArgs = args?.params || {}
         const { messages: appendMessages, apiKey, model, maxTokens, baseUrl } = openaiArgs || {}
@@ -112,7 +114,7 @@ export const OpenaiStream = async (parent: TParent, args: Record<string, any>, c
                                 conversation_id: conversationID,
                                 role: 'ai',
                                 userid,
-                                aiid: `openai_${model || ''}`,
+                                aiid,
                                 content: content,
                             })
                         }

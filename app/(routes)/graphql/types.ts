@@ -51,5 +51,7 @@ export interface IOpenaiArgs extends ICommonDalArgs {
 }
 
 export interface IWorkersAIArgs extends ICommonDalArgs {
+    baseUrl?: string
+
     accountID?: string
 }
