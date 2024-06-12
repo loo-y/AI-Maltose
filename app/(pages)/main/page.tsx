@@ -76,29 +76,30 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
         console.log(`currentConversation`, currentConversation)
     }
 
-    const handleChangeConversation = useCallback((conversationID: number) => {
-        setIsFetching(false)
-        // 变更对话ID时，重新获取服务端的聊天记录
-        if (conversationID > 0) {
-            handleGetConversationHistory({ conversationID }).then(historyFromServer => {
-                setHistory(historyFromServer)
-                const theConversation = _.find(conversationList, c => {
-                    return c.conversation_id == conversationID
+    const handleChangeConversation = useCallback(
+        (conversationID: number) => {
+            setIsFetching(false)
+            // 变更对话ID时，重新获取服务端的聊天记录
+            if (conversationID > 0) {
+                handleGetConversationHistory({ conversationID }).then(historyFromServer => {
+                    setHistory(historyFromServer)
+                    const theConversation = _.find(conversationList, c => {
+                        return c.conversation_id == conversationID
+                    })
+                    updateCurrentConversation(
+                        theConversation
+                            ? {
+                                  id: theConversation.conversation_id,
+                                  topic: theConversation.topic,
+                                  aiBotIDs: theConversation.aiBotIDs,
+                              }
+                            : { id: conversationID }
+                    )
                 })
-                console.log(`theConversation`, theConversation, conversationID)
-
-                updateCurrentConversation(
-                    theConversation
-                        ? {
-                              id: theConversation.conversation_id,
-                              topic: theConversation.topic,
-                              aiBotIDs: theConversation.aiBotIDs,
-                          }
-                        : { id: conversationID }
-                )
-            })
-        }
-    }, [])
+            }
+        },
+        [conversationList]
+    )
 
     const handleUpdateTopic = async () => {
         if (!currentConversation.topic && currentConversation?.id && history.length >= 3) {
