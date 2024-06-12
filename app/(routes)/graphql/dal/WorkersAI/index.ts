@@ -6,7 +6,7 @@ import { generationConfig } from '../../utils/constants'
 import { fetchEventStream } from '../../utils/tools'
 
 const DEFAULT_MODEL_NAME = '@cf/meta/llama-3-8b-instruct'
-const defaultBaseUrl = `https://api.cloudflare.com/client/v4/accounts/`
+const defaultBaseUrl = `https://api.cloudflare.com/client/v4/accounts`
 const defaultErrorInfo = `currently the mode is not supported`
 
 const convertMessages = (messages: IWorkersAIArgs['messages']) => {
@@ -68,7 +68,7 @@ const fetchWorkersAI = async (ctx: TBaseContext, params: Record<string, any>, op
         body: JSON.stringify(body),
     }
 
-    const requestUrl = `${BASE_URL}${ACCOUNT_ID}/ai/run/${modelUse}`
+    const requestUrl = `${BASE_URL}/${ACCOUNT_ID}/ai/run/${modelUse}`
 
     console.log(`requestUrl`, requestUrl)
     if (isStream) {
