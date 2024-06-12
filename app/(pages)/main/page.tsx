@@ -29,7 +29,9 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     const [isFetching, setIsFetching] = useState(false)
     const [waitingForResponse, setWaitingForResponse] = useState(false)
     const [history, setHistory] = useState<IHistory>([])
-    const [conversationList, setConversationList] = useState<{ conversation_id: number; topic: string }[]>([])
+    const [conversationList, setConversationList] = useState<
+        { conversation_id: number; topic: string; aiBotIDs?: string[] }[]
+    >([])
     const conversationContainerRef = useRef<HTMLDivElement>(null)
     const [hideSidebar, setHideSidebar] = useState(false)
     // useEffect(() => {
@@ -80,7 +82,18 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
         if (conversationID > 0) {
             handleGetConversationHistory({ conversationID }).then(historyFromServer => {
                 setHistory(historyFromServer)
-                updateCurrentConversation({ id: conversationID })
+                const theConversation = _.find(conversationList, c => {
+                    return c.conversation_id == conversationID
+                })
+                updateCurrentConversation(
+                    theConversation
+                        ? {
+                              id: theConversation.conversation_id,
+                              topic: theConversation.topic,
+                              aiBotIDs: theConversation.aiBotIDs,
+                          }
+                        : { id: conversationID }
+                )
             })
         }
     }, [])

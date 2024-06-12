@@ -181,9 +181,12 @@ export const getUserConversations = async ({ ctx, userid }: { userid: string; ct
                 created_at: d.created_at,
                 topic: d.topic,
                 cleared_messageid: d.cleared_messageid,
-                AIBotsIDs: _.filter(aiList, ai => {
-                    return ai.conversation_id == d.conversation_id
-                }),
+                aiBotIDs: _.map(
+                    _.filter(aiList, ai => {
+                        return ai.conversation_id == d.conversation_id
+                    }),
+                    item => item.aiid
+                ),
             }
         })
     }
