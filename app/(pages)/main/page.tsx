@@ -93,7 +93,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                                   topic: theConversation.topic,
                                   aiBotIDs: theConversation.aiBotIDs,
                               }
-                            : { id: conversationID }
+                            : { id: conversationID, topic: '', aiBotIDs: [] }
                     )
                 })
             }
