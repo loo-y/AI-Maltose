@@ -40,7 +40,7 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
                 className=" w-52 justify-start border-none h-9 hover:bg-transparent p-0 pt-1"
             >
                 <div className="flex flex-row items-center justify-start hover:bg-gray-100 px-4 py-2 rounded-md">
-                    {_.find(aiBots, aibot => aibot.id === id)?.name || ''}
+                    {_.find(aiBots, aibot => aibot.id === aiBotIDs?.[0])?.name || ''}
                 </div>
             </Button>
         )
