@@ -87,9 +87,12 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
 
     const handleUpdateTopic = async () => {
         if (!currentConversation.topic && currentConversation?.id && history.length >= 3) {
+            const { queryType, id: aiid } = _.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] }) || {}
+
             const topicMessages = _.take(history, 3)
             const topicResult = await handleGetAIResponse({
-                aiid: currentConversation.aiBotIDs?.[0] || '',
+                aiid: aiid || '',
+                queryType: queryType,
                 messages: [
                     ...topicMessages,
                     { role: Roles.user, content: `请根据上面的对话，总结出话题，限定一句话。` } as UserMessage,
