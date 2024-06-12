@@ -85,7 +85,8 @@ const fetchWorkersAI = async (ctx: TBaseContext, params: Record<string, any>, op
                 completeHandler: () => {
                     console.log(`totalContent`, totalContent)
                     completeHandler({
-                        content: `closed`,
+                        model: modelUse,
+                        content: totalContent,
                         status: true,
                     })
                 },

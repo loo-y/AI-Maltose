@@ -85,6 +85,8 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 const theConversation = _.find(conversationList, c => {
                     return c.conversation_id == conversationID
                 })
+                console.log(`theConversation`, theConversation, conversationID)
+
                 updateCurrentConversation(
                     theConversation
                         ? {
