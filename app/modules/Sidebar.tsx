@@ -1,12 +1,15 @@
 import _ from 'lodash'
 import React from 'react'
+import type { ConversationType } from '@/app/shared/interface'
 
 const Sidebar = ({
+    currentConversation,
     conversationList,
     onSelectConversation,
     onToggleSidebar,
     onCreateNewConversation,
 }: {
+    currentConversation: ConversationType
     conversationList?: {
         conversation_id: number
         topic: string
@@ -26,6 +29,7 @@ const Sidebar = ({
     const handleCreateNewConversation = () => {
         typeof onCreateNewConversation == `function` && onCreateNewConversation()
     }
+    const selectedClass = `bg-gray-200`
     return (
         <div className="flex flex-col bg-gray-100 w-full h-full">
             <div className="m-3 mt-0">
@@ -48,10 +52,11 @@ const Sidebar = ({
                 <div className="conversation_list flex flex-col gap-1 text-gray-600 text-base text-[15px]">
                     {_.map(conversationList, (conversationItem, index) => {
                         console.log(`conversationItem`, conversationItem)
+                        const isSelected = currentConversation?.id == conversationItem?.conversation_id
                         return (
                             <div
                                 key={`conversationItem-${index}`}
-                                className="flex py-2 px-3 hover:rounded-xl hover:bg-gray-200 cursor-pointer "
+                                className={`flex py-2 px-3 rounded-xl hover:bg-gray-200 cursor-pointer ${isSelected ? selectedClass : ``}`}
                                 onClick={handleSelectConversation.bind(this, conversationItem?.conversation_id)}
                             >
                                 <div className="line-clamp-1">{conversationItem?.topic || `untitled`}</div>

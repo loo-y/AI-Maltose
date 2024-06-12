@@ -1,11 +1,7 @@
 import { isNumber } from 'lodash'
 import { createStore } from 'zustand/vanilla'
+import type { ConversationType } from '@/app/shared/interface'
 
-type ConversationType = {
-    id?: number
-    topic?: string
-    aiBotIDs?: string[]
-}
 type AIBotType = {
     id: string
     name: string

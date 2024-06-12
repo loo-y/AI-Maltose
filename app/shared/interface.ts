@@ -80,3 +80,9 @@ export type AI_BOT_TYPE = {
     isCustom: boolean
     imageCapability: boolean
 }
+
+export type ConversationType = {
+    id?: number
+    topic?: string
+    aiBotIDs?: string[]
+}

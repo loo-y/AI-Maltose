@@ -21,9 +21,14 @@ import {
 } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } from '@/app/shared/handlers'
+import { useMediaQuery } from 'react-responsive'
 
 const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     console.log(`aiBots`, aiBots)
+    const [mounted, setMounted] = useState(false)
+    const isMd = useMediaQuery({ query: '(min-width: 768px)' })
+    const isMountedSmallScreen = mounted && !isMd
+
     const mainState = useMainStore(state => state)
     let { currentConversation, updateCurrentConversation } = mainState
     const [isFetching, setIsFetching] = useState(false)
@@ -40,6 +45,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
 
     // 变更选中的对话时，移除 fetching 状态
     useEffect(() => {
+        setMounted(true)
         setIsFetching(false)
         handleGetUserInfo().then(userInfo => {
             console.log(`userInfo`, userInfo)
@@ -106,7 +112,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
         if (!currentConversation.topic && currentConversation?.id && history.length >= 2) {
             const { queryType, id: aiid } = _.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] }) || {}
 
-            const topicMessages = _.take(history, 2)
+            const topicMessages = _.take(history, 4)
             const topicResult = await handleGetAIResponse({
                 aiid: aiid || '',
                 queryType: queryType,
@@ -243,6 +249,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 className={`sidebar h-full bg-gray-100 overflow-hidden hidden md:block transition-transform duration-500 ease-in-out ${hideSidebar ? sidebarHideClass : sidebarShowClass}`}
             >
                 <Sidebar
+                    currentConversation={currentConversation}
                     conversationList={conversationList}
                     onSelectConversation={handleChangeConversation}
                     onToggleSidebar={handleToggleSidebar}
@@ -255,7 +262,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>
                     <div className="absolute flex flex-row h-14 w-full items-center justify-between z-10 bg-white">
                         <div className="topleft ml-4 flex flex-row">
-                            {hideSidebar && (
+                            {hideSidebar || isMountedSmallScreen ? (
                                 <>
                                     <div
                                         className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center"
@@ -270,7 +277,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                                         <img src="/images/icons/create-new.svg" className="w-6 h-6" />
                                     </div>
                                 </>
-                            )}
+                            ) : null}
                             <div className="flex items-center justify-center">
                                 <AISelection aiBots={aiBots} mainState={mainState} />
                             </div>
