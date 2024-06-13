@@ -137,6 +137,13 @@ const aibotMock = [
         imageCapability: true,
     },
     {
+        id: `claude_3_sonnet`,
+        name: `Claude 3 Sonnet`,
+        queryType: `queryOpenAI`,
+        isCustom: false,
+        imageCapability: true,
+    },
+    {
         id: `siliconflow_qwen2_72b_instruct`,
         name: `Qwen2 72B Instruct`,
         queryType: `queryOpenAI`,
