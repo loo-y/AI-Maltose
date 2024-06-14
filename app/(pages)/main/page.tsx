@@ -100,6 +100,10 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                               }
                             : { id: conversationID, topic: '', aiBotIDs: [] }
                     )
+                    setTimeout(() => {
+                        // scoll to bottom
+                        scrollToEnd()
+                    }, 0)
                 })
             }
         },
