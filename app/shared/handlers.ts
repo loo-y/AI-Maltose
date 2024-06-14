@@ -116,6 +116,13 @@ export const handleGetAIBots = async (): Promise<AI_BOT_TYPE[]> => {
 
 const aibotMock = [
     {
+        id: `openai_gpt-4o_deepbricks`,
+        name: `GPT-4o (Lower Price)`,
+        queryType: `queryOpenAI`, // query_type
+        isCustom: false, // is_custom
+        imageCapability: true, // image_capability
+    },
+    {
         id: `openai_gpt-4o`,
         name: `GPT-4o`,
         queryType: `queryOpenAI`, // query_type
