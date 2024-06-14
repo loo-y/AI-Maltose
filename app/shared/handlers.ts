@@ -1,6 +1,12 @@
 import _ from 'lodash'
 import { sleep } from './util'
-import { fetchAIGraphql, fetchUploadImage, fetchUserInfoGraphql, fetchConversationMessagesGraphql } from './fetches'
+import {
+    fetchAIGraphql,
+    fetchUploadImage,
+    fetchUserInfoGraphql,
+    fetchConversationMessagesGraphql,
+    fetchAIBotListGraphql,
+} from './fetches'
 import { IChatMessage, Roles, AI_BOT_TYPE } from './interface'
 
 export const handleUploadImage = async (imageBlob: Blob): Promise<string | null> => {
@@ -111,7 +117,14 @@ export const handleGetUserInfo = async () => {
 }
 
 export const handleGetAIBots = async (): Promise<AI_BOT_TYPE[]> => {
-    return aibotMock
+    const result = await fetchAIBotListGraphql()
+    const { data, status } = result || {}
+    console.log(`data handleGetAIBots`, data)
+    if (status && data?.user?.AIBotList) {
+        return data.user.AIBotList
+    }
+
+    return []
 }
 
 const aibotMock = [

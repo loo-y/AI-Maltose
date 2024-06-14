@@ -16,6 +16,7 @@ import User from './User'
 import BasicInfo from './UserService/BasicInfo'
 import Histories from './UserService/Histories'
 import Conversation from './UserService/Conversation'
+import AIBotList from './UserService/AIBotList'
 
 const serviceList = [
     Chain,
@@ -35,6 +36,7 @@ const serviceList = [
     BasicInfo,
     Histories,
     Conversation,
+    AIBotList,
 ]
 
 export default {

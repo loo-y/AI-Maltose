@@ -233,3 +233,36 @@ export const fetchConversationMessagesGraphql = async (params?: { conversationID
         }
     }
 }
+
+export const fetchAIBotListGraphql = async () => {
+    const options = await getCommonOptions({})
+    const operationName = `GetAIBotListQuery`
+    const body = {
+        operationName,
+        query: `
+            query ${operationName}($params: UserArgs){
+                user(params: $params) {
+                    AIBotList
+                }
+            }
+        `,
+        variables: {},
+    }
+    try {
+        const response = await fetch(graphqlUrl, {
+            ...options,
+            body: JSON.stringify(body),
+        })
+        const data = await response.json()
+        return {
+            data: data.data,
+            status: true,
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            content: String(e),
+            status: false,
+        }
+    }
+}

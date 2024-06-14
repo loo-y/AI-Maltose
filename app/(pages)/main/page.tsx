@@ -24,7 +24,6 @@ import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } 
 import { useMediaQuery } from 'react-responsive'
 
 const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
-    console.log(`aiBots`, aiBots)
     const [mounted, setMounted] = useState(false)
     const isMd = useMediaQuery({ query: '(min-width: 768px)' })
     const isMountedSmallScreen = mounted && !isMd

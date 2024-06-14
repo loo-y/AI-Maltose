@@ -1,7 +1,7 @@
 // import 'dotenv/config'
 import DataLoader from 'dataloader'
 import _ from 'lodash'
-import { getUser, getconversationMessages } from './queries'
+import { getUser, getconversationMessages, getAIBots } from './queries'
 
 const loaderUserBasicInfo = (ctx: TBaseContext, args: { userid: string }, key: string) => {
     ctx.loaderUserBasicInfoArgs = {
@@ -75,4 +75,37 @@ const loaderConversationsHistory = (ctx: TBaseContext, args: { userid: string },
     return ctx.loaderConversationsHistory
 }
 
-export default { loaderUserBasicInfo, loaderConversationsHistory }
+const loadAIBotList = (ctx: TBaseContext, args: { userid?: string; aiid?: string }, key: string) => {
+    ctx.loaderAIBotListArgs = {
+        ...ctx.loaderUserBasicInfoArgs,
+        [key]: args,
+    }
+
+    if (!ctx?.loaderAIBotList) {
+        ctx.loaderAIBotList = new DataLoader<string, string>(
+            async keys => {
+                console.log(`loaderAIBotList-keys-🐹🐹🐹`, keys)
+                try {
+                    const userBasicInfoList = await Promise.all(
+                        keys.map(key =>
+                            getAIBots({
+                                ctx,
+                                ...ctx.loaderAIBotListArgs[key],
+                            })
+                        )
+                    )
+                    return userBasicInfoList
+                } catch (e) {
+                    console.log(`[loaderAIBotList] error: ${e}`)
+                }
+                return new Array(keys.length || 1).fill({ status: false })
+            },
+            {
+                batchScheduleFn: callback => setTimeout(callback, 100),
+            }
+        )
+    }
+
+    return ctx.loaderAIBotList
+}
+export default { loaderUserBasicInfo, loaderConversationsHistory, loadAIBotList }

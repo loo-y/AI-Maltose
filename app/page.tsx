@@ -1,7 +1,8 @@
 import MainPage from '@/app/(pages)/main/page'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { handleGetAIBots } from '@/app/shared/handlers'
+import { AI_BOT_TYPE } from '@/app/shared/interface'
+import { getAIBots } from '@/app/(routes)/graphql/dal/Supabase/queries'
 
 export default async function Home() {
     const { userId } = auth()
@@ -11,10 +12,30 @@ export default async function Home() {
         redirect('/signin')
         return null
     }
-    const AIBots = await handleGetAIBots()
+    const AIBots = await handleGetAIBotsByServer()
     return (
         <main className="main h-full overflow-hidden">
             <MainPage aiBots={AIBots} />
         </main>
     )
+}
+
+const handleGetAIBotsByServer = async (): Promise<AI_BOT_TYPE[]> => {
+    const aibotlist = await getAIBots({})
+    if (!_.isEmpty(aibotlist)) {
+        const AIBotList = _.map(aibotlist, aibot => {
+            const { aiid, ainame, query_type, is_custom, image_capability } = aibot || {}
+            return {
+                id: aiid,
+                name: ainame,
+                queryType: query_type, // query_type
+                isCustom: is_custom, // is_custom
+                imageCapability: image_capability, // image_capability
+            }
+        })
+
+        return AIBotList
+    }
+
+    return []
 }
