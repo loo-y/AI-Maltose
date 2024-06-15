@@ -35,7 +35,11 @@ const handleGetAIBotsByServer = async (): Promise<AI_BOT_TYPE[]> => {
             }
         })
         // lowerPrice 排第一个
-        AIBotList = _.orderBy(AIBotList, ['isCustom', 'imageCapability'], ['asc', 'desc'])
+        AIBotList = _.orderBy(AIBotList, aiBot => {
+            if (aiBot.id.includes(`deepbricks`)) return -1
+            return 1
+        })
+
         return AIBotList
     }
 
