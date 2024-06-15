@@ -24,7 +24,7 @@ export default async function Home() {
 const handleGetAIBotsByServer = async (): Promise<AI_BOT_TYPE[]> => {
     const aibotlist = await getAIBots({})
     if (!_.isEmpty(aibotlist)) {
-        const AIBotList = _.map(aibotlist, aibot => {
+        let AIBotList = _.map(aibotlist, aibot => {
             const { aiid, ainame, query_type, is_custom, image_capability } = aibot || {}
             return {
                 id: aiid,
@@ -34,7 +34,8 @@ const handleGetAIBotsByServer = async (): Promise<AI_BOT_TYPE[]> => {
                 imageCapability: image_capability, // image_capability
             }
         })
-
+        // lowerPrice 排第一个
+        AIBotList = _.orderBy(AIBotList, ['isCustom', 'imageCapability'], ['asc', 'desc'])
         return AIBotList
     }
 
