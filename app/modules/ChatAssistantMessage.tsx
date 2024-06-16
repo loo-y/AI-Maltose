@@ -14,6 +14,23 @@ interface IChatAssistantMessageProps {
 const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessageProps) => {
     const { content, provider, role } = chatMessage || {}
 
+    const handleCopy = async (textToCopy: string) => {
+        try {
+            if (navigator?.clipboard?.writeText) {
+                await navigator.clipboard.writeText(textToCopy)
+            } else if (document.execCommand) {
+                const textArea = document.createElement('textarea')
+                textArea.value = textToCopy
+                document.body.appendChild(textArea)
+                textArea.select()
+                document.execCommand('copy')
+                document.body.removeChild(textArea)
+            }
+        } catch (err) {
+            console.error('copy failed: ', err)
+        }
+    }
+
     return (
         <div className="w-full">
             <div className="py-2 px-3 text-base m-auto md:px-5 lg:px-1 xl:px-5 mb-3">
@@ -48,7 +65,14 @@ const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessagePro
                                                             <span>{codeName}</span>
                                                             <div className="flex items-center">
                                                                 <span className="" data-state="closed">
-                                                                    <button className="flex gap-1 items-center">
+                                                                    <button
+                                                                        className="flex gap-1 items-center"
+                                                                        onClick={() => {
+                                                                            handleCopy(
+                                                                                String(children)?.replace(/\n$/, '')
+                                                                            )
+                                                                        }}
+                                                                    >
                                                                         <img
                                                                             src="/images/icons/copy-code.svg"
                                                                             alt="copy code"
