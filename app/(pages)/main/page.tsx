@@ -289,7 +289,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                                                     onToggleSidebar={handleToggleSidebar}
                                                     onCreateNewConversation={handleCreateNewConversation}
                                                     isMountedSmallScreen={isMountedSmallScreen}
-                                                    className={`bg-white`}
+                                                    className={`bg-white max-h-[70vh]`}
                                                 />
                                             </DrawerContent>
                                         </Drawer>
@@ -322,7 +322,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                                 </DrawerContent>
                             </Drawer> */}
                         </div>
-                        <div className="topright signmodule mr-4">
+                        <div className="topright signmodule mr-4 mt-3">
                             <SignedIn>
                                 <UserButton />
                             </SignedIn>
