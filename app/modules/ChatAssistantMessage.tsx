@@ -5,6 +5,7 @@ import _ from 'lodash'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter, PrismLight as SyntaxHighlighterLight } from 'react-syntax-highlighter'
 import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { toast } from 'sonner'
 
 interface IChatAssistantMessageProps {
     chatMessage?: AssistantMessage
@@ -18,6 +19,7 @@ const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessagePro
         try {
             if (navigator?.clipboard?.writeText) {
                 await navigator.clipboard.writeText(textToCopy)
+                toast('Copied')
             } else if (document.execCommand) {
                 const textArea = document.createElement('textarea')
                 textArea.value = textToCopy
@@ -25,6 +27,7 @@ const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessagePro
                 textArea.select()
                 document.execCommand('copy')
                 document.body.removeChild(textArea)
+                toast('Copied')
             }
         } catch (err) {
             console.error('copy failed: ', err)

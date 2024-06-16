@@ -73,8 +73,7 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
             </PopoverTrigger>
             <PopoverContent className="relative left-0 w-60 p-0 -mr-8">
                 <Command>
-                    {/* <CommandInput placeholder="Search AI..." className="h-9" /> */}
-                    <CommandInput placeholder="TODO...Only for testing" className="h-9" />
+                    <CommandInput placeholder="Search AI..." className="h-9" />
                     <CommandList>
                         <CommandEmpty>No AI found.</CommandEmpty>
                         <CommandGroup>

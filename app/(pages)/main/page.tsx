@@ -22,6 +22,7 @@ import {
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } from '@/app/shared/handlers'
 import { useMediaQuery } from 'react-responsive'
+import { Toaster } from '@/components/ui/sonner'
 
 const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     const [mounted, setMounted] = useState(false)
@@ -310,6 +311,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                     />
                 </div>
             </div>
+            <Toaster />
         </div>
     )
 }
