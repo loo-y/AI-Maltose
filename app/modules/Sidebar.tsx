@@ -8,12 +8,16 @@ const Sidebar = ({
     onSelectConversation,
     onToggleSidebar,
     onCreateNewConversation,
+    isMountedSmallScreen = false,
+    className,
 }: {
     currentConversation: ConversationType
     conversationList?: {
         conversation_id: number
         topic: string
     }[]
+    isMountedSmallScreen?: boolean
+    className?: string
     onSelectConversation?: (conversationID: number) => void
     onToggleSidebar?: () => void
     onCreateNewConversation?: () => void
@@ -31,24 +35,28 @@ const Sidebar = ({
     }
     const selectedClass = `bg-gray-200`
     return (
-        <div className="flex flex-col bg-gray-100 w-full h-full">
+        <div
+            className={`flex flex-col bg-gray-100 w-full h-full overflow-y-scroll overflow-x-hidden ${className || ''}`}
+        >
             <div className="m-3 mt-0">
-                <div className="h-14 flex items-center ml-1 mb-2">
-                    <div className="flex flex-row justify-between w-full">
-                        <div
-                            className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center"
-                            onClick={handleToggleSidebar}
-                        >
-                            <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
-                        </div>
-                        <div
-                            className=" cursor-pointer hover:bg-gray-200 w-9 h-9 pt-[2px] rounded-lg flex items-center justify-center"
-                            onClick={handleCreateNewConversation}
-                        >
-                            <img src="/images/icons/create-new.svg" className="w-6 h-6" />
+                {isMountedSmallScreen ? null : (
+                    <div className="h-14 flex items-center ml-1 mb-2">
+                        <div className="flex flex-row justify-between w-full">
+                            <div
+                                className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center"
+                                onClick={handleToggleSidebar}
+                            >
+                                <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
+                            </div>
+                            <div
+                                className=" cursor-pointer hover:bg-gray-200 w-9 h-9 pt-[2px] rounded-lg flex items-center justify-center"
+                                onClick={handleCreateNewConversation}
+                            >
+                                <img src="/images/icons/create-new.svg" className="w-6 h-6" />
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
                 <div className="conversation_list flex flex-col gap-1 text-gray-600 text-base text-[15px]">
                     {_.map(conversationList, (conversationItem, index) => {
                         console.log(`conversationItem`, conversationItem)

@@ -39,6 +39,8 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     >([])
     const conversationContainerRef = useRef<HTMLDivElement>(null)
     const [hideSidebar, setHideSidebar] = useState(false)
+    const [openDrawerSidebar, setOpenDrawerSidebar] = useState<boolean>(false)
+
     // useEffect(() => {
     //     handleGetConversation({ conversationID: 1 })
     // }, [])
@@ -72,7 +74,9 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     }, [isFetching])
 
     const handleToggleSidebar = () => {
-        setHideSidebar(!hideSidebar)
+        if (!isMountedSmallScreen) {
+            setHideSidebar(!hideSidebar)
+        }
     }
 
     const handleCreateNewConversation = () => {
@@ -104,6 +108,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                     setTimeout(() => {
                         // scoll to bottom
                         scrollToEnd()
+                        setOpenDrawerSidebar(false)
                     }, 0)
                 })
             }
@@ -258,6 +263,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                     onSelectConversation={handleChangeConversation}
                     onToggleSidebar={handleToggleSidebar}
                     onCreateNewConversation={handleCreateNewConversation}
+                    isMountedSmallScreen={isMountedSmallScreen}
                 />
             </div>
             <div
@@ -268,12 +274,33 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                         <div className="topleft ml-4 flex flex-row">
                             {hideSidebar || isMountedSmallScreen ? (
                                 <>
-                                    <div
-                                        className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center"
-                                        onClick={handleToggleSidebar}
-                                    >
-                                        <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
-                                    </div>
+                                    {isMountedSmallScreen ? (
+                                        <Drawer open={openDrawerSidebar} onOpenChange={setOpenDrawerSidebar}>
+                                            <DrawerTrigger>
+                                                <div className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center">
+                                                    <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
+                                                </div>
+                                            </DrawerTrigger>
+                                            <DrawerContent>
+                                                <Sidebar
+                                                    currentConversation={currentConversation}
+                                                    conversationList={conversationList}
+                                                    onSelectConversation={handleChangeConversation}
+                                                    onToggleSidebar={handleToggleSidebar}
+                                                    onCreateNewConversation={handleCreateNewConversation}
+                                                    isMountedSmallScreen={isMountedSmallScreen}
+                                                    className={`bg-white`}
+                                                />
+                                            </DrawerContent>
+                                        </Drawer>
+                                    ) : (
+                                        <div
+                                            className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center"
+                                            onClick={handleToggleSidebar}
+                                        >
+                                            <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
+                                        </div>
+                                    )}
                                     <div
                                         className=" cursor-pointer hover:bg-gray-200 w-9 h-9 pt-[2px] rounded-lg flex items-center justify-center"
                                         onClick={handleCreateNewConversation}
