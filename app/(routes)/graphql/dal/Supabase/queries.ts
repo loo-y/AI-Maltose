@@ -6,11 +6,18 @@ export const getUser = async ({ userid }: { ctx?: TBaseContext; userid: string }
 
     const { data } = await supabase.from('users').select('*').eq('userid', userid)
     const user = data?.[0] || {}
+
+    if (!user?.userid) {
+        return {
+            conversations: [],
+        }
+    }
+
     const { balance, email, username } = user || {}
     let conversations: Record<string, any>[] = []
-    if (user?.userid) {
-        conversations = await getUserConversations({ userid: user.userid })
-    }
+
+    conversations = await getUserConversations({ userid: user.userid })
+
     return {
         balance,
         email,
