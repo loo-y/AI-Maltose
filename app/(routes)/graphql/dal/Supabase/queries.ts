@@ -25,10 +25,12 @@ export const createUser = async (userData: { username: string; userid: string; e
     const user = await getUser({ userid: userData.userid })
     // 用户已存在
     if (user?.userid) {
+        console.log(`user is exited, no need create`, user.userid)
         return true
     }
     const { data, error } = await supabase.from('users').insert([{ ...userData, balance: userData.balance || 100 }])
     if (_.isEmpty(error) && !_.isEmpty(data)) {
+        console.log(`create new user success`, data)
         return true
     }
     return false
