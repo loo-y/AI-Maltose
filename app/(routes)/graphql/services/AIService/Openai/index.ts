@@ -2,7 +2,7 @@
 import OpenaiDal from '../../../dal/Openai'
 import _ from 'lodash'
 import { Repeater } from 'graphql-yoga'
-import { addConversationMessage, updateConversationTopic } from '../../../dal/Supabase/queries'
+import { addConversationMessage, updateConversationTopic, addConsumptionRecords } from '../../../dal/Supabase/queries'
 
 const typeDefinitions = `
     scalar JSON
@@ -108,16 +108,31 @@ export const OpenaiStream = async (parent: TParent, args: Record<string, any>, c
                     isStream: true,
                     searchWeb,
                     baseUrl: api_url || baseUrl,
-                    completeHandler: async ({ content, status, model }) => {
+                    completeHandler: async ({ content, status, model, usage }) => {
+                        const promiseQueries = []
                         if (content && status && !isTopic) {
-                            await addConversationMessage({
-                                conversation_id: conversationID,
-                                role: 'ai',
-                                userid,
-                                aiid,
-                                content: content,
-                            })
+                            promiseQueries.push(
+                                addConversationMessage({
+                                    conversation_id: conversationID,
+                                    role: 'ai',
+                                    userid,
+                                    aiid,
+                                    content: content,
+                                })
+                            )
                         }
+                        if (status && usage?.total_tokens) {
+                            promiseQueries.push(
+                                addConsumptionRecords({
+                                    conversation_id: conversationID,
+                                    aiid,
+                                    userid,
+                                    tokens: usage?.total_tokens,
+                                })
+                            )
+                        }
+                        promiseQueries?.length && (await Promise.all(promiseQueries))
+
                         stop()
                     },
                     streamHandler: ({ token, status }) => {

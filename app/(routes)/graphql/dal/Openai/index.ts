@@ -101,9 +101,17 @@ const fetchOpenai = async (ctx: TBaseContext, params: Record<string, any>, optio
                 stream: true,
             })
 
-            let content = ``
+            let content = ``,
+                usage: Record<string, any> = {}
             for await (const chunk of completion) {
                 const text = chunk.choices[0].delta.content
+                if (chunk?.usage?.total_tokens) {
+                    usage = chunk.usage
+                }
+                const { completion_tokens, prompt_tokens, total_tokens } = usage || {}
+                if (total_tokens) {
+                    console.log(`chunk usage=====>`, usage)
+                }
                 console.log(`Openai text`, text)
                 if (text) {
                     streamHandler({
@@ -114,6 +122,7 @@ const fetchOpenai = async (ctx: TBaseContext, params: Record<string, any>, optio
                 }
             }
             completeHandler({
+                usage,
                 model: modelUse,
                 content: content,
                 status: true,

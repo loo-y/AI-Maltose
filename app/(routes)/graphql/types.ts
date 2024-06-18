@@ -29,7 +29,12 @@ export interface ICommonDalArgs {
     isStream?: boolean
     maxOutputTokens?: number
     searchWeb?: boolean
-    completeHandler?: (params: { content: string; status: boolean; model?: string }) => void
+    completeHandler?: (params: {
+        content: string
+        status: boolean
+        model?: string
+        usage?: { completion_tokens?: number; prompt_tokens?: number; total_tokens?: number }
+    }) => void
     streamHandler?: (params: { token: string; status: boolean }) => void
 }
 

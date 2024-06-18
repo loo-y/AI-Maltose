@@ -145,11 +145,11 @@ export const addConversationMessage = async (messageData: {
 
     console.log(`insertMessages===>`, insertMessages)
     const { data, error } = await supabase.from('messages').insert(insertMessages)
-    if (_.isEmpty(error) && !_.isEmpty(data)) {
+    if (_.isEmpty(error)) {
         return true
     }
 
-    console.log(`addConversationMessage error`, error)
+    console.log(`addConversationMessage error`, error, data)
     return false
 }
 
@@ -254,4 +254,29 @@ export const getAIBots = async ({ userid, aiid }: { userid?: string; aiid?: stri
     }
 
     return []
+}
+
+export const addConsumptionRecords = async ({
+    userid,
+    aiid,
+    conversation_id,
+    tokens,
+}: {
+    userid: string
+    aiid?: string
+    conversation_id: number
+    tokens: number
+    ctx?: TBaseContext
+}) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('consumption_records')
+        .insert([{ userid, aiid, conversation_id, tokens }])
+        .select()
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return true
+    }
+
+    console.log(`addConsumption error`, error, data)
+    return false
 }

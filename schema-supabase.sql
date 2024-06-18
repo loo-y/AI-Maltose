@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS consumption_records (
     userid TEXT,
     aiid TEXT,
     conversation_id INTEGER,
-    points DECIMAL(10, 2) NOT NULL,
+    tokens DECIMAL(10, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (userid) REFERENCES users(userid),
     FOREIGN KEY (aiid) REFERENCES ai_bots(aiid),
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS consumption_records (
 );
 
 -- 插入 consumption_records 表的示例数据
-INSERT INTO consumption_records (userid, aiid, conversation_id, points)
+INSERT INTO consumption_records (userid, aiid, conversation_id, tokens)
 SELECT u.userid, a.aiid, c.conversation_id, 5.00
 FROM users u
 JOIN conversations c ON u.userid = c.userid
