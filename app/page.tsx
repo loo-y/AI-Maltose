@@ -34,9 +34,9 @@ const handleGetAIBotsByServer = async (): Promise<AI_BOT_TYPE[]> => {
                 imageCapability: image_capability, // image_capability
             }
         })
-        // lowerPrice 排第一个
+        // gpt-4o lowerPrice 排第一个
         AIBotList = _.orderBy(AIBotList, aiBot => {
-            if (aiBot.id.includes(`deepbricks`)) return -1
+            if (aiBot.id.includes(`4o_deepbricks`)) return -1
             return 1
         })
 
