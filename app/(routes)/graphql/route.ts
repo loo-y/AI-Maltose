@@ -1,4 +1,4 @@
-import { createSchema, createYoga } from 'graphql-yoga'
+import { createSchema, createYoga, useExecutionCancellation } from 'graphql-yoga'
 import { schema } from './schema'
 import { useDeferStream } from '@graphql-yoga/plugin-defer-stream'
 import { auth, currentUser } from '@clerk/nextjs/server'
@@ -29,7 +29,7 @@ const { handleRequest } = createYoga({
 
         return { userId, emailAddres, userName, balance }
     },
-    plugins: [useDeferStream()],
+    plugins: [useDeferStream(), useExecutionCancellation()],
     // While using Next.js file convention for routing, we need to configure Yoga to use the correct endpoint
     graphqlEndpoint: '/graphql',
     // Yoga needs to know how to create a valid Next response
