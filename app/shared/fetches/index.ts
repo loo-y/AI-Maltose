@@ -21,8 +21,10 @@ const getCommonOptions = async ({ userToken }: { userToken?: string }) => {
     return options
 }
 
-export const fetchAIGraphql = async (paramsForAIGraphql: IGrahpqlAIFetchProps) => {
-    const { isStream, ...rest } = paramsForAIGraphql || {}
+export const fetchAIGraphql = async (
+    paramsForAIGraphql: IGrahpqlAIFetchProps & { abortController?: AbortController }
+) => {
+    const { isStream, abortController, ...rest } = paramsForAIGraphql || {}
     if (isStream) {
         return fetchAIGraphqlStream(paramsForAIGraphql)
     }
@@ -37,6 +39,7 @@ export const fetchAIGraphql = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =
         const response = await fetch(graphqlUrl, {
             ...options,
             body: JSON.stringify(body),
+            signal: abortController?.signal,
         })
         const data = await response.json()
         return {
@@ -52,9 +55,11 @@ export const fetchAIGraphql = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =
     }
 }
 
-const fetchAIGraphqlStream = async (paramsForAIGraphql: IGrahpqlAIFetchProps) => {
-    const abortController = new AbortController()
-    const { streamHandler, nonStreamHandler, completeHandler, ...rest } = paramsForAIGraphql || {}
+const fetchAIGraphqlStream = async (
+    paramsForAIGraphql: IGrahpqlAIFetchProps & { abortController?: AbortController }
+) => {
+    // const abortController = new AbortController()
+    const { streamHandler, nonStreamHandler, completeHandler, abortController, ...rest } = paramsForAIGraphql || {}
     const body = getGraphqlAIMashupBody({
         ...rest,
         name: `GetAiGraphqlQuery`,
@@ -66,7 +71,6 @@ const fetchAIGraphqlStream = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =>
             method: 'POST',
             body: JSON.stringify(body),
             onmessage(ev) {
-                console.log(ev.data)
                 const data: string | Record<string, any> = ev?.data || {}
                 try {
                     const {
@@ -117,7 +121,7 @@ const fetchAIGraphqlStream = async (paramsForAIGraphql: IGrahpqlAIFetchProps) =>
                     })
                 }
             },
-            signal: abortController.signal,
+            signal: abortController?.signal,
         })
     } catch (err) {
         console.log(`fetchAIGraphqlStream`, err)

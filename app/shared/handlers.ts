@@ -27,6 +27,7 @@ export const handleGetAIResponse = async ({
     isTopic,
     queryType,
     aiid,
+    abortController,
 }: {
     messages: IChatMessage[]
     conversationID: number
@@ -36,10 +37,12 @@ export const handleGetAIResponse = async ({
     isTopic?: boolean
     queryType?: string
     aiid?: string
+    abortController?: AbortController
 }) => {
     return Promise.race([
         new Promise((resolve, reject) =>
             fetchAIGraphql({
+                abortController,
                 aiid,
                 isTopic,
                 messages: messages,
@@ -59,13 +62,19 @@ export const handleGetAIResponse = async ({
                     typeof onNonStream == `function` && onNonStream(data)
                 },
                 completeHandler: (value: string) => {
+                    console.log(`completeHandler`, value)
                     typeof onStream == `function` && onStream(`__{{streamCompleted}}__`)
                     // resolve(true)
                 },
-            }).then(res => {
-                console.log(`fetchAIGraphql===>`, res)
-                resolve(res)
             })
+                .then(res => {
+                    console.log(`fetchAIGraphql===>`, res)
+                    resolve(res)
+                })
+                .catch(err => {
+                    console.log(`fetchAIGraphql===> error`, err)
+                    reject(err)
+                })
         ) as Promise<any>,
         sleep(10),
     ])

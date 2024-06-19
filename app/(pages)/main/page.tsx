@@ -40,6 +40,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     const conversationContainerRef = useRef<HTMLDivElement>(null)
     const [hideSidebar, setHideSidebar] = useState(false)
     const [openDrawerSidebar, setOpenDrawerSidebar] = useState<boolean>(false)
+    const [abortController, setAbortController] = useState<AbortController | null>(null)
 
     // useEffect(() => {
     //     handleGetConversation({ conversationID: 1 })
@@ -154,6 +155,12 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     }
 
     const handleSendQuestion = async (question: string, imageList?: string[]) => {
+        // 必须每次新建一个新的 abortController，
+        // 这个新的 abortController 作为新的signal传递
+        // 并且保存到 state 中
+        // state 保存是异步的
+        let _abortController = new AbortController()
+        setAbortController(_abortController)
         setWaitingForResponse(true)
         setIsFetching(true)
         console.log(`imageList`, imageList)
@@ -201,6 +208,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
         console.log(`currentConversation===>`, currentConversation)
 
         await handleGetAIResponse({
+            abortController: _abortController || undefined,
             aiid,
             queryType: queryType,
             messages: lastQuestMessages,
@@ -246,6 +254,15 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 }
             },
         })
+    }
+
+    const handleAbortQuestion = () => {
+        if (abortController) {
+            // 检查 controller 是否存在
+            abortController.abort()
+            setIsFetching(false)
+            setWaitingForResponse(false)
+        }
     }
 
     const sidebarHideClass = `md:hidden`
@@ -334,6 +351,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                     <Chatinput
                         isFetching={isFetching}
                         onSendQuestion={handleSendQuestion}
+                        onAbortQuestion={handleAbortQuestion}
                         imageCapability={_.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] })?.imageCapability}
                     />
                 </div>

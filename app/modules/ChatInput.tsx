@@ -8,9 +8,16 @@ interface IChatInputProps {
     imageCapability?: boolean
     maxRows?: number
     onSendQuestion: (question: string, imagList?: string[]) => void
+    onAbortQuestion?: () => void
     isFetching?: boolean
 }
-const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion, imageCapability = true }: IChatInputProps) => {
+const Chatinput = ({
+    maxRows = 5,
+    isFetching = false,
+    onSendQuestion,
+    onAbortQuestion,
+    imageCapability = true,
+}: IChatInputProps) => {
     const [isComposing, setIsComposing] = useState(false)
     const [inputValue, setInputValue] = useState<string>('')
     const [inputRows, setInputRows] = useState<number>(1)
@@ -90,6 +97,9 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion, imageCapab
         }, 50)
     }
 
+    const handleAbort = () => {
+        onAbortQuestion && onAbortQuestion()
+    }
     const handleImageUploaded = async (imageItem: { imageId: number; imageUrl: string }) => {
         if (_.isEmpty(imageItem)) return
         await new Promise((resolve, reject) => {
@@ -185,7 +195,7 @@ const Chatinput = ({ maxRows = 5, isFetching = false, onSendQuestion, imageCapab
                             <div className=" items-center flex">
                                 <div
                                     className="svg-image flex h-10 w-10 overflow-hidden items-center justify-center cursor-pointer bg-lightGreen rounded-full"
-                                    onClick={handleSendQuestion}
+                                    onClick={isFetching ? handleAbort : handleSendQuestion}
                                 >
                                     <img
                                         src={isFetching ? '/images/icons/stop.svg' : '/images/icons/arrow-up.svg'}
