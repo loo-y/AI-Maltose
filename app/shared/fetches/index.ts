@@ -28,15 +28,15 @@ export const fetchAIGraphql = async (
     if (isStream) {
         return fetchAIGraphqlStream(paramsForAIGraphql)
     }
-
+    const operationName = `GetAiGraphqlQuery`
     const body = getGraphqlAIMashupBody({
         ...rest,
-        name: `GetAiGraphqlQuery`,
+        name: operationName,
     })
     const options = await getCommonOptions({ userToken: 'test' })
 
     try {
-        const response = await fetch(graphqlUrl, {
+        const response = await fetch(`${graphqlUrl}?operationName=${operationName}`, {
             ...options,
             body: JSON.stringify(body),
             signal: abortController?.signal,
@@ -60,13 +60,14 @@ const fetchAIGraphqlStream = async (
 ) => {
     // const abortController = new AbortController()
     const { streamHandler, nonStreamHandler, completeHandler, abortController, ...rest } = paramsForAIGraphql || {}
+    const operationName = `GetAiGraphqlQuery`
     const body = getGraphqlAIMashupBody({
         ...rest,
-        name: `GetAiGraphqlQuery`,
+        name: operationName,
     })
     try {
         const options = await getCommonOptions({ userToken: 'test' })
-        return await fetchEventSource(graphqlUrl, {
+        return await fetchEventSource(`${graphqlUrl}?operationName=${operationName}`, {
             ...options,
             method: 'POST',
             body: JSON.stringify(body),
@@ -182,7 +183,7 @@ export const fetchUserInfoGraphql = async (params?: { conversationID: number }) 
         },
     }
     try {
-        const response = await fetch(graphqlUrl, {
+        const response = await fetch(`${graphqlUrl}?operationName=${operationName}`, {
             ...options,
             body: JSON.stringify(body),
         })
@@ -220,7 +221,7 @@ export const fetchConversationMessagesGraphql = async (params?: { conversationID
         },
     }
     try {
-        const response = await fetch(graphqlUrl, {
+        const response = await fetch(`${graphqlUrl}?operationName=${operationName}`, {
             ...options,
             body: JSON.stringify(body),
         })
@@ -253,7 +254,7 @@ export const fetchAIBotListGraphql = async () => {
         variables: {},
     }
     try {
-        const response = await fetch(graphqlUrl, {
+        const response = await fetch(`${graphqlUrl}?operationName=${operationName}`, {
             ...options,
             body: JSON.stringify(body),
         })

@@ -32,6 +32,14 @@ const Chatinput = ({
         }
     }, [isFetching])
 
+    const resizeTextarea = () => {
+        const textarea = inputRef.current
+        if (!textarea) return
+        const rows = Math.ceil((textarea.scrollHeight - 8) / 24) // 计算所需行数，假设每行高度为24px
+        console.log(`rows`, rows, textarea.scrollHeight)
+        setInputRows(Math.min(rows, maxRows))
+    }
+
     const handleCompositionStart = () => {
         setIsComposing(true)
     }
@@ -45,6 +53,7 @@ const Chatinput = ({
         setInputValue(currentValue)
         const rows = currentValue.split('\n').length + (currentValue.match(/\n$/)?.[1] ? 1 : 0)
         setInputRows(Math.min(rows, maxRows))
+        resizeTextarea()
     }
 
     const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
