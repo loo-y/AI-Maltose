@@ -32,12 +32,15 @@ const Chatinput = ({
         }
     }, [isFetching])
 
-    const resizeTextarea = () => {
+    const resizeTextarea = (textValue: string) => {
         const textarea = inputRef.current
         if (!textarea) return
+        textarea.rows = 1
         const rows = Math.ceil((textarea.scrollHeight - 8) / 24) // 计算所需行数，假设每行高度为24px
-        console.log(`rows`, rows, textarea.scrollHeight)
-        setInputRows(Math.min(rows, maxRows))
+        const textRows = textValue.split('\n').length + (textValue.match(/\n$/)?.[1] ? 1 : 0)
+        const newRows = Math.min(rows, maxRows)
+        textarea.rows = newRows
+        // setInputRows(newRows)
     }
 
     const handleCompositionStart = () => {
@@ -51,9 +54,9 @@ const Chatinput = ({
     const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         const currentValue = event.target.value
         setInputValue(currentValue)
-        const rows = currentValue.split('\n').length + (currentValue.match(/\n$/)?.[1] ? 1 : 0)
-        setInputRows(Math.min(rows, maxRows))
-        resizeTextarea()
+        // const rows = currentValue.split('\n').length + (currentValue.match(/\n$/)?.[1] ? 1 : 0)
+        // setInputRows(Math.min(rows, maxRows))
+        resizeTextarea(currentValue)
     }
 
     const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -64,9 +67,10 @@ const Chatinput = ({
             const { selectionStart, selectionEnd } = currentInputRef
             const newInputValue = inputValue.substring(0, selectionStart) + '\n' + inputValue.substring(selectionEnd)
             setInputValue(newInputValue)
-            setInputRows(value => {
-                return Math.min(value + 1, maxRows)
-            })
+            // setInputRows(value => {
+            //     return Math.min(value + 1, maxRows)
+            // })
+            inputRef.current!.rows = Math.min((inputRef.current?.rows || 0) + 1, maxRows)
             // 移动光标位置到插入换行符后
             const newSelectionStart = selectionStart + 1
             // 需要延时执行，否则无法定位，会被 setInputValue 后执行修改定位
