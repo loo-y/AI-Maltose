@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter, PrismLight as SyntaxHighlighterLight } from 'react-syntax-highlighter'
 import { vscDarkPlus, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { toast } from 'sonner'
+import { SvgCopyCode } from '@/components/svg'
 
 interface IChatAssistantMessageProps {
     chatMessage?: AssistantMessage
@@ -76,11 +77,9 @@ const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessagePro
                                                                             )
                                                                         }}
                                                                     >
-                                                                        <img
-                                                                            src="/images/icons/copy-code.svg"
-                                                                            alt="copy code"
-                                                                            className="w-3 h-3 text-gray-300"
-                                                                        />
+                                                                        <div className="w-3 h-3 text-gray-300">
+                                                                            <SvgCopyCode />
+                                                                        </div>
                                                                         Copy code
                                                                     </button>
                                                                 </span>
