@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { env } from 'process'
+const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
 import Replicate from 'replicate'
 const { REPLICATE_API_TOKEN } = env || {}
 

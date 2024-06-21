@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { env } from 'process'
+const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
 import * as D1Fetches from '../../graphql/dal/D1/queries'
 export const runtime = 'edge'
 

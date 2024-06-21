@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { env } from 'process'
+const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
 import { defaultSalt } from './constants'
 // 加盐并加密函数
 export const imageIDEncrypt = (imageID: string) => {
