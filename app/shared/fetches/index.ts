@@ -71,6 +71,7 @@ const fetchAIGraphqlStream = async (
             ...options,
             method: 'POST',
             body: JSON.stringify(body),
+            openWhenHidden: true,
             onmessage(ev) {
                 const data: string | Record<string, any> = ev?.data || {}
                 try {

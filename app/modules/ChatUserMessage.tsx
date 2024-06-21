@@ -16,7 +16,9 @@ const ChatUserMessage = ({ chatMessage }: IChatUserMessageProps) => {
                 <div className="mx-auto flex flex-1 gap-3 md:gap-6 md:max-w-[50rem] w-full justify-end px-4">
                     <div className="flex relative max-w-[70%]">
                         {typeof content === 'string' ? (
-                            <div className="text-gray-600 bg-gray-100 rounded-3xl  px-5 py-2.5">{content}</div>
+                            <div className="text-gray-600 bg-gray-100 rounded-3xl  px-5 py-2.5 whitespace-pre-wrap">
+                                {content}
+                            </div>
                         ) : (
                             <ObjectContent content={content} />
                         )}
@@ -70,7 +72,7 @@ const ObjectContent = ({ content }: { content: (TextMessage | ImageUrlMessage)[]
             ) : null}
             {textContent ? (
                 <div className="flex justify-end flex-row w-full">
-                    <div className="text-gray-600 bg-gray-100 rounded-3xl  px-5 py-2.5 rounded-tr-lg  ">
+                    <div className="text-gray-600 bg-gray-100 rounded-3xl  px-5 py-2.5 rounded-tr-lg whitespace-pre-wrap">
                         {textContent}
                     </div>
                 </div>
