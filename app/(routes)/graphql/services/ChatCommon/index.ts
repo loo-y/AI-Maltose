@@ -74,6 +74,10 @@ const resolvers = {
                 throw new Error('Unauthorized')
             }
 
+            if (!(context.balance > 0)) {
+                throw new Error('Insufficient balance')
+            }
+
             let currentConversationID = conversationID
 
             const lastMessage = _.last(fixedMessages)
