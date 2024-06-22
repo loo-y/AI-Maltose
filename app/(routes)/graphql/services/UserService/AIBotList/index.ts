@@ -19,7 +19,7 @@ export const AIBotList = async (parent: TParent, args: Record<string, any>, cont
         return []
     }
 
-    const loader = SupabaseDal.loadAIBotList(context, { aiid }, userID)
+    const loader = SupabaseDal.loadAIBotList(context, { aiid, userid: userID }, userID)
     const aiBotList = (await loader.load({})) || []
 
     return aiBotList

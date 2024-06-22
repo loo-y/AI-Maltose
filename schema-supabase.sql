@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS users (
     username TEXT UNIQUE NOT NULL,
     password TEXT,
     email TEXT UNIQUE NOT NULL,
-    balance DECIMAL(10, 2) DEFAULT 0.00
+    balance DECIMAL(10, 2) DEFAULT 0.00,
+    is_pro BOOLEAN DEFAULT FALSE, -- 是否为 Pro 用户
+
 );
 
 -- 插入一些示例数据
@@ -69,7 +71,8 @@ CREATE TABLE IF NOT EXISTS ai_bots (
     query_type TEXT, -- 调用的接口类型
     image_capability BOOLEAN DEFAULT TRUE,
     userid TEXT, -- 属于哪个用户
-    is_custom BOOLEAN DEFAULT FALSE
+    is_custom BOOLEAN DEFAULT FALSE,
+    is_pro BOOLEAN DEFAULT FALSE, -- limit to pro users
 );
 
 -- 插入 ai_bots 表的示例数据

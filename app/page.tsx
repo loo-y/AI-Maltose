@@ -22,7 +22,8 @@ export default async function Home() {
 }
 
 const handleGetAIBotsByServer = async (): Promise<AI_BOT_TYPE[]> => {
-    const aibotlist = await getAIBots({})
+    const { userId } = auth()
+    const aibotlist = await getAIBots({ userid: userId || '' })
     if (!_.isEmpty(aibotlist)) {
         let AIBotList = _.map(aibotlist, aibot => {
             const { aiid, ainame, query_type, is_custom, image_capability } = aibot || {}

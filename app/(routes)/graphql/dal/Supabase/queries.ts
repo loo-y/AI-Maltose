@@ -13,7 +13,7 @@ export const getUser = async ({ userid }: { ctx?: TBaseContext; userid: string }
         }
     }
 
-    const { balance, email, username } = user || {}
+    const { balance, email, username, is_pro } = user || {}
     let conversations: Record<string, any>[] = []
 
     conversations = await getUserConversations({ userid: user.userid })
@@ -24,6 +24,7 @@ export const getUser = async ({ userid }: { ctx?: TBaseContext; userid: string }
         username,
         userid,
         conversations,
+        is_pro,
     }
 }
 
@@ -228,13 +229,16 @@ export const updateConversationTopic = async ({
 
 export const getAIBots = async ({ userid, aiid }: { userid?: string; aiid?: string; ctx?: TBaseContext }) => {
     const supabase = createClient()
-    const combinedData = []
+    let combinedData = []
+    let isUserPro = false // 是否是Pro版用户
     const { data, error } = await supabase.from('ai_bots').select('*').eq('is_custom', false)
     if (_.isEmpty(error) && !_.isEmpty(data)) {
         combinedData.push(...data)
     }
     if (userid) {
         const { data: userselfData } = await supabase.from('ai_bots').select('*').eq('userid', userid)
+        const { is_pro } = await getUser({ userid })
+        isUserPro = is_pro || isUserPro
 
         if (!_.isEmpty(userselfData)) {
             combinedData.push(...userselfData)
@@ -242,6 +246,10 @@ export const getAIBots = async ({ userid, aiid }: { userid?: string; aiid?: stri
     }
 
     if (!_.isEmpty(combinedData)) {
+        combinedData = _.filter(combinedData, d => {
+            return isUserPro ? true : !d.is_pro
+        })
+
         if (aiid) {
             const selectedAI = _.find(combinedData, d => d.aiid == aiid)
             if (selectedAI) {
