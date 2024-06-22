@@ -64,6 +64,8 @@ export interface IGrahpqlAIFetchProps {
     ernieParams?: Record<string, any>
     queryOpenAI?: boolean
     openAIParams?: Record<string, any>
+    queryAzureOpenAI?: boolean
+    azureOpenAIParams?: Record<string, any>
     queryWorkersAI?: boolean
     workersAIParams?: Record<string, any>
     queryLingyiwanwu?: boolean

@@ -82,13 +82,17 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
                                 return (
                                     <React.Fragment key={`aibot_select_${index}`}>
                                         <CommandItem key={id} value={id} onSelect={handleSelectAI}>
-                                            {name}
-                                            <CheckIcon
-                                                className={cn(
-                                                    'ml-auto h-4 w-4',
-                                                    value === id ? 'opacity-100' : 'opacity-0'
-                                                )}
-                                            />
+                                            <div className="flex flex-row w-full items-center justify-between my-1">
+                                                <div className="line-clamp-1">
+                                                    <span title={name}>{name}</span>
+                                                </div>
+                                                <CheckIcon
+                                                    className={cn(
+                                                        'ml-auto h-4 w-4',
+                                                        value === id ? 'opacity-100' : 'opacity-0'
+                                                    )}
+                                                />
+                                            </div>
                                         </CommandItem>
                                     </React.Fragment>
                                 )

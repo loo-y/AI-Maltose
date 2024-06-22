@@ -62,11 +62,26 @@ const fetchAzureOpenai = async (ctx: TBaseContext, params: Record<string, any>, 
         searchWeb,
     } = params || {}
     const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
-    const ENDPOINT = endpoint || env?.AZURE_OPENAI_ENDPOINT || ''
-    const API_KEY = apiKey || env?.AZURE_OPENAI_API_KEY || ''
-    const modelUse = modelName || DEFAULT_MODEL_NAME
+
+    let API_KEY = '',
+        ENDPOINT = undefined,
+        modelUse = ''
+    if (apiKey && modelName) {
+        API_KEY = apiKey || ''
+        modelUse = modelName
+        ENDPOINT = endpoint || undefined
+    } else if (modelName) {
+        API_KEY = env?.AZURE_OPENAI_API_KEY || ''
+        modelUse = modelName
+        ENDPOINT = endpoint || undefined
+    } else if (env.AZURE_OPENAI_API_KEY) {
+        API_KEY = env.AZURE_OPENAI_API_KEY || ''
+        modelUse = env.AZURE_OPENAI_API_MODEL || DEFAULT_MODEL_NAME
+        ENDPOINT = env.AZURE_OPENAI_ENDPOINT || undefined
+    }
     const max_tokens = maxOutputTokens || generationConfig.maxOutputTokens
-    if (_.isEmpty(messages) || !API_KEY) {
+    if (_.isEmpty(messages) || !API_KEY || !ENDPOINT) {
+        console.log(`messages: ${messages}, api key: ${API_KEY}, endpoint: ${ENDPOINT}`)
         return 'there is no messages or api key of Openai'
     }
     const { history } = convertMessages(messages)
@@ -83,7 +98,8 @@ const fetchAzureOpenai = async (ctx: TBaseContext, params: Record<string, any>, 
 
     if (isStream) {
         try {
-            let content = ``
+            let content = ``,
+                usage: Record<string, any> = {}
             if (searchWeb) {
                 const firstRoundCompletion = await client.streamChatCompletions(modelUse, history, {
                     maxTokens: max_tokens,
@@ -161,6 +177,12 @@ const fetchAzureOpenai = async (ctx: TBaseContext, params: Record<string, any>, 
                 })
                 for await (const chunk of completion) {
                     const text = chunk.choices?.[0]?.delta?.content || ``
+                    if (chunk?.usage?.totalTokens) {
+                        usage = {
+                            ...chunk.usage,
+                            total_tokens: chunk.usage.totalTokens,
+                        }
+                    }
                     console.log(`Azure Openai text`, text)
                     if (text) {
                         streamHandler({
@@ -171,6 +193,8 @@ const fetchAzureOpenai = async (ctx: TBaseContext, params: Record<string, any>, 
                     }
                 }
                 completeHandler({
+                    usage,
+                    model: modelUse,
                     content: content,
                     status: true,
                 })
@@ -182,6 +206,12 @@ const fetchAzureOpenai = async (ctx: TBaseContext, params: Record<string, any>, 
 
                 for await (const chunk of completion) {
                     const text = chunk.choices?.[0]?.delta?.content || ``
+                    if (chunk?.usage?.totalTokens) {
+                        usage = {
+                            ...chunk.usage,
+                            total_tokens: chunk.usage.totalTokens,
+                        }
+                    }
                     console.log(`Azure Openai text`, text)
                     if (text) {
                         streamHandler({
@@ -192,6 +222,8 @@ const fetchAzureOpenai = async (ctx: TBaseContext, params: Record<string, any>, 
                     }
                 }
                 completeHandler({
+                    usage,
+                    model: modelUse,
                     content: content,
                     status: true,
                 })
@@ -201,6 +233,7 @@ const fetchAzureOpenai = async (ctx: TBaseContext, params: Record<string, any>, 
             console.log(`Azure Openai error`, e)
 
             completeHandler({
+                model: modelUse,
                 content: '',
                 status: false,
             })

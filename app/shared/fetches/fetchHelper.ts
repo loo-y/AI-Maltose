@@ -24,6 +24,8 @@ export const getGraphqlAIMashupBody = ({
     ernieParams,
     queryOpenAI,
     openAIParams,
+    queryAzureOpenAI,
+    azureOpenAIParams,
     queryWorkersAI,
     workersAIParams,
     queryLingyiwanwu,
@@ -128,6 +130,18 @@ export const getGraphqlAIMashupBody = ({
             variables.openAIParams = openAIParams
         }
         queryList.push(isStream ? `OpenaiStream${paramsOpenAI}@stream` : `Openai ${paramsOpenAI} {text}`)
+    }
+    if (queryAzureOpenAI) {
+        let paramsAzureOpenAI = '',
+            hasAzureOpenAIArgs = azureOpenAIParams
+        if (hasAzureOpenAIArgs) {
+            paramsList.push(`$azureOpenAIParams: AzureOpenaiArgs`)
+            paramsAzureOpenAI = '(params: $azureOpenAIParams)'
+            variables.azureOpenAIParams = azureOpenAIParams
+        }
+        queryList.push(
+            isStream ? `AzureOpenaiStream${paramsAzureOpenAI}@stream` : `AzureOpenai ${paramsAzureOpenAI} {text}`
+        )
     }
     if (queryWorkersAI) {
         let paramsWorkersAI = '',
