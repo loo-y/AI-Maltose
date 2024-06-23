@@ -17,6 +17,8 @@ const config = {
     },
     extend: {
       colors: {
+        'paw-gray': 'rgb(50, 50, 50)',
+        'paw-black': 'rgb(29, 29, 29)',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
