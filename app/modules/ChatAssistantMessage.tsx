@@ -42,10 +42,17 @@ const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessagePro
                     <div className="flex relative flex-row gap-3">
                         <div className="provider-icon flex-shrink-0 flex flex-col relative items-end">
                             <div className="rounded-full border border-gray-200 border-solid w-8 h-8 flex justify-center items-center">
-                                <img
-                                    src={`/images/providers/${provider || 'default'}.svg`}
-                                    className="w-[1.125rem] h-[1.125rem]"
-                                />
+                                {provider ? (
+                                    <img
+                                        src={`/images/providers/${provider}.svg`}
+                                        className="w-[1.125rem] h-[1.125rem]"
+                                    />
+                                ) : (
+                                    <img
+                                        src={`/images/providers/${'default'}.svg`}
+                                        className="w-[1.375rem] h-[1.375rem]"
+                                    />
+                                )}
                             </div>
                         </div>
                         <div className="flex w-full flex-col gap-1 juice:empty:hidden juice:first:pt-[3px] text-gray-600">
