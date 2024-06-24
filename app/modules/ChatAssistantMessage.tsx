@@ -49,8 +49,8 @@ const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessagePro
                                     />
                                 ) : (
                                     <img
-                                        src={`/images/providers/${'default'}.svg`}
-                                        className="w-[1.375rem] h-[1.375rem]"
+                                        src={`/images/providers/default.png`}
+                                        className="w-[1.375rem] h-[1.375rem] bg-white"
                                     />
                                 )}
                             </div>
