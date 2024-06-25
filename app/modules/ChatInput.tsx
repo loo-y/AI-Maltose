@@ -93,7 +93,9 @@ const Chatinput = ({
                 _.map(imageList, imgItem => imgItem.imageUrl)
             )
             setInputValue('')
-            setInputRows(1)
+            // setInputRows(1)
+            const textarea = inputRef.current
+            textarea!.rows = 1
         }
         setImageList([])
     }
