@@ -43,7 +43,7 @@ const ChatImagePreview = ({
                 onClick={handleClosePreview}
             >
                 <div className=" max-h-[90vh] max-w-[90vw] min-w-[80vw] min-h-[80vh] object-contain justify-center items-center flex">
-                    <img src={imageUrl} className="" onClick={handleImageClick} />
+                    <img src={imageUrl} className="max-h-[90vh] max-w-[90vw] rounded-xl" onClick={handleImageClick} />
                 </div>
             </DialogContent>
         </Dialog>
