@@ -11,6 +11,7 @@ export default async function HairStyle() {
         redirect('/signin')
         return null
     }
+    const HairStyleList = await handleGetHairstylesByServer()
 
     return (
         <main className="main h-full overflow-hidden bg-paw-white-gray flex">
@@ -27,10 +28,14 @@ export default async function HairStyle() {
                 </div>
                 <div className="flex-1 w-full">
                     <div className="max-w-[50rem] h-full mx-auto py-10">
-                        <ImageOperation />
+                        <ImageOperation hairStyleList={HairStyleList} />
                     </div>
                 </div>
             </div>
         </main>
     )
+}
+
+const handleGetHairstylesByServer = async () => {
+    return [`Yi85ZmFpMmwyZTUvM2Q3NGViNWJkZjg3YTNhODRiYjFkNGZkNDA4MmI5ODNhOWVlMmQwMDYyMy5hajJwNmc=`]
 }

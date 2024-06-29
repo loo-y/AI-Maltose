@@ -1,6 +1,6 @@
 'use client'
 import React, { ChangeEvent, useEffect, useRef, useState, KeyboardEvent, MouseEvent } from 'react'
-import { imageSizeLimition } from '@/app/shared/constants'
+import { imageSizeLimition, imageUrlPrefix } from '@/app/shared/constants'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -26,13 +26,17 @@ type ImageItem = {
     imageUrl: string
     isLoading: boolean
 }
-export default function ImageOperation() {
+export default function ImageOperation({ hairStyleList }: { hairStyleList: string[] }) {
     const [isExpended, setIsExpended] = useState(false)
     const [selectType, setSelectType] = useState<SELECT_TYPE>()
     const [imageList, setImageList] = useState<ImageItem[]>([])
     const [selectedImage, setSelectedImage] = useState<ImageItem>()
+    const [selectedStyle, setSelectedStyle] = useState<string>()
 
-    useEffect(() => {}, [selectedImage])
+    useEffect(() => {
+        if (selectedImage) {
+        }
+    }, [selectedImage])
 
     const handleClickExpend = (_selectType_: SELECT_TYPE) => {
         if (!isExpended) {
@@ -43,7 +47,11 @@ export default function ImageOperation() {
         setSelectType(_selectType_)
     }
 
-    const selectedClass = ``
+    const handleGenerate = () => {
+        if (!selectedImage || !selectedStyle) return
+        setIsExpended(false)
+    }
+
     return (
         <div
             className={`${isExpended ? 'image-operation-expand' : 'image-operation-collapse'} flex  flex-col w-[50rem] bg-paw-white shadow-md border border-solid border-[rgba(236,236,236)] pr-3 transition-all duration-1000 ease-out `}
@@ -57,11 +65,17 @@ export default function ImageOperation() {
                         }}
                     >
                         <div
-                            className={`iamge-circle rounded-full w-12 h-12 ${isExpended && selectType == SELECT_TYPE.imageUpload ? 'bg-gray-50' : 'bg-gray-200 '}`}
-                        ></div>
+                            className={`image-circle rounded-full w-12 h-12 ${isExpended && selectType == SELECT_TYPE.imageUpload ? 'bg-gray-50' : 'bg-gray-200 '}`}
+                        >
+                            {selectedImage ? (
+                                <img src={selectedImage.imageUrl} className="w-full h-full object-cover rounded-full" />
+                            ) : null}
+                        </div>
                         <div className="flex flex-col">
                             <div className="text-paw-gray text-sm font-semibold">Image *</div>
-                            <div className="text-gray-400 text-xs items-end">Choose an image</div>
+                            <div className="text-gray-400 text-xs items-end">
+                                {selectedImage ? 'One image selected' : 'Choose an image'}
+                            </div>
                         </div>
                     </div>
                     <div className="w-px h-12 bg-gray-300 mx-2"></div>
@@ -72,17 +86,27 @@ export default function ImageOperation() {
                         }}
                     >
                         <div
-                            className={`iamge-circle rounded-full w-12 h-12 ${isExpended && selectType == SELECT_TYPE.styleSelect ? 'bg-gray-50' : 'bg-gray-200 '}`}
-                        ></div>
+                            className={`image-circle rounded-full w-12 h-12 ${isExpended && selectType == SELECT_TYPE.styleSelect ? 'bg-gray-50' : 'bg-gray-200 '}`}
+                        >
+                            {selectedStyle ? (
+                                <img
+                                    src={`${imageUrlPrefix}/${selectedStyle}`}
+                                    className="w-full h-full object-cover rounded-full"
+                                />
+                            ) : null}
+                        </div>
                         <div className="flex flex-col">
                             <div className="text-paw-gray text-sm font-semibold">Hair Style *</div>
-                            <div className="text-gray-400 text-xs items-end">Choose an hair style</div>
+                            <div className="text-gray-400 text-xs items-end">
+                                {selectedStyle ? 'One style selected' : 'Choose a style'}
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div className="generate_button flex items-center justify-center">
                     <button
                         className={`rounded-full w-32 bg-blue-500 hover:bg-blue-600 text-white h-14 flex flex-row items-center justify-center gap-2`}
+                        onClick={handleGenerate}
                     >
                         <span>Generate</span>
                         <svg
@@ -111,7 +135,11 @@ export default function ImageOperation() {
                         setSelectedImage={setSelectedImage}
                     />
                 ) : (
-                    <StyleSelect />
+                    <StyleSelect
+                        styleList={hairStyleList}
+                        selectedStyle={selectedStyle}
+                        setSelectedStyle={setSelectedStyle}
+                    />
                 )
             ) : null}
         </div>
@@ -169,14 +197,27 @@ const ImageSelect = ({
             const newList = _.filter(oldList, item => item.imageId !== imageItem?.imageId)
             return newList
         })
+        if (selectedImage?.imageId == imageItem?.imageId) {
+            setSelectedImage && setSelectedImage(undefined)
+        }
     }
 
+    const handleCheck = (imageItem: ImageItem) => {
+        // debugger
+        if (imageItem?.imageId == selectedImage?.imageId) {
+            setSelectedImage && setSelectedImage(undefined)
+        } else {
+            setSelectedImage && setSelectedImage(imageItem)
+        }
+    }
     return (
         <div className="flex flex-1 rounded-2xl mb-3 bg-gray-100 ml-3 border border-dashed border-gray-300 flex-col h-[19rem]">
             <div className="flex flex-1 overflow-hidden overflow-y-scroll">
                 {_.isEmpty(imageList) ? null : (
                     <div className="flex flex-wrap flex-row gap-2 my-2">
                         {_.map(imageList, (item, imageIndex) => {
+                            const isChecked = item?.imageId == selectedImage?.imageId
+                            console.log(`isChecked: ${isChecked}, imageID: ${item.imageId}`)
                             return (
                                 <div
                                     className="relative flex items-center m-2 w-fit h-fit"
@@ -189,25 +230,20 @@ const ImageSelect = ({
                                             handleDeleteImage(item)
                                         }}
                                     />
-                                    <div className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center">
-                                        <input
-                                            type="checkbox"
-                                            id={`custom-checkbox-${imageIndex}`}
-                                            className="hidden"
-                                        />
-                                        <label
-                                            htmlFor={`custom-checkbox-${imageIndex}`}
-                                            className="flex items-center cursor-pointer"
+                                    <div
+                                        className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
+                                        onClick={() => handleCheck(item)}
+                                    >
+                                        <div
+                                            className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
                                         >
-                                            <div className="flex w-4 h-4 bg-white border-2 border-gray-200 rounded-md  items-center justify-center transition-all duration-200 ease-in-out">
-                                                <svg
-                                                    className="w-4 h-4 text-white fill-current hidden"
-                                                    viewBox="0 0 20 20"
-                                                >
-                                                    <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
-                                                </svg>
-                                            </div>
-                                        </label>
+                                            <svg
+                                                className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 </div>
                             )
@@ -304,28 +340,29 @@ const ImageUploadButton = ({
     )
 }
 
-const ThumbnailDisplay: React.FC<{ imageUrl: string; isLoading: boolean; onDelete: () => void }> = ({
-    imageUrl,
-    isLoading,
-    onDelete,
-}) => {
+const ThumbnailDisplay: React.FC<{
+    imageUrl: string
+    isLoading: boolean
+    onDelete?: () => void
+    hideDelete?: boolean
+}> = ({ imageUrl, isLoading, onDelete, hideDelete }) => {
     const [hovered, setHovered] = useState(true)
     const [openPreview, setOpenPreview] = useState(false)
     const thumbnailRef = useRef(null)
     const imagePreviewRef = useRef(null)
 
     const handleMouseEnter = () => {
-        // setHovered(true)
+        setHovered(true)
     }
 
     const handleMouseLeave = () => {
-        // setHovered(false)
+        setHovered(false)
     }
 
     const handleDelete = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
         event.stopPropagation()
-        onDelete()
+        onDelete && onDelete()
     }
 
     const handleClickThumbnail = () => {
@@ -362,7 +399,7 @@ const ThumbnailDisplay: React.FC<{ imageUrl: string; isLoading: boolean; onDelet
                         <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-gray-500"></div>
                     </div>
                 )}
-                {hovered && (
+                {hovered && !hideDelete && (
                     <button
                         className="absolute -top-2 -right-2 p-1 bg-gray-600 text-white rounded-full"
                         onClick={handleDelete}
@@ -391,8 +428,60 @@ const ThumbnailDisplay: React.FC<{ imageUrl: string; isLoading: boolean; onDelet
     )
 }
 
-const StyleSelect = () => {
-    return <div className="flex flex-1 rounded-2xl mb-3 bg-white ml-3"></div>
+const StyleSelect = ({
+    styleList,
+    selectedStyle,
+    setSelectedStyle,
+}: {
+    styleList: string[]
+    selectedStyle: string | undefined
+    setSelectedStyle: React.Dispatch<React.SetStateAction<string | undefined>>
+}) => {
+    const handleCheck = (item: string) => {
+        if (item == selectedStyle) {
+            setSelectedStyle(undefined)
+        } else {
+            setSelectedStyle(item)
+        }
+    }
+    return (
+        <div className="flex flex-1 rounded-2xl mb-3 bg-white overflow-hidden overflow-y-scroll">
+            {_.isEmpty(styleList) ? null : (
+                <div className="flex flex-wrap flex-row gap-2 my-2">
+                    {_.map(styleList, (item, styleIndex) => {
+                        const isChecked = item == selectedStyle
+                        return (
+                            <div
+                                className="relative flex items-center m-2 w-fit h-fit"
+                                key={`inputImageList_${styleIndex}`}
+                            >
+                                <ThumbnailDisplay
+                                    imageUrl={`${imageUrlPrefix}/${item}`}
+                                    isLoading={false}
+                                    hideDelete={true}
+                                />
+                                <div
+                                    className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
+                                    onClick={() => handleCheck(item)}
+                                >
+                                    <div
+                                        className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
+                                    >
+                                        <svg
+                                            className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
+                                            viewBox="0 0 20 20"
+                                        >
+                                            <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
+        </div>
+    )
 }
 
 const OverSizeAlert = ({ title, content, callback }: { title?: string; content?: string; callback: () => void }) => {
