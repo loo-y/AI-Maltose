@@ -2,15 +2,11 @@ import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { SignedIn, UserButton } from '@clerk/nextjs'
 import ImageOperation from '@/app/(pages)/hairstyle/ImageOperation'
+import ImageDisplay from '@/app/(pages)/hairstyle/ImageDisplay'
 
-export default async function HairStyle() {
-    const { userId } = auth()
-    console.log(`page userId`, userId)
-    if (!userId) {
-        // 如果 auth 不存在，则重定向到登录页面
-        redirect('/signin')
-        return null
-    }
+import { HairStyleStoreProvider } from './providers'
+
+async function HairStyle() {
     const HairStyleList = await handleGetHairstylesByServer()
 
     return (
@@ -27,12 +23,28 @@ export default async function HairStyle() {
                     </div>
                 </div>
                 <div className="flex-1 w-full">
-                    <div className="max-w-[50rem] h-full mx-auto py-10">
+                    <div className="max-w-[50rem] h-full mx-auto py-10 flex flex-col">
                         <ImageOperation hairStyleList={HairStyleList} />
+                        <ImageDisplay />
                     </div>
                 </div>
             </div>
         </main>
+    )
+}
+
+export default async function HairStylePage() {
+    const { userId } = auth()
+    console.log(`page userId`, userId)
+    if (!userId) {
+        // 如果 auth 不存在，则重定向到登录页面
+        redirect('/signin')
+        return null
+    }
+    return (
+        <HairStyleStoreProvider>
+            <HairStyle></HairStyle>
+        </HairStyleStoreProvider>
     )
 }
 

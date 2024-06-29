@@ -5,7 +5,7 @@ import { type StoreApi, useStore } from 'zustand'
 
 import { type MainStore, createMainStore, initMainStore } from './stores'
 
-export const CounterStoreContext = createContext<StoreApi<MainStore> | null>(null)
+export const MainStoreContext = createContext<StoreApi<MainStore> | null>(null)
 
 export interface CounterStoreProviderProps {
     children: ReactNode
@@ -16,15 +16,15 @@ export const MainStoreProvider = ({ children }: CounterStoreProviderProps) => {
     if (!storeRef.current) {
         storeRef.current = createMainStore(initMainStore())
     }
-    return <CounterStoreContext.Provider value={storeRef.current}>{children}</CounterStoreContext.Provider>
+    return <MainStoreContext.Provider value={storeRef.current}>{children}</MainStoreContext.Provider>
 }
 
 export const useMainStore = <T,>(selector: (store: MainStore) => T): T => {
-    const counterStoreContext = useContext(CounterStoreContext)
+    const mainStoreContext = useContext(MainStoreContext)
 
-    if (!counterStoreContext) {
-        throw new Error(`useCounterStore must be use within CounterStoreProvider`)
+    if (!mainStoreContext) {
+        throw new Error(`useMainStore must be use within MainStoreProvider`)
     }
 
-    return useStore(counterStoreContext, selector)
+    return useStore(mainStoreContext, selector)
 }
