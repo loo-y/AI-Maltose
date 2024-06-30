@@ -21,6 +21,27 @@ const getCommonOptions = async ({ userToken }: { userToken?: string }) => {
     return options
 }
 
+export const fetchFaceSwap = async (params: { inputID: string; targetID: string }) => {
+    const options = await getCommonOptions({ userToken: 'test' })
+    try {
+        const response = await fetch('/api/faceswap', {
+            ...options,
+            body: JSON.stringify(params),
+        })
+        const data = await response.json()
+        return {
+            data: data.data,
+            status: true,
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            data: String(e),
+            status: false,
+        }
+    }
+}
+
 export const fetchAIGraphql = async (
     paramsForAIGraphql: IGrahpqlAIFetchProps & { abortController?: AbortController }
 ) => {
