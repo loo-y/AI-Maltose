@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ message: 'REPLICATE_API_TOKEN not found' }, { status: 500 })
     }
 
+    const showImage = request.nextUrl.searchParams.get('showImage')
     const inputImageUrl = request.nextUrl.searchParams.get('inputImageUrl')
     const targetImageUrl = request.nextUrl.searchParams.get('targetImageUrl')
     const inputID = request.nextUrl.searchParams.get('inputID')
@@ -41,6 +42,19 @@ export async function GET(request: NextRequest) {
         }
     )
     console.log(output)
+
+    if (showImage == `1`) {
+        // @ts-ignore
+        const imageResponse = await fetch((output as string) || '')
+        if (imageResponse.ok) {
+            const imageBuffer = await imageResponse.arrayBuffer()
+            const response = new NextResponse(imageBuffer)
+            response.headers.set('Content-Type', 'image/jpeg')
+            response.headers.set('Cache-Control', 's-maxage=3600, stale-while-revalidate')
+            return response
+        }
+        // throw new Error(`Failed to fetch image: ${imageResponse.status} ${imageResponse.statusText}`);
+    }
 
     const nextResponse = NextResponse.json({ output }, { status: 200 })
     nextResponse.headers.set('Access-Control-Allow-Origin', '*')
