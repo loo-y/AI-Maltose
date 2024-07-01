@@ -288,3 +288,24 @@ export const addConsumptionRecords = async ({
     console.log(`addConsumption error`, error, data)
     return false
 }
+
+export const getSwapStyle = async ({
+    imageshowid,
+    style_type,
+}: {
+    imageshowid: string
+    style_type: string
+    ctx?: TBaseContext
+}) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('swap_styles')
+        .select('*')
+        .eq('style_imageshowid', imageshowid)
+        .eq('style_type', style_type)
+
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return data?.[0] || {}
+    }
+    return {}
+}

@@ -128,3 +128,11 @@ FROM users u
 JOIN conversations c ON u.userid = c.userid
 JOIN ai_bots a ON a.ainame = 'AI Bot 1'
 WHERE u.username = 'user1';
+
+-- 创建 swap_styles 表
+CREATE TABLE IF NOT EXISTS swap_styles (
+    style_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    style_imageshowid TEXT NOT NULL,
+    style_type TEXT NOT NULL,
+    input_type TEXT
+);
