@@ -8,8 +8,6 @@ import Sidebar from '@/app/modules/Sidebar'
 import Chatinput from '@/app/modules/ChatInput'
 import ConversationBox from '@/app/modules/ConversationBox'
 import AISelection from '@/app/modules/AISelection'
-import { sleep } from '../../shared/util'
-import { fetchAIGraphql } from '@/app/shared/fetches'
 import {
     IChatMessage,
     Roles,

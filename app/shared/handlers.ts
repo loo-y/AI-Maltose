@@ -6,6 +6,7 @@ import {
     fetchUserInfoGraphql,
     fetchConversationMessagesGraphql,
     fetchAIBotListGraphql,
+    fetchFaceSwapGraphql,
 } from './fetches'
 import { IChatMessage, Roles, AI_BOT_TYPE } from './interface'
 
@@ -136,61 +137,24 @@ export const handleGetAIBots = async (): Promise<AI_BOT_TYPE[]> => {
     return []
 }
 
-const aibotMock = [
-    {
-        id: `openai_gpt-4o_deepbricks`,
-        name: `GPT-4o (Lower Price)`,
-        queryType: `queryOpenAI`, // query_type
-        isCustom: false, // is_custom
-        imageCapability: true, // image_capability
-    },
-    {
-        id: `openai_gpt-4o`,
-        name: `GPT-4o`,
-        queryType: `queryOpenAI`, // query_type
-        isCustom: false, // is_custom
-        imageCapability: true, // image_capability
-    },
-    {
-        id: `gemini_pro_1.5`,
-        name: `Gemini Pro 1.5`,
-        queryType: `queryOpenAI`,
-        isCustom: false,
-        imageCapability: true,
-    },
-    {
-        id: `gemini_flash_1.5`,
-        name: `Gemini Flash 1.5`,
-        queryType: `queryOpenAI`,
-        isCustom: false,
-        imageCapability: true,
-    },
-    {
-        id: `claude_3_sonnet`,
-        name: `Claude 3 Sonnet`,
-        queryType: `queryOpenAI`,
-        isCustom: false,
-        imageCapability: true,
-    },
-    {
-        id: `siliconflow_qwen2_72b_instruct`,
-        name: `Qwen2 72B Instruct`,
-        queryType: `queryOpenAI`,
-        isCustom: false,
-        imageCapability: false,
-    },
-    {
-        id: `siliconflow_glm4_9b_chat`,
-        name: `GLM4 9B Chat`,
-        queryType: `queryOpenAI`,
-        isCustom: false,
-        imageCapability: false,
-    },
-    {
-        id: `cf_llama3_8b_instruct`,
-        name: `Llama3 8B Instruct`,
-        queryType: `queryWorkersAI`,
-        isCustom: false,
-        imageCapability: false,
-    },
-]
+export const handleGetFaceSwapImages = async ({
+    inputID,
+    inputImageUrl,
+    targetIDs,
+}: {
+    inputID?: string
+    inputImageUrl?: string
+    targetIDs: string[]
+}) => {
+    const result = await fetchFaceSwapGraphql({
+        provider: 'replicate',
+        inputID,
+        inputImageUrl,
+        targetIDs,
+    })
+    const { data, status } = result || {}
+    if (status && data?.FaceSwap) {
+        return data.FaceSwap
+    }
+    return []
+}

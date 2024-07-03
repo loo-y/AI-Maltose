@@ -307,20 +307,20 @@ export const getSwapStyles = async ({
               .from('swap_styles')
               .select('*')
               .eq('style_type', style_type)
-              .eq('style_providerid', providerid)
-              .in('image_show_id', imageShowIDList)
+              .eq('providerid', providerid)
+              .in('style_imageshowid', imageShowIDList)
         : await supabase
               .from('swap_styles')
               .select('*')
               .eq('style_type', style_type)
-              .eq('style_providerid', providerid)
+              .eq('providerid', providerid)
               .eq('is_nsfw', false)
-              .in('image_show_id', imageShowIDList)
+              .in('style_imageshowid', imageShowIDList)
 
     if (_.isEmpty(error) && !_.isEmpty(data)) {
-        return data || {}
+        return data || []
     }
-    return {}
+    return []
 }
 
 export const getImageAIProvider = async ({ providerid }: { providerid: string; ctx?: TBaseContext }) => {

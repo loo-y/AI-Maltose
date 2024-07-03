@@ -1,6 +1,7 @@
 'use client'
 import React, { ChangeEvent, useEffect, useRef, useState, KeyboardEvent, MouseEvent } from 'react'
 import { imageSizeLimition, imageUrlPrefix } from '@/app/shared/constants'
+import { useHairStyleStore } from './providers'
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,7 +16,7 @@ import {
 import ChatImagePreview from '@/app/modules/ChatImagePreview'
 import { handleUploadImage } from '@/app/shared/handlers'
 import _ from 'lodash'
-
+import { handleGetFaceSwapImages } from '@/app/shared/handlers'
 enum SELECT_TYPE {
     imageUpload = `imageUpload`,
     styleSelect = `styleSelect`,
@@ -32,6 +33,8 @@ export default function ImageOperation({ hairStyleList }: { hairStyleList: strin
     const [imageList, setImageList] = useState<ImageItem[]>([])
     const [selectedImage, setSelectedImage] = useState<ImageItem>()
     const [selectedStyle, setSelectedStyle] = useState<string>()
+    const hairStyleState = useHairStyleStore(state => state)
+    const { updateNewImage } = hairStyleState || {}
 
     useEffect(() => {
         if (selectedImage) {
@@ -50,6 +53,17 @@ export default function ImageOperation({ hairStyleList }: { hairStyleList: strin
     const handleGenerate = () => {
         if (!selectedImage || !selectedStyle) return
         setIsExpended(false)
+        handleGetFaceSwapImages({
+            inputImageUrl: selectedImage.imageUrl,
+            targetIDs: [selectedStyle],
+        }).then(res => {
+            _.map(res, item => {
+                const { status, output } = item || {}
+                if (status && output) {
+                    updateNewImage(output)
+                }
+            })
+        })
     }
 
     return (

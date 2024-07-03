@@ -42,6 +42,55 @@ export const fetchFaceSwap = async (params: { inputID: string; targetID: string 
     }
 }
 
+export const fetchFaceSwapGraphql = async (params: {
+    inputID?: string
+    inputImageUrl?: string
+    targetIDs: string[]
+    provider: string
+    abortController?: AbortController
+}) => {
+    const { abortController, inputID, targetIDs, provider, inputImageUrl } = params || {}
+    const operationName = `GetFaceSwapQuery`
+    const body = {
+        operationName,
+        query: `
+            query ${operationName}($faceSwapParams: FaceSwapArgs){
+                imageSwap {
+                    FaceSwap(params: $faceSwapParams)
+                }
+            }
+        `,
+        variables: {
+            faceSwapParams: {
+                inputID,
+                inputImageUrl,
+                targetImageIDs: targetIDs,
+                provider,
+            },
+        },
+    }
+
+    const options = await getCommonOptions({})
+    try {
+        const response = await fetch(`${graphqlUrl}?operationName=${operationName}`, {
+            ...options,
+            body: JSON.stringify(body),
+            signal: abortController?.signal,
+        })
+        const data = await response.json()
+        return {
+            data: data.data,
+            status: true,
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            data: String(e),
+            status: false,
+        }
+    }
+}
+
 export const fetchAIGraphql = async (
     paramsForAIGraphql: IGrahpqlAIFetchProps & { abortController?: AbortController }
 ) => {
