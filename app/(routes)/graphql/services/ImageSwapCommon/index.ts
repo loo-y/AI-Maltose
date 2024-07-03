@@ -23,6 +23,11 @@ const resolvers = {
             if (!context.userId) {
                 throw new Error('Unauthorized')
             }
+            // 限制 100 以下不准使用 ImageSwap
+            if (!(context.balance > 100)) {
+                throw new Error('Insufficient balance')
+            }
+
             return {
                 ...imageSwapArgs,
                 userID: context.userId,
