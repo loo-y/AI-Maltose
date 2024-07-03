@@ -51,7 +51,11 @@ export default function ImageOperation({ hairStyleList }: { hairStyleList: strin
     }
 
     const handleGenerate = () => {
-        if (!selectedImage || !selectedStyle) return
+        if (!selectedImage || !selectedStyle) {
+            setIsExpended(true)
+            setSelectType(!selectedImage ? SELECT_TYPE.imageUpload : SELECT_TYPE.styleSelect)
+            return
+        }
         setIsExpended(false)
         handleGetFaceSwapImages({
             inputImageUrl: selectedImage.imageUrl,
