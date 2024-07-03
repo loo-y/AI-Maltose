@@ -153,8 +153,9 @@ export const handleGetFaceSwapImages = async ({
         targetIDs,
     })
     const { data, status } = result || {}
-    if (status && data?.FaceSwap) {
-        return data.FaceSwap
+    console.log(`handleGetFaceSwapImages`, data)
+    if (status && data?.imageSwap?.FaceSwap) {
+        return data.imageSwap?.FaceSwap
     }
     return []
 }
