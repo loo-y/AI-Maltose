@@ -17,6 +17,8 @@ import BasicInfo from './UserService/BasicInfo'
 import Histories from './UserService/Histories'
 import Conversation from './UserService/Conversation'
 import AIBotList from './UserService/AIBotList'
+import ImageSwapCommon from './ImageSwapCommon'
+import FaceSwap from './ImageSwapServices/FaceSwap'
 
 const serviceList = [
     Chain,
@@ -37,6 +39,9 @@ const serviceList = [
     Histories,
     Conversation,
     AIBotList,
+
+    ImageSwapCommon,
+    FaceSwap,
 ]
 
 export default {

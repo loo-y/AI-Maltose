@@ -1,29 +1,40 @@
 import _ from 'lodash'
+import { loadReplicateFaceSwap } from '../../../dal/ImageSwap'
 
 const typeDefinitions = `
     scalar JSON
     type ImageSwap {
-        FaceSwap(params: FaceSwapArgs): JSON
+        FaceSwap(params: FaceSwapArgs): [JSON]
     }
 
     input FaceSwapArgs {
-        inputID: string
-        inputImageUrl: string
-        targetImageIDs: [string]
+        inputID: String
+        inputImageUrl: String
+        targetImageIDs: [String]
+        provider: String
     }
 `
 export const FaceSwap = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
-    const { userID } = parent || {}
-    const { aiid } = args?.params || {}
-    if (!userID) {
-        return {}
+    const { userID, keyValues } = parent || {}
+    const { inputID, inputImageUrl, targetImageIDs, provider } = args?.params || {}
+    const inputID_param = inputID || _.find(keyValues, kv => kv.key == 'inputID')?.value
+    const inputImageUrl_param = inputImageUrl || _.find(keyValues, kv => kv.key == 'inputImageUrl')?.value
+    if (!userID || !(inputID_param || inputImageUrl_param) || _.isEmpty(targetImageIDs) || !provider) {
+        return []
     }
 
-    return {}
+    const loader = loadReplicateFaceSwap(
+        context,
+        { inputID: inputID_param, inputImageUrl: inputImageUrl_param, provider },
+        targetImageIDs
+    )
+    const results = (await loader.loadMany(targetImageIDs)) || []
+
+    return results
 }
 
 const resolvers = {
-    User: {
+    ImageSwap: {
         FaceSwap: FaceSwap,
     },
 }

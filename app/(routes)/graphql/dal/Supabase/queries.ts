@@ -289,20 +289,43 @@ export const addConsumptionRecords = async ({
     return false
 }
 
-export const getSwapStyle = async ({
-    imageshowid,
+export const getSwapStyles = async ({
+    imageShowIDList,
     style_type,
+    providerid,
+    showNSFW,
 }: {
-    imageshowid: string
+    imageShowIDList: string[]
     style_type: string
+    providerid: string
+    showNSFW?: boolean
     ctx?: TBaseContext
 }) => {
     const supabase = createClient()
-    const { data, error } = await supabase
-        .from('swap_styles')
-        .select('*')
-        .eq('style_imageshowid', imageshowid)
-        .eq('style_type', style_type)
+    const { data, error } = showNSFW
+        ? await supabase
+              .from('swap_styles')
+              .select('*')
+              .eq('style_type', style_type)
+              .eq('style_providerid', providerid)
+              .in('image_show_id', imageShowIDList)
+        : await supabase
+              .from('swap_styles')
+              .select('*')
+              .eq('style_type', style_type)
+              .eq('style_providerid', providerid)
+              .eq('is_nsfw', false)
+              .in('image_show_id', imageShowIDList)
+
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return data || {}
+    }
+    return {}
+}
+
+export const getImageAIProvider = async ({ providerid }: { providerid: string; ctx?: TBaseContext }) => {
+    const supabase = createClient()
+    const { data, error } = await supabase.from('imageai_providers').select('*').eq('providerid', providerid)
 
     if (_.isEmpty(error) && !_.isEmpty(data)) {
         return data?.[0] || {}

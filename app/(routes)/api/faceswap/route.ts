@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
 import Replicate from 'replicate'
-import { imageUrlPrefix } from '@/app/shared/constants'
+import { imageUrlPrefix, appDomain } from '@/app/shared/constants'
 import { auth, currentUser } from '@clerk/nextjs/server'
 
 const { REPLICATE_API_TOKEN } = env || {}
@@ -11,8 +11,6 @@ const replicate = new Replicate({
 })
 
 export const runtime = 'edge'
-
-const appDomain = 'https://sheepaw.com'
 
 export async function GET(request: NextRequest) {
     if (!REPLICATE_API_TOKEN) {

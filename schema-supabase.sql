@@ -135,4 +135,14 @@ CREATE TABLE IF NOT EXISTS swap_styles (
     style_imageshowid TEXT NOT NULL,
     style_type TEXT NOT NULL,
     input_type TEXT
+    providerid TEXT
+    is_nsfw BOOLEAN DEFAULT FALSE
+);
+
+
+CREATE TABLE IF NOT EXISTS imageai_providers (
+    provider_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    providerid TEXT NOT NULL,
+    api_url TEXT,
+    api_key TEXT
 );

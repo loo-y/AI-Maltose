@@ -8,9 +8,11 @@
 
 export declare global {
     namespace globalThis{
+        var replicateClient: Replicate
         var SupabaseClient: SupabaseClient<any, "public", any>
         type TBaseContext = Record<string, any>;
         type TParent = Record<string, any>;
+
     }
     
   }

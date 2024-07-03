@@ -4,12 +4,12 @@ const typeDefinitions = `
         imageSwap(params: ImageSwapArgs): ImageSwap
     }
 
-    type KeyValuePair {
+    input KeyValuePair {
         key: String!
         value: String!
     }
 
-    input ImageSwap {
+    input ImageSwapArgs {
         "Swap Keys"
         keyValues: [KeyValuePair]
     }
