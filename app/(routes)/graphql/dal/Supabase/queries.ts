@@ -294,28 +294,27 @@ export const getSwapStyles = async ({
     style_type,
     providerid,
     showNSFW,
+    ctx,
 }: {
-    imageShowIDList: string[]
-    style_type: string
-    providerid: string
+    imageShowIDList?: string[]
+    style_type?: string
+    providerid?: string
     showNSFW?: boolean
     ctx?: TBaseContext
 }) => {
     const supabase = createClient()
-    const { data, error } = showNSFW
-        ? await supabase
-              .from('swap_styles')
-              .select('*')
-              .eq('style_type', style_type)
-              .eq('providerid', providerid)
-              .in('style_imageshowid', imageShowIDList)
-        : await supabase
-              .from('swap_styles')
-              .select('*')
-              .eq('style_type', style_type)
-              .eq('providerid', providerid)
-              .eq('is_nsfw', false)
-              .in('style_imageshowid', imageShowIDList)
+    let supabaseQuery = supabase
+        .from('swap_styles')
+        .select('*')
+        .eq('style_type', style_type)
+        .eq('providerid', providerid)
+    if (!showNSFW) {
+        supabaseQuery = supabaseQuery.eq('is_nsfw', false)
+    }
+    if (!_.isEmpty(imageShowIDList)) {
+        supabaseQuery = supabaseQuery.in('style_imageshowid', imageShowIDList)
+    }
+    const { data, error } = await supabaseQuery
 
     if (_.isEmpty(error) && !_.isEmpty(data)) {
         return data || []

@@ -16,7 +16,7 @@ import {
 import ChatImagePreview from '@/app/modules/ChatImagePreview'
 import { handleUploadImage } from '@/app/shared/handlers'
 import _ from 'lodash'
-import { handleGetFaceSwapImages } from '@/app/shared/handlers'
+import { handleGetFaceSwapImages, handleGetFaceSwapImageStyles } from '@/app/shared/handlers'
 enum SELECT_TYPE {
     imageUpload = `imageUpload`,
     styleSelect = `styleSelect`,
@@ -27,14 +27,24 @@ type ImageItem = {
     imageUrl: string
     isLoading: boolean
 }
-export default function ImageOperation({ hairStyleList }: { hairStyleList: string[] }) {
+export default function ImageOperation(/*{ hairStyleList }: { hairStyleList: string[] }*/) {
     const [isExpended, setIsExpended] = useState(false)
     const [selectType, setSelectType] = useState<SELECT_TYPE>()
     const [imageList, setImageList] = useState<ImageItem[]>([])
     const [selectedImage, setSelectedImage] = useState<ImageItem>()
     const [selectedStyle, setSelectedStyle] = useState<string>()
+    const [hairStyleList, setHairStyleList] = useState<string[]>([])
     const hairStyleState = useHairStyleStore(state => state)
     const { updateNewImage, updateIsLoading, isloading } = hairStyleState || {}
+
+    useEffect(() => {
+        handleGetFaceSwapImageStyles().then(res => {
+            if (res) {
+                console.log('[handleGetFaceSwapImageStyles]', res)
+                setHairStyleList(res)
+            }
+        })
+    }, [])
 
     useEffect(() => {
         if (selectedImage) {

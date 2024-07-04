@@ -24,7 +24,7 @@ async function HairStyle() {
                 </div>
                 <div className="flex-1 w-full">
                     <div className="max-w-[50rem] h-full mx-auto py-10 flex flex-col">
-                        <ImageOperation hairStyleList={HairStyleList} />
+                        <ImageOperation /* hairStyleList={HairStyleList}*/ />
                         <ImageDisplay />
                     </div>
                 </div>

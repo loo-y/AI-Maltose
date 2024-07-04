@@ -7,6 +7,7 @@ import {
     fetchConversationMessagesGraphql,
     fetchAIBotListGraphql,
     fetchFaceSwapGraphql,
+    fetchImageStylesGraphql,
 } from './fetches'
 import { IChatMessage, Roles, AI_BOT_TYPE } from './interface'
 
@@ -156,6 +157,19 @@ export const handleGetFaceSwapImages = async ({
     console.log(`handleGetFaceSwapImages`, data)
     if (status && data?.imageSwap?.FaceSwap) {
         return data.imageSwap?.FaceSwap
+    }
+    return []
+}
+
+export const handleGetFaceSwapImageStyles = async () => {
+    const result = await fetchImageStylesGraphql({
+        provider: 'replicate',
+        styleType: 'faceswap',
+    })
+    const { data, status } = result || {}
+    console.log(`handleGetImageStyles`, data)
+    if (status && data?.imageSwap?.ImageStyle) {
+        return _.map(data.imageSwap.ImageStyle, item => item.style_imageshowid)
     }
     return []
 }

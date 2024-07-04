@@ -19,6 +19,7 @@ import Conversation from './UserService/Conversation'
 import AIBotList from './UserService/AIBotList'
 import ImageSwapCommon from './ImageSwapCommon'
 import FaceSwap from './ImageSwapServices/FaceSwap'
+import ImageStyle from './ImageSwapServices/ImageStyle'
 
 const serviceList = [
     Chain,
@@ -42,6 +43,7 @@ const serviceList = [
 
     ImageSwapCommon,
     FaceSwap,
+    ImageStyle,
 ]
 
 export default {

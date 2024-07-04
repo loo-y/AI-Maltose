@@ -66,3 +66,37 @@ export const loadReplicateFaceSwap = (
     }
     return ctx.loaderReplicateFaceSwap
 }
+
+export const loadImageStyles = (ctx: TBaseContext, args: { styleType: string; provider?: string }, key: string) => {
+    ctx.loaderReplicateFaceSwapArgs = {
+        ...ctx.loaderReplicateFaceSwapArgs,
+        [key]: args,
+    }
+
+    if (!ctx?.loaderReplicateFaceSwap) {
+        ctx.loaderReplicateFaceSwap = new DataLoader<string, string>(
+            async keys => {
+                console.log(`loaderReplicateFaceSwap-keys-🐹🐹🐹`, keys)
+                try {
+                    const lingyiwanwuAnswerList = await Promise.all(
+                        keys.map(key =>
+                            getSwapStyles({
+                                ctx,
+                                style_type: ctx.loaderReplicateFaceSwapArgs[key].styleType,
+                                providerid: ctx.loaderReplicateFaceSwapArgs[key].provider,
+                            })
+                        )
+                    )
+                    return lingyiwanwuAnswerList
+                } catch (e) {
+                    console.log(`[loaderReplicateFaceSwap] error: ${e}`)
+                }
+                return new Array(keys.length || 1).fill({ status: false })
+            },
+            {
+                batchScheduleFn: callback => setTimeout(callback, 100),
+            }
+        )
+    }
+    return ctx.loaderReplicateFaceSwap
+}
