@@ -34,7 +34,7 @@ export default function ImageOperation({ hairStyleList }: { hairStyleList: strin
     const [selectedImage, setSelectedImage] = useState<ImageItem>()
     const [selectedStyle, setSelectedStyle] = useState<string>()
     const hairStyleState = useHairStyleStore(state => state)
-    const { updateNewImage } = hairStyleState || {}
+    const { updateNewImage, updateIsLoading, isloading } = hairStyleState || {}
 
     useEffect(() => {
         if (selectedImage) {
@@ -51,12 +51,14 @@ export default function ImageOperation({ hairStyleList }: { hairStyleList: strin
     }
 
     const handleGenerate = () => {
+        if (isloading) return
         if (!selectedImage || !selectedStyle) {
             setIsExpended(true)
             setSelectType(!selectedImage ? SELECT_TYPE.imageUpload : SELECT_TYPE.styleSelect)
             return
         }
         setIsExpended(false)
+        updateIsLoading(true)
         handleGetFaceSwapImages({
             inputImageUrl: selectedImage.imageUrl,
             targetIDs: [selectedStyle],
@@ -66,6 +68,7 @@ export default function ImageOperation({ hairStyleList }: { hairStyleList: strin
                 if (status && output) {
                     updateNewImage(output)
                 }
+                updateIsLoading(false)
             })
         })
     }
@@ -123,24 +126,26 @@ export default function ImageOperation({ hairStyleList }: { hairStyleList: strin
                 </div>
                 <div className="generate_button flex items-center justify-center">
                     <button
-                        className={`rounded-full w-32 bg-blue-500 hover:bg-blue-600 text-white h-14 flex flex-row items-center justify-center gap-2`}
+                        className={`rounded-full w-32  text-white h-14 flex flex-row items-center justify-center gap-2 ${isloading ? 'bg-gray-300 hover:bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'}`}
                         onClick={handleGenerate}
                     >
-                        <span>Generate</span>
-                        <svg
-                            fill="currentColor"
-                            className=""
-                            aria-hidden="true"
-                            width="1em"
-                            height="1em"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M10.84 3.13a.5.5 0 0 0-.68.74l6.17 5.63H2.5a.5.5 0 0 0 0 1h13.83l-6.17 5.63a.5.5 0 0 0 .68.74l6.91-6.32a.75.75 0 0 0 0-1.1l-6.91-6.32Z"
+                        <span>{isloading ? 'Generating...' : 'Generate'}</span>
+                        {isloading ? null : (
+                            <svg
                                 fill="currentColor"
-                            ></path>
-                        </svg>
+                                className=""
+                                aria-hidden="true"
+                                width="1em"
+                                height="1em"
+                                viewBox="0 0 20 20"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path
+                                    d="M10.84 3.13a.5.5 0 0 0-.68.74l6.17 5.63H2.5a.5.5 0 0 0 0 1h13.83l-6.17 5.63a.5.5 0 0 0 .68.74l6.91-6.32a.75.75 0 0 0 0-1.1l-6.91-6.32Z"
+                                    fill="currentColor"
+                                ></path>
+                            </svg>
+                        )}
                     </button>
                 </div>
             </div>
