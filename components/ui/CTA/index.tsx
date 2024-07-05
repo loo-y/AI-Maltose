@@ -16,7 +16,7 @@ const CTA = () => {
                             Start Your AI Journey
                         </h2>
                         <p className="mt-3 text-gray-600">
-                        We offer a diverse AI chat experience, featuring top-tier dialogue models like ChatGPT, Claude, Gemini, and advanced AI art generation capabilities. Whether for daily communication, creative inspiration, or professional consultation, you'll find the perfect AI assistant here.
+                        <span>{`We offer a diverse AI chat experience, featuring top-tier dialogue models like ChatGPT, Claude, Gemini, and advanced AI art generation capabilities. Whether for daily communication, creative inspiration, or professional consultation, you'll find the perfect AI assistant here.`}</span>
                         </p>
                         <NavLink
                             href="/chat"
