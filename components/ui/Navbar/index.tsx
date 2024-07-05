@@ -76,10 +76,8 @@ const Navbar = ({userId}: {userId?: string}) => {
                                     </SignedIn>
                                     </div>
                                 ) : (
-                                    <div className=''>
-                                <SignedIn>
+                                    <div className='text-gray-700 border hover:bg-gray-100 p-2 rounded-md cursor-pointer bg-gray-50'>
                                     <SignInButton />
-                                </SignedIn>
                                 </div>
                                 )}
                                 
