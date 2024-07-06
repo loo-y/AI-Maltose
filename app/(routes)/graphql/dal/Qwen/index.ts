@@ -110,7 +110,7 @@ const fetchQwen = async (ctx: TBaseContext, params: Record<string, any>, options
             fetchEventStream({
                 url: requestUrl,
                 options: requestOptions,
-                regex: /^.*?data:/gs,
+                regex: new RegExp(/^.*?data:/gs),
                 completeHandler: async () => {
                     console.log(`totalContent`, totalContent)
                     if (searchWeb && message?.output?.choices) {
@@ -159,7 +159,7 @@ const fetchQwen = async (ctx: TBaseContext, params: Record<string, any>, options
                                         },
                                     }),
                                 },
-                                regex: /^.*?data:/gs,
+                                regex: new RegExp(/^.*?data:/gs),
                                 completeHandler: () => {
                                     completeHandler({
                                         content: `closed`,

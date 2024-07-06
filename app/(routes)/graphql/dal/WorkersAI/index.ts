@@ -81,7 +81,7 @@ const fetchWorkersAI = async (ctx: TBaseContext, params: Record<string, any>, op
             fetchEventStream({
                 url: requestUrl,
                 options: requestOptions,
-                regex: /^.*?data:/gs,
+                regex: new RegExp(/^.*?data:/gs),
                 completeHandler: () => {
                     console.log(`totalContent`, totalContent)
                     completeHandler({

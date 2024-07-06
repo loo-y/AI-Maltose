@@ -95,7 +95,7 @@ const fetchZhipu = async (ctx: TBaseContext, params: Record<string, any>, option
             fetchEventStream({
                 url: requestUrl,
                 options: requestOptions,
-                regex: /^.*?data:/gs,
+                regex: new RegExp(/^.*?data:/gs),
                 completeHandler: () => {
                     console.log(`totalContent`, totalContent)
                     completeHandler({
