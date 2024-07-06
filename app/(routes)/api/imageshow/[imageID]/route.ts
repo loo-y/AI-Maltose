@@ -31,7 +31,8 @@ export async function GET(request: NextRequest, { params }: { params: { imageID:
             headers: {
                 'Content-Type': response.headers.get('Content-Type') || '',
                 'Content-Length': response.headers.get('Content-Length') || '',
-                'Cache-Control': 's-maxage=3600, stale-while-revalidate',
+                // 'Cache-Control': 's-maxage=3600, stale-while-revalidate',
+                'Cache-Control': 'public, max-age=31536000, immutable',
             },
         })
     } catch (error) {
