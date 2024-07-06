@@ -12,7 +12,7 @@ const Navbar = ({userId}: {userId?: string}) => {
     const navigation = [
         { title: "Pricing", path: "#pricing" },
         { title: "Chat", path: "/chat" },
-        { title: "Image", path: "/hairstyle" },
+        { title: "Painting", path: "/hairstyle" },
     ]
 
     const handleNavMenu = () => {

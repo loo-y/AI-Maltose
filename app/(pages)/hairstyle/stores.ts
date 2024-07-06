@@ -18,7 +18,7 @@ export type HairStyleStore = HairStyleState & HairStyleActions
 const defaultInitState: HairStyleState = {
     isloading: false,
     userInfo: {},
-    createdImageList: [`Yi85ZmFpMmwyZTUvM2Q3NGViNWJkZjg3YTNhODRiYjFkNGZkNDA4MmI5ODNhOWVlMmQwMDYyMy5hajJwNmc=`],
+    createdImageList: [],
 }
 
 export const initHairStyleStore = (): HairStyleState => {

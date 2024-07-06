@@ -96,11 +96,13 @@ export default function ImageOperation(/*{ hairStyleList }: { hairStyleList: str
                         }}
                     >
                         <div
-                            className={`image-circle rounded-full w-12 h-12 ${isExpended && selectType == SELECT_TYPE.imageUpload ? 'bg-gray-50' : 'bg-gray-200 '}`}
+                            className={`image-circle rounded-full w-12 h-12 items-center flex justify-center ${isExpended && selectType == SELECT_TYPE.imageUpload ? 'bg-gray-50' : 'bg-gray-200 '}`}
                         >
                             {selectedImage ? (
                                 <img src={selectedImage.imageUrl} className="w-full h-full object-cover rounded-full" />
-                            ) : null}
+                            ) : (
+                                <img src={`/images/icons/photo.png`} className="object-cover w-6 h-6 opacity-50" />
+                            )}
                         </div>
                         <div className="flex flex-col">
                             <div className="text-paw-gray text-sm font-semibold">Image *</div>
@@ -117,14 +119,16 @@ export default function ImageOperation(/*{ hairStyleList }: { hairStyleList: str
                         }}
                     >
                         <div
-                            className={`image-circle rounded-full w-12 h-12 ${isExpended && selectType == SELECT_TYPE.styleSelect ? 'bg-gray-50' : 'bg-gray-200 '}`}
+                            className={`image-circle rounded-full w-12 h-12 items-center flex justify-center ${isExpended && selectType == SELECT_TYPE.styleSelect ? 'bg-gray-50' : 'bg-gray-200 '}`}
                         >
                             {selectedStyle ? (
                                 <img
                                     src={`${imageUrlPrefix}/${selectedStyle}`}
                                     className="w-full h-full object-cover rounded-full"
                                 />
-                            ) : null}
+                            ) : (
+                                <img src={`/images/icons/ps.png`} className="object-cover w-7 h-7 opacity-50" />
+                            )}
                         </div>
                         <div className="flex flex-col">
                             <div className="text-paw-gray text-sm font-semibold">Hair Style *</div>
@@ -237,6 +241,8 @@ const ImageSelect = ({
 
     const handleCheck = (imageItem: ImageItem) => {
         // debugger
+        if (imageItem?.isLoading) return
+
         if (imageItem?.imageId == selectedImage?.imageId) {
             setSelectedImage && setSelectedImage(undefined)
         } else {
@@ -263,21 +269,23 @@ const ImageSelect = ({
                                             handleDeleteImage(item)
                                         }}
                                     />
-                                    <div
-                                        className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
-                                        onClick={() => handleCheck(item)}
-                                    >
+                                    {item?.isLoading ? null : (
                                         <div
-                                            className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
+                                            className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
+                                            onClick={() => handleCheck(item)}
                                         >
-                                            <svg
-                                                className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
-                                                viewBox="0 0 20 20"
+                                            <div
+                                                className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
                                             >
-                                                <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
-                                            </svg>
+                                                <svg
+                                                    className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
+                                                    viewBox="0 0 20 20"
+                                                >
+                                                    <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                                                </svg>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                             )
                         })}

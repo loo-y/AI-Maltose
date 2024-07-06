@@ -9,7 +9,7 @@ const FooterCTA = () => (
                     Get started with Sheepaw AI today
                 </h2>
                 <p className="mt-3 text-gray-600">
-                    Hire experts to create your next idea, follow best practices, remove roadblocks, and delivery on schedule.
+                    {`Start Your AI Journey, Reshape Your Work and Life with AI.`}
                 </p>
                 <NavLink
                     href="/hairstyle"

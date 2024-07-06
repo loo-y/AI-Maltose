@@ -5,7 +5,7 @@ export default function Pricing() {
             type: `Personal`,
             costText: `Free`,
             benifits: [
-                `Unlimited Conversations`,
+                `100 Credits`,
                 `No Credits Required`,
                 `No Credit Limit`,
                 `Personal Assistant`
