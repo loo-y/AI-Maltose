@@ -347,7 +347,8 @@ const ImageUploadButton = ({
 
             const blob = new Blob([file], { type: file.type })
             fileInput.value = ''
-            const imageID = await handleUploadImage(blob)
+            const style = `faceswap`
+            const imageID = await handleUploadImage(blob, style)
             const imageUrl = `${location.protocol}//${location.host}/api/imageShow/${imageID}`
             console.log(`imageUrl`, imageUrl)
             completedCallback && completedCallback({ imageId, imageUrl })

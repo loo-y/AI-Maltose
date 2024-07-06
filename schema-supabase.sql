@@ -146,3 +146,11 @@ CREATE TABLE IF NOT EXISTS imageai_providers (
     api_url TEXT,
     api_key TEXT
 );
+
+CREATE TABLE IF NOT EXISTS imageai_userimages (
+    style_type TEXT,
+    imageid TEXT NOT NULL,
+    is_hidden BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    userid TEXT
+)

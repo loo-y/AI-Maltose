@@ -331,3 +331,49 @@ export const getImageAIProvider = async ({ providerid }: { providerid: string; c
     }
     return {}
 }
+
+export const saveUserImage = async ({
+    imageid,
+    userid,
+    ishidden,
+    styleType,
+    ctx,
+}: {
+    imageid: string
+    userid: string
+    ishidden?: boolean
+    styleType?: string
+    ctx?: TBaseContext
+}) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('imageai_userimages')
+        .insert([{ userid, imageid, is_hidden: ishidden || false, style_type: styleType || '' }])
+        .select()
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return true
+    }
+    return false
+}
+
+export const hidenUserImage = async ({
+    imageid,
+    userid,
+    ctx,
+}: {
+    imageid: string
+    userid: string
+    ctx?: TBaseContext
+}) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('imageai_userimages')
+        .update({ is_hidden: true })
+        .eq('imageid', imageid)
+        .eq('userid', userid)
+        .select()
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return true
+    }
+    return false
+}

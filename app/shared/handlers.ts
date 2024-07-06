@@ -11,8 +11,8 @@ import {
 } from './fetches'
 import { IChatMessage, Roles, AI_BOT_TYPE } from './interface'
 
-export const handleUploadImage = async (imageBlob: Blob): Promise<string | null> => {
-    const result = await fetchUploadImage(imageBlob)
+export const handleUploadImage = async (imageBlob: Blob, style?: string): Promise<string | null> => {
+    const result = await fetchUploadImage(imageBlob, style)
     const { data, status } = result || {}
     if (status && data?.imageID) {
         return data.imageID

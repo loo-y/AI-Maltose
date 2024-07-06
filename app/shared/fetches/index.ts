@@ -251,8 +251,8 @@ const fetchAIGraphqlStream = async (
     }
 }
 
-export const fetchUploadImage = async (imageBlob: Blob) => {
-    const url = `/api/imageUpload`
+export const fetchUploadImage = async (imageBlob: Blob, style?: string) => {
+    const url = style ? `api/styleImageUpload?style=${style}` : `/api/imageUpload`
     const options = await getCommonOptions({ userToken: 'test' })
     delete options.headers['Content-Type']
     // 创建 FormData 对象
