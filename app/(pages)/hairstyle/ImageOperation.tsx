@@ -257,50 +257,52 @@ const ImageSelect = ({
         }
     }
     return (
-        <div className="flex flex-1 rounded-2xl mb-3 bg-gray-100 ml-3 border border-dashed border-gray-300 flex-col h-[19rem]">
-            <div className="flex flex-1 overflow-hidden overflow-y-scroll">
-                {_.isEmpty(imageList) ? null : (
-                    <div className="flex flex-wrap flex-row gap-2 my-2">
-                        {_.map(imageList, (item, imageIndex) => {
-                            const isChecked = item?.imageId == selectedImage?.imageId
-                            console.log(`isChecked: ${isChecked}, imageID: ${item.imageId}`)
-                            return (
-                                <div
-                                    className="relative flex items-center m-2 w-fit h-fit"
-                                    key={`inputImageList_${imageIndex}`}
-                                >
-                                    <ThumbnailDisplay
-                                        imageUrl={item?.imageUrl}
-                                        isLoading={item?.isLoading}
-                                        onDelete={() => {
-                                            handleDeleteImage(item)
-                                        }}
-                                    />
-                                    {item?.isLoading ? null : (
-                                        <div
-                                            className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
-                                            onClick={() => handleCheck(item)}
-                                        >
+        <div className="flex flex-1 rounded-2xl mb-3 bg-white overflow-hidden w-full">
+            <div className="flex w-full rounded-2xl bg-gray-100 ml-3 border border-dashed border-gray-300 flex-col h-[19rem]">
+                <div className="flex flex-1 overflow-hidden overflow-y-scroll">
+                    {_.isEmpty(imageList) ? null : (
+                        <div className="flex flex-wrap flex-row gap-2 my-2">
+                            {_.map(imageList, (item, imageIndex) => {
+                                const isChecked = item?.imageId == selectedImage?.imageId
+                                console.log(`isChecked: ${isChecked}, imageID: ${item.imageId}`)
+                                return (
+                                    <div
+                                        className="relative flex items-center m-2 w-fit h-fit"
+                                        key={`inputImageList_${imageIndex}`}
+                                    >
+                                        <ThumbnailDisplay
+                                            imageUrl={item?.imageUrl}
+                                            isLoading={item?.isLoading}
+                                            onDelete={() => {
+                                                handleDeleteImage(item)
+                                            }}
+                                        />
+                                        {item?.isLoading ? null : (
                                             <div
-                                                className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
+                                                className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
+                                                onClick={() => handleCheck(item)}
                                             >
-                                                <svg
-                                                    className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
-                                                    viewBox="0 0 20 20"
+                                                <div
+                                                    className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
                                                 >
-                                                    <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
-                                                </svg>
+                                                    <svg
+                                                        className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                                                    </svg>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )
-                        })}
-                    </div>
-                )}
-            </div>
-            <div className="flex w-full items-center justify-center py-2">
-                <ImageUploadButton uploadCallback={handleOnUpload} completedCallback={handleOnCompleted} />
+                                        )}
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
+                </div>
+                <div className="flex w-full items-center justify-center py-2">
+                    <ImageUploadButton uploadCallback={handleOnUpload} completedCallback={handleOnCompleted} />
+                </div>
             </div>
         </div>
     )
@@ -399,6 +401,7 @@ const ThumbnailDisplay: React.FC<{
     const [openPreview, setOpenPreview] = useState(false)
     const thumbnailRef = useRef(null)
     const imagePreviewRef = useRef(null)
+    const [backgroundImage, setBackgroundImage] = useState('')
 
     const handleMouseEnter = () => {
         setHovered(true)
@@ -433,42 +436,65 @@ const ThumbnailDisplay: React.FC<{
         }
     }
 
+    // 当图片加载完成时
+    const handleImageLoad = () => {
+        if (imagePreviewRef?.current) {
+            console.log(`handleImageLoad`)
+            const imagePreviewElement = imagePreviewRef.current as HTMLDivElement
+            setBackgroundImage(imageUrl)
+        }
+    }
+
     return (
         <>
-            <div
-                className="w-28 h-36 min-h-12 relative rounded-lg bg-contain bg-no-repeat bg-center border border-transparent bg-transparent cursor-zoom-in"
-                style={{ backgroundImage: `url(${imageUrl})` }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                onClick={handleClickThumbnail}
-                ref={thumbnailRef}
-            >
-                {isLoading && (
-                    <div className="w-full h-full flex items-center justify-center flex-col bg-opacity-50 bg-gray-500 ">
-                        <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-gray-500"></div>
-                    </div>
-                )}
-                {hovered && !hideDelete && (
-                    <button
-                        className="absolute -top-2 -right-2 p-1 bg-gray-600 text-white rounded-full"
-                        onClick={handleDelete}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            className="w-2 h-2"
+            <div className="w-28 h-36  min-h-12 overflow-hidden rounded-xl">
+                <div
+                    className="w-28 h-36  min-h-12  border-none relative bg-cover bg-no-repeat bg-center bg-transparent cursor-zoom-in overflow-hidden transform transition-transform duration-300 ease-in-out hover:scale-110 "
+                    style={
+                        backgroundImage
+                            ? { backgroundImage: `url(${backgroundImage})` }
+                            : { backgroundImage: `url(${imageUrl})` }
+                    }
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    onClick={handleClickThumbnail}
+                    ref={thumbnailRef}
+                >
+                    {backgroundImage ? null : (
+                        <img
+                            src={imageUrl}
+                            ref={imagePreviewRef}
+                            onLoad={handleImageLoad}
+                            className="w-full h-full bg-cover bg-no-repeat bg-center hidden -z-10"
+                        />
+                    )}
+                    {isLoading || !backgroundImage ? (
+                        <div className="w-full h-full flex items-center justify-center flex-col bg-opacity-50 bg-gray-500  z-20">
+                            <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-gray-500"></div>
+                        </div>
+                    ) : null}
+                    {hovered && !hideDelete && (
+                        <button
+                            className="absolute -top-2 -right-2 p-1 bg-gray-600 text-white rounded-full"
+                            onClick={handleDelete}
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                )}
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                className="w-2 h-2"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                    )}
+                </div>
             </div>
             <div className="">
                 <ChatImagePreview imageUrl={imageUrl} isOpen={openPreview} closeCallback={handleClosePreview} />
@@ -495,8 +521,14 @@ const StyleSelect = ({
     }
     return (
         <div className="flex flex-1 rounded-2xl mb-3 bg-white overflow-hidden overflow-y-scroll">
-            {_.isEmpty(styleList) ? null : (
-                <div className="flex flex-wrap flex-row gap-2 my-2">
+            {_.isEmpty(styleList) ? (
+                <div className="flex w-full h-full flex-row items-center justify-center my-2 pb-6">
+                    <div className="loadingshow flex items-center justify-center animate-spin-slow">
+                        <img src={`/images/icons/loading.svg`} className="w-20 h-20" />
+                    </div>
+                </div>
+            ) : (
+                <div className="flex flex-wrap flex-row gap-2 my-2 ml-3">
                     {_.map(styleList, (item, styleIndex) => {
                         const isChecked = item == selectedStyle
                         return (
