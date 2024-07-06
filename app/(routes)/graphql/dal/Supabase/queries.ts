@@ -56,6 +56,21 @@ export const addBalanceForUser = async (userData: { userid: string; balance: num
     return false
 }
 
+export const reduceBalanceForUser = async ({ userid, reduceAmount }: { userid: string; reduceAmount: number }) => {
+    const user = await getUser({ userid })
+    if (!user) return false
+    if (user.balance < reduceAmount) return false
+    const newBalance = user.balance - reduceAmount
+    const supabase = createClient()
+    const { data, error } = await supabase.from('users').update({ balance: newBalance }).eq('userid', userid).select()
+    console.log(`reduceBalanceForUser`, data, error)
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return true
+    }
+
+    return false
+}
+
 export const createConversation = async ({ userid, aiid }: { userid: string; aiid?: string }) => {
     const supabase = createClient()
     const { data, error } = await supabase.from('conversations').insert([{ userid }]).select()

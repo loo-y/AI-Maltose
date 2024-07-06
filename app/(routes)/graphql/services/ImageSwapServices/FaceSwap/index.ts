@@ -3,7 +3,7 @@ import { loadReplicateFaceSwap } from '../../../dal/ImageSwap'
 
 const typeDefinitions = `
     scalar JSON
-    type ImageSwap {
+    type ImageSwapMutation {
         FaceSwap(params: FaceSwapArgs): [JSON]
     }
 
@@ -34,7 +34,7 @@ export const FaceSwap = async (parent: TParent, args: Record<string, any>, conte
 }
 
 const resolvers = {
-    ImageSwap: {
+    ImageSwapMutation: {
         FaceSwap: FaceSwap,
     },
 }

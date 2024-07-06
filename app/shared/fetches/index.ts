@@ -99,7 +99,7 @@ export const fetchFaceSwapGraphql = async (params: {
     const body = {
         operationName,
         query: `
-            query ${operationName}($faceSwapParams: FaceSwapArgs){
+            mutation ${operationName}($faceSwapParams: FaceSwapArgs){
                 imageSwap {
                     FaceSwap(params: $faceSwapParams)
                 }

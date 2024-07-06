@@ -107,7 +107,7 @@ export default function ImageOperation(/*{ hairStyleList }: { hairStyleList: str
                         <div className="flex flex-col">
                             <div className="text-paw-gray text-sm font-semibold">Image *</div>
                             <div className="text-gray-400 text-xs items-end">
-                                {selectedImage ? 'One image selected' : 'Choose an image'}
+                                {selectedImage ? 'One image selected' : 'Upload and choose an image'}
                             </div>
                         </div>
                     </div>
