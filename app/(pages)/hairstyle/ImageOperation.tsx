@@ -106,9 +106,12 @@ export default function ImageOperation(/*{ hairStyleList }: { hairStyleList: str
                             )}
                         </div>
                         <div className="flex flex-col">
-                            <div className="text-paw-gray text-sm font-semibold">Image *</div>
+                            <div className="text-paw-gray text-sm font-semibold">
+                                Photo{' '}
+                                <span className={`text-xs ${selectedImage ? 'text-gray-500' : 'text-red-500'}`}>*</span>
+                            </div>
                             <div className="text-gray-400 text-xs items-end">
-                                {selectedImage ? 'One image selected' : 'Upload and choose an image'}
+                                {selectedImage ? 'One photo selected' : 'Upload and choose a photo'}
                             </div>
                         </div>
                     </div>
@@ -132,7 +135,10 @@ export default function ImageOperation(/*{ hairStyleList }: { hairStyleList: str
                             )}
                         </div>
                         <div className="flex flex-col">
-                            <div className="text-paw-gray text-sm font-semibold">Hair Style *</div>
+                            <div className="text-paw-gray text-sm font-semibold">
+                                Hair Style{' '}
+                                <span className={`text-xs ${selectedStyle ? 'text-gray-500' : 'text-red-500'}`}>*</span>
+                            </div>
                             <div className="text-gray-400 text-xs items-end">
                                 {selectedStyle ? 'One style selected' : 'Choose a style'}
                             </div>
