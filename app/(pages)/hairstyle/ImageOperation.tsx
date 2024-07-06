@@ -261,39 +261,41 @@ const ImageSelect = ({
             <div className="flex w-full rounded-2xl bg-gray-100 ml-3 border border-dashed border-gray-300 flex-col h-[19rem]">
                 <div className="flex flex-1 overflow-hidden overflow-y-scroll">
                     {_.isEmpty(imageList) ? null : (
-                        <div className="flex flex-wrap flex-row gap-2 my-2">
+                        <div className="flex flex-wrap flex-row my-2 w-full">
                             {_.map(imageList, (item, imageIndex) => {
                                 const isChecked = item?.imageId == selectedImage?.imageId
                                 console.log(`isChecked: ${isChecked}, imageID: ${item.imageId}`)
                                 return (
-                                    <div
-                                        className="relative flex items-center m-2 w-fit h-fit"
-                                        key={`inputImageList_${imageIndex}`}
-                                    >
-                                        <ThumbnailDisplay
-                                            imageUrl={item?.imageUrl}
-                                            isLoading={item?.isLoading}
-                                            onDelete={() => {
-                                                handleDeleteImage(item)
-                                            }}
-                                        />
-                                        {item?.isLoading ? null : (
-                                            <div
-                                                className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
-                                                onClick={() => handleCheck(item)}
-                                            >
+                                    <div className="flex justify-center w-1/5">
+                                        <div
+                                            className="relative flex items-center m-2 w-fit h-fit"
+                                            key={`inputImageList_${imageIndex}`}
+                                        >
+                                            <ThumbnailDisplay
+                                                imageUrl={item?.imageUrl}
+                                                isLoading={item?.isLoading}
+                                                onDelete={() => {
+                                                    handleDeleteImage(item)
+                                                }}
+                                            />
+                                            {item?.isLoading ? null : (
                                                 <div
-                                                    className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
+                                                    className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
+                                                    onClick={() => handleCheck(item)}
                                                 >
-                                                    <svg
-                                                        className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
-                                                        viewBox="0 0 20 20"
+                                                    <div
+                                                        className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
                                                     >
-                                                        <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
-                                                    </svg>
+                                                        <svg
+                                                            className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
+                                                            viewBox="0 0 20 20"
+                                                        >
+                                                            <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                                                        </svg>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 )
                             })}
@@ -528,32 +530,34 @@ const StyleSelect = ({
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-wrap flex-row gap-2 my-2 ml-3">
+                <div className="flex flex-wrap flex-row my-2 ml-3 w-full">
                     {_.map(styleList, (item, styleIndex) => {
                         const isChecked = item == selectedStyle
                         return (
-                            <div
-                                className="relative flex items-center m-2 w-fit h-fit"
-                                key={`inputImageList_${styleIndex}`}
-                            >
-                                <ThumbnailDisplay
-                                    imageUrl={`${imageUrlPrefix}/${item}`}
-                                    isLoading={false}
-                                    hideDelete={true}
-                                />
+                            <div className="flex justify-center w-1/5">
                                 <div
-                                    className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
-                                    onClick={() => handleCheck(item)}
+                                    className="relative flex items-center m-2 w-fit h-fit"
+                                    key={`inputImageList_${styleIndex}`}
                                 >
+                                    <ThumbnailDisplay
+                                        imageUrl={`${imageUrlPrefix}/${item}`}
+                                        isLoading={false}
+                                        hideDelete={true}
+                                    />
                                     <div
-                                        className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
+                                        className="absolute bottom-0 w-full h-6 bg-white bg-opacity-50 cursor-pointer flex items-center justify-center"
+                                        onClick={() => handleCheck(item)}
                                     >
-                                        <svg
-                                            className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
-                                            viewBox="0 0 20 20"
+                                        <div
+                                            className={`w-4 h-4 flex border-2 rounded-md  items-center justify-center transition-all duration-200 ease-in-out ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-200 hover:border-blue-500'}`}
                                         >
-                                            <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
-                                        </svg>
+                                            <svg
+                                                className={`w-4 h-4 text-white fill-current ${isChecked ? 'block' : 'hidden'}`}
+                                                viewBox="0 0 20 20"
+                                            >
+                                                <path d="M0 11l2-2 5 5L18 3l2 2L7 18z" />
+                                            </svg>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
