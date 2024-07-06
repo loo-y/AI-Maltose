@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE NOT NULL,
     balance DECIMAL(10, 2) DEFAULT 0.00,
     is_pro BOOLEAN DEFAULT FALSE, -- 是否为 Pro 用户
-
+    is_admin BOOLEAN DEFAULT FALSE, -- 是否为管理员
 );
 
 -- 插入一些示例数据

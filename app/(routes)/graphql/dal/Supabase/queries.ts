@@ -13,7 +13,7 @@ export const getUser = async ({ userid }: { ctx?: TBaseContext; userid: string }
         }
     }
 
-    const { balance, email, username, is_pro } = user || {}
+    const { balance, email, username, is_pro, is_admin } = user || {}
     let conversations: Record<string, any>[] = []
 
     conversations = await getUserConversations({ userid: user.userid })
@@ -25,6 +25,7 @@ export const getUser = async ({ userid }: { ctx?: TBaseContext; userid: string }
         userid,
         conversations,
         is_pro,
+        is_admin,
     }
 }
 
