@@ -35,7 +35,7 @@ export default function ImageOperation(/*{ hairStyleList }: { hairStyleList: str
     const [selectedStyle, setSelectedStyle] = useState<string>()
     const [hairStyleList, setHairStyleList] = useState<string[]>([])
     const hairStyleState = useHairStyleStore(state => state)
-    const { updateNewImage, updateIsLoading, isloading } = hairStyleState || {}
+    const { updateNewImage, updateIsLoading, isloading, updateBalanceRefreshTime } = hairStyleState || {}
 
     useEffect(() => {
         handleGetFaceSwapImageStyles().then(res => {
@@ -80,6 +80,7 @@ export default function ImageOperation(/*{ hairStyleList }: { hairStyleList: str
                 }
                 updateIsLoading(false)
             })
+            updateBalanceRefreshTime(Date.now())
         })
     }
 

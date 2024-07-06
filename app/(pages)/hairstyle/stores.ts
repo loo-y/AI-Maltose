@@ -6,11 +6,13 @@ type HairStyleState = {
     userInfo: Record<string, any>
     createdImageList: string[]
     newImageByAI?: string
+    balanceRefreshTime?: number
 }
 
 type HairStyleActions = {
     updateIsLoading: (loading: boolean) => void
     updateNewImage: (imageUrlID: string) => void
+    updateBalanceRefreshTime: (time: number) => void
 }
 
 export type HairStyleStore = HairStyleState & HairStyleActions
@@ -19,6 +21,7 @@ const defaultInitState: HairStyleState = {
     isloading: false,
     userInfo: {},
     createdImageList: [],
+    balanceRefreshTime: 0,
 }
 
 export const initHairStyleStore = (): HairStyleState => {
@@ -41,6 +44,13 @@ export const createHairStyleStore = (initState: HairStyleState = defaultInitStat
                     return {
                         newImageByAI: imageUrlID,
                         createdImageList: [imageUrlID, ...state.createdImageList],
+                    }
+                })
+            },
+            updateBalanceRefreshTime: (time: number) => {
+                return set(state => {
+                    return {
+                        balanceRefreshTime: time,
                     }
                 })
             },
