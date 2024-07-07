@@ -230,9 +230,10 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 }
             },
             onStream: (content: any) => {
-                setWaitingForResponse(false)
                 console.log(`stream result`, content)
                 if (content && !content.includes(`__{{streamCompleted}}__`)) {
+                    // 有第一个单词返回才隐藏点点点
+                    setWaitingForResponse(false)
                     setHistory(_history => {
                         const newHistory = [..._history]
                         if (newHistory?.at(-1)?.role !== Roles.assistant) {
