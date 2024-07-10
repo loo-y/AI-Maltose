@@ -13,11 +13,7 @@ import _ from 'lodash'
 import ChatImagePreview from './ChatImagePreview'
 
 interface IChatUserMessageProps {
-    chatMessage: {
-        role: Roles.user
-        content: string | (TextMessage | ImageUrlMessage)[]
-        name?: string
-    }
+    chatMessage: UserMessage
 }
 const ChatUserMessage = ({ chatMessage }: IChatUserMessageProps) => {
     const { role, content } = chatMessage || {}
@@ -32,7 +28,7 @@ const ChatUserMessage = ({ chatMessage }: IChatUserMessageProps) => {
                                 {content}
                             </div>
                         ) : (
-                            <ObjectContent content={content} />
+                            <ObjectContent content={content as (TextMessage | ImageUrlMessage)[]} />
                         )}
                     </div>
                 </div>
