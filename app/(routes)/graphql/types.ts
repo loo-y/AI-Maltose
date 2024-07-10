@@ -6,9 +6,18 @@ import {
     AssistantMessage,
     TextMessage,
     ImageUrlMessage,
+    AzureImageUrlMessage,
 } from '@/app/shared/interface'
 export { Roles }
-export type { IChatMessage, SystemMessage, UserMessage, AssistantMessage, TextMessage, ImageUrlMessage }
+export type {
+    IChatMessage,
+    SystemMessage,
+    UserMessage,
+    AssistantMessage,
+    TextMessage,
+    ImageUrlMessage,
+    AzureImageUrlMessage,
+}
 
 export interface IMessage {
     role: Roles

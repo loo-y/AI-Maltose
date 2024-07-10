@@ -7,10 +7,11 @@ export interface SystemMessage {
 
 export type TextMessage = { type: 'text'; text: string }
 export type ImageUrlMessage = { type: 'image_url'; image_url: { url: string; detail?: string } }
+export type AzureImageUrlMessage = { type: 'image_url'; imageUrl: { url: string; detail?: string } }
 
 export interface UserMessage {
     role: Roles.user
-    content: string | (TextMessage | ImageUrlMessage)[]
+    content: string | (TextMessage | ImageUrlMessage | AzureImageUrlMessage)[]
     name?: string
 }
 

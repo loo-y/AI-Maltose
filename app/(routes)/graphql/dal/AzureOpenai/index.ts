@@ -8,6 +8,8 @@ import {
     SystemMessage,
     UserMessage,
     AssistantMessage,
+    ImageUrlMessage,
+    AzureImageUrlMessage,
 } from '../../types'
 import { OpenAIClient, AzureKeyCredential } from '@azure/openai'
 import _ from 'lodash'
@@ -33,9 +35,23 @@ const convertMessages = (messages: ICommonDalArgs['messages']): { history: IChat
                     content: content,
                 } as SystemMessage
             case Roles.user:
+                let newContent = content
+                if (Array.isArray(newContent)) {
+                    newContent = _.map(newContent, nc => {
+                        const { type } = nc || {}
+                        if (type == `image_url`) {
+                            const { image_url } = nc as ImageUrlMessage
+                            return {
+                                type,
+                                imageUrl: image_url, // fix as AzureImageUrlMessage
+                            } as AzureImageUrlMessage
+                        }
+                        return nc
+                    })
+                }
                 return {
                     role: Roles.user,
-                    content: content,
+                    content: newContent,
                 } as UserMessage
             default:
                 return {
