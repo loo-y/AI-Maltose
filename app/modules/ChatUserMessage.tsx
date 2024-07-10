@@ -1,11 +1,23 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { IHistory, Roles, IChatMessage, UserMessage, TextMessage, ImageUrlMessage } from '../shared/interface'
+import {
+    IHistory,
+    Roles,
+    IChatMessage,
+    UserMessage,
+    TextMessage,
+    ImageUrlMessage,
+    AzureImageUrlMessage,
+} from '../shared/interface'
 import _ from 'lodash'
 import ChatImagePreview from './ChatImagePreview'
 
 interface IChatUserMessageProps {
-    chatMessage: UserMessage
+    chatMessage: {
+        role: Roles.user
+        content: string | (TextMessage | ImageUrlMessage)[]
+        name?: string
+    }
 }
 const ChatUserMessage = ({ chatMessage }: IChatUserMessageProps) => {
     const { role, content } = chatMessage || {}
