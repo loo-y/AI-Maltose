@@ -10,6 +10,7 @@ const typeDefinitions = `
     input PhotoSwapArgs {
         inputID: String
         inputImageUrl: String
+        provider: String
     }
 
     type ImageSwap {

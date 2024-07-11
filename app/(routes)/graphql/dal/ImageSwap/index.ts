@@ -102,7 +102,11 @@ export const loadImageStyles = (ctx: TBaseContext, args: { styleType: string; pr
     return ctx.loaderReplicateFaceSwap
 }
 
-export const loadTensorArtTemplate = (ctx: TBaseContext, args: { templateId: string }, key: string) => {
+export const loadTensorArtTemplate = (
+    ctx: TBaseContext,
+    args: { templateId: string; providerid: string },
+    key: string
+) => {
     ctx.loaderTensorArtTemplateArgs = {
         ...ctx.loaderTensorArtTemplatepArgs,
         [key]: args,
@@ -112,6 +116,9 @@ export const loadTensorArtTemplate = (ctx: TBaseContext, args: { templateId: str
         ctx.loaderTensorArtTemplate = new DataLoader<string, string>(
             async keys => {
                 console.log(`loaderTensorArtTemplate-keys-🐹🐹🐹`, keys)
+                const providerid = args.providerid
+                const imageAIProviderInfo = await getImageAIProvider({ ctx, providerid })
+                const { api_url: endpoint, api_key: authToken } = imageAIProviderInfo || {}
                 try {
                     const lingyiwanwuAnswerList = await Promise.all(
                         keys.map(key => {
@@ -123,6 +130,8 @@ export const loadTensorArtTemplate = (ctx: TBaseContext, args: { templateId: str
                                     const jobResult = await createJobByTemplate({
                                         templateId,
                                         fields,
+                                        authToken,
+                                        endpoint,
                                     })
                                     if (jobResult?.status && jobResult?.job) {
                                         job = jobResult.job
