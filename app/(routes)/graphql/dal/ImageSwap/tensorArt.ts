@@ -12,7 +12,7 @@ const getCommonOptions = (authToken?: string) => {
     }
 }
 
-const getWorkflowTemplateInfo = async ({
+export const getWorkflowTemplateInfo = async ({
     templateId,
     endpoint = tensorArtEndpoint,
     authToken,
@@ -49,7 +49,7 @@ const getWorkflowTemplateInfo = async ({
     }
 }
 
-const createJobByTemplate = async ({
+export const createJobByTemplate = async ({
     templateId,
     endpoint = tensorArtEndpoint,
     fields,
@@ -92,7 +92,7 @@ const createJobByTemplate = async ({
     }
 }
 
-const getJobStatus = async ({
+export const getJobStatus = async ({
     jobId,
     endpoint = tensorArtEndpoint,
     authToken,

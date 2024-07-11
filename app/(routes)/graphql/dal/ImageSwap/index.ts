@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { getSwapStyles, getImageAIProvider } from '../Supabase/queries'
 import { getFaceSwap } from './replicate'
 import { imageUrlPrefix, appDomain } from '@/app/shared/constants'
+import { getWorkflowTemplateInfo, createJobByTemplate } from './tensorArt'
 
 export const loadReplicateFaceSwap = (
     ctx: TBaseContext,
@@ -99,4 +100,48 @@ export const loadImageStyles = (ctx: TBaseContext, args: { styleType: string; pr
         )
     }
     return ctx.loaderReplicateFaceSwap
+}
+
+export const loadTensorArtTemplate = (ctx: TBaseContext, args: { templateId: string }, key: string) => {
+    ctx.loaderTensorArtTemplateArgs = {
+        ...ctx.loaderTensorArtTemplatepArgs,
+        [key]: args,
+    }
+
+    if (!ctx?.loaderTensorArtTemplate) {
+        ctx.loaderTensorArtTemplate = new DataLoader<string, string>(
+            async keys => {
+                console.log(`loaderTensorArtTemplate-keys-🐹🐹🐹`, keys)
+                try {
+                    const lingyiwanwuAnswerList = await Promise.all(
+                        keys.map(key => {
+                            return new Promise(async (resolve, reject) => {
+                                let job = {}
+                                const { templateId } = ctx.loaderTensorArtTemplateArgs[key]
+                                const { fields, status } = await getWorkflowTemplateInfo({ templateId })
+                                if (status && !_.isEmpty(fields)) {
+                                    const jobResult = await createJobByTemplate({
+                                        templateId,
+                                        fields,
+                                    })
+                                    if (jobResult?.status && jobResult?.job) {
+                                        job = jobResult.job
+                                    }
+                                }
+                                resolve(job)
+                            })
+                        })
+                    )
+                    return lingyiwanwuAnswerList
+                } catch (e) {
+                    console.log(`[loaderTensorArtTemplate] error: ${e}`)
+                }
+                return new Array(keys.length || 1).fill({ status: false })
+            },
+            {
+                batchScheduleFn: callback => setTimeout(callback, 100),
+            }
+        )
+    }
+    return ctx.loaderTensorArtTemplate
 }
