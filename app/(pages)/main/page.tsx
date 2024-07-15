@@ -21,6 +21,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } from '@/app/shared/handlers'
 import { useMediaQuery } from 'react-responsive'
 import { Toaster } from '@/components/ui/sonner'
+import Loading from './Loading'
 
 const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     const [mounted, setMounted] = useState(false)
@@ -28,7 +29,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     const isMountedSmallScreen = mounted && !isMd
 
     const mainState = useMainStore(state => state)
-    let { currentConversation, updateCurrentConversation } = mainState
+    let { currentConversation, updateCurrentConversation, updateIsLoading } = mainState
     const [isFetching, setIsFetching] = useState(false)
     const [waitingForResponse, setWaitingForResponse] = useState(false)
     const [history, setHistory] = useState<IHistory>([])
@@ -90,6 +91,8 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
             setIsFetching(false)
             // 变更对话ID时，重新获取服务端的聊天记录
             if (conversationID > 0) {
+                setOpenDrawerSidebar(false)
+                updateIsLoading(true)
                 handleGetConversationHistory({ conversationID }).then(historyFromServer => {
                     setHistory(historyFromServer)
                     const theConversation = _.find(conversationList, c => {
@@ -107,7 +110,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                     setTimeout(() => {
                         // scoll to bottom
                         scrollToEnd()
-                        setOpenDrawerSidebar(false)
+                        updateIsLoading(false)
                     }, 0)
                 })
             }
@@ -269,66 +272,68 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     const rightFullClass = `w-full`
     const rightNormalClass = `flex-1`
     return (
-        <div className="w-full flex flex-row h-full focus-visible:outline-0 transition-all duration-500">
-            <div
-                className={`sidebar h-full bg-gray-100 overflow-hidden hidden md:block transition-transform duration-500 ease-in-out ${hideSidebar ? sidebarHideClass : sidebarShowClass}`}
-            >
-                <Sidebar
-                    currentConversation={currentConversation}
-                    conversationList={conversationList}
-                    onSelectConversation={handleChangeConversation}
-                    onToggleSidebar={handleToggleSidebar}
-                    onCreateNewConversation={handleCreateNewConversation}
-                    isMountedSmallScreen={isMountedSmallScreen}
-                />
-            </div>
-            <div
-                className={`flex flex-col relative h-full focus-visible:outline-0 transition-transform duration-500 ease-in-out ${hideSidebar ? rightFullClass : rightNormalClass}`}
-            >
-                <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>
-                    <div className="absolute flex flex-row h-14 w-full items-center justify-between z-10 bg-white">
-                        <div className="topleft ml-4 flex flex-row">
-                            {hideSidebar || isMountedSmallScreen ? (
-                                <>
-                                    {isMountedSmallScreen ? (
-                                        <Drawer open={openDrawerSidebar} onOpenChange={setOpenDrawerSidebar}>
-                                            <DrawerTrigger>
-                                                <div className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center">
-                                                    <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
-                                                </div>
-                                            </DrawerTrigger>
-                                            <DrawerContent>
-                                                <Sidebar
-                                                    currentConversation={currentConversation}
-                                                    conversationList={conversationList}
-                                                    onSelectConversation={handleChangeConversation}
-                                                    onToggleSidebar={handleToggleSidebar}
-                                                    onCreateNewConversation={handleCreateNewConversation}
-                                                    isMountedSmallScreen={isMountedSmallScreen}
-                                                    className={`bg-white max-h-[70vh]`}
-                                                />
-                                            </DrawerContent>
-                                        </Drawer>
-                                    ) : (
+        <>
+            <Loading />
+            <div className="w-full flex flex-row h-full focus-visible:outline-0 transition-all duration-500">
+                <div
+                    className={`sidebar h-full bg-gray-100 overflow-hidden hidden md:block transition-transform duration-500 ease-in-out ${hideSidebar ? sidebarHideClass : sidebarShowClass}`}
+                >
+                    <Sidebar
+                        currentConversation={currentConversation}
+                        conversationList={conversationList}
+                        onSelectConversation={handleChangeConversation}
+                        onToggleSidebar={handleToggleSidebar}
+                        onCreateNewConversation={handleCreateNewConversation}
+                        isMountedSmallScreen={isMountedSmallScreen}
+                    />
+                </div>
+                <div
+                    className={`flex flex-col relative h-full focus-visible:outline-0 transition-transform duration-500 ease-in-out ${hideSidebar ? rightFullClass : rightNormalClass}`}
+                >
+                    <div className="flex-1 overflow-hidden overflow-y-scroll " ref={conversationContainerRef}>
+                        <div className="absolute flex flex-row h-14 w-full items-center justify-between z-10 bg-white">
+                            <div className="topleft ml-4 flex flex-row">
+                                {hideSidebar || isMountedSmallScreen ? (
+                                    <>
+                                        {isMountedSmallScreen ? (
+                                            <Drawer open={openDrawerSidebar} onOpenChange={setOpenDrawerSidebar}>
+                                                <DrawerTrigger>
+                                                    <div className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center">
+                                                        <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
+                                                    </div>
+                                                </DrawerTrigger>
+                                                <DrawerContent>
+                                                    <Sidebar
+                                                        currentConversation={currentConversation}
+                                                        conversationList={conversationList}
+                                                        onSelectConversation={handleChangeConversation}
+                                                        onToggleSidebar={handleToggleSidebar}
+                                                        onCreateNewConversation={handleCreateNewConversation}
+                                                        isMountedSmallScreen={isMountedSmallScreen}
+                                                        className={`bg-white max-h-[70vh]`}
+                                                    />
+                                                </DrawerContent>
+                                            </Drawer>
+                                        ) : (
+                                            <div
+                                                className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center"
+                                                onClick={handleToggleSidebar}
+                                            >
+                                                <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
+                                            </div>
+                                        )}
                                         <div
-                                            className=" cursor-pointer hover:bg-gray-200 w-9 h-9 rounded-lg flex items-center justify-center"
-                                            onClick={handleToggleSidebar}
+                                            className=" cursor-pointer hover:bg-gray-200 w-9 h-9 pt-[2px] rounded-lg flex items-center justify-center"
+                                            onClick={handleCreateNewConversation}
                                         >
-                                            <img src="/images/icons/sidebar.svg" className="w-6 h-6" />
+                                            <img src="/images/icons/create-new.svg" className="w-6 h-6" />
                                         </div>
-                                    )}
-                                    <div
-                                        className=" cursor-pointer hover:bg-gray-200 w-9 h-9 pt-[2px] rounded-lg flex items-center justify-center"
-                                        onClick={handleCreateNewConversation}
-                                    >
-                                        <img src="/images/icons/create-new.svg" className="w-6 h-6" />
-                                    </div>
-                                </>
-                            ) : null}
-                            <div className="flex items-center justify-center">
-                                <AISelection aiBots={aiBots} mainState={mainState} />
-                            </div>
-                            {/* <Drawer direction="left">
+                                    </>
+                                ) : null}
+                                <div className="flex items-center justify-center">
+                                    <AISelection aiBots={aiBots} mainState={mainState} />
+                                </div>
+                                {/* <Drawer direction="left">
                                 <DrawerTrigger>Open</DrawerTrigger>
                                 <DrawerContent
                                     direction="left"
@@ -337,26 +342,29 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                                     <Sidebar />
                                 </DrawerContent>
                             </Drawer> */}
+                            </div>
+                            <div className="topright signmodule mr-4 mt-3">
+                                <SignedIn>
+                                    <UserButton />
+                                </SignedIn>
+                            </div>
                         </div>
-                        <div className="topright signmodule mr-4 mt-3">
-                            <SignedIn>
-                                <UserButton />
-                            </SignedIn>
-                        </div>
+                        <ConversationBox history={history} isFetching={isFetching} waiting={waitingForResponse} />
                     </div>
-                    <ConversationBox history={history} isFetching={isFetching} waiting={waitingForResponse} />
+                    <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
+                        <Chatinput
+                            isFetching={isFetching}
+                            onSendQuestion={handleSendQuestion}
+                            onAbortQuestion={handleAbortQuestion}
+                            imageCapability={
+                                _.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] })?.imageCapability
+                            }
+                        />
+                    </div>
                 </div>
-                <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
-                    <Chatinput
-                        isFetching={isFetching}
-                        onSendQuestion={handleSendQuestion}
-                        onAbortQuestion={handleAbortQuestion}
-                        imageCapability={_.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] })?.imageCapability}
-                    />
-                </div>
+                <Toaster />
             </div>
-            <Toaster />
-        </div>
+        </>
     )
 }
 
