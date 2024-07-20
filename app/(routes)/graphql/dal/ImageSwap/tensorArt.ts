@@ -1,6 +1,8 @@
 import { tensorArtEndpoint } from '@/app/shared/constants'
 import { generateMD5 } from '@/app/shared/util'
 
+type TEMPLATE_FIELDS = { fieldAttrs: { nodeId: string; fieldName: string; fieldValue: any }[] }
+
 const getCommonOptions = (authToken?: string) => {
     return {
         method: 'POST',
@@ -28,11 +30,11 @@ export const getWorkflowTemplateInfo = async ({
     }
 
     try {
-        const response = await fetch('url', {
+        const response = await fetch(url, {
             ...options,
         })
         const result = await response.json()
-        const { name, fields } = result || {}
+        const { name, fields } = (result || {}) as { templateId: string; name: string; fields: TEMPLATE_FIELDS }
         return {
             name,
             fields,
@@ -58,7 +60,7 @@ export const createJobByTemplate = async ({
     templateId: string
     endpoint?: string
     authToken?: string
-    fields: { fieldAttrs: { nodeId: string; fieldName: string; fieldValue: any }[] }
+    fields: TEMPLATE_FIELDS
 }) => {
     const url = `https://${endpoint}/v1/jobs/workflow/template`
     const requestId = await generateMD5(Date.now().toString())
@@ -74,13 +76,14 @@ export const createJobByTemplate = async ({
     }
 
     try {
-        const response = await fetch('url', {
+        const response = await fetch(url, {
             ...options,
         })
         const result = await response.json()
-        const { job } = result || {}
+        const { job, status } = result || {}
         return {
             job,
+            jobStatus: status,
             status: true,
         }
     } catch (e) {
@@ -107,7 +110,7 @@ export const getJobStatus = async ({
         method: 'GET',
     }
     try {
-        const response = await fetch('url', {
+        const response = await fetch(url, {
             ...options,
         })
         const result = await response.json()

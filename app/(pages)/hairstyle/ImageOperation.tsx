@@ -266,11 +266,8 @@ const ImageSelect = ({
                                 const isChecked = item?.imageId == selectedImage?.imageId
                                 console.log(`isChecked: ${isChecked}, imageID: ${item.imageId}`)
                                 return (
-                                    <div className="flex justify-center w-1/5">
-                                        <div
-                                            className="relative flex items-center m-2 w-fit h-fit"
-                                            key={`inputImageList_${imageIndex}`}
-                                        >
+                                    <div className="flex justify-center w-1/5" key={`inputImageList_${imageIndex}`}>
+                                        <div className="relative flex items-center m-2 w-fit h-fit">
                                             <ThumbnailDisplay
                                                 imageUrl={item?.imageUrl}
                                                 isLoading={item?.isLoading}
@@ -534,11 +531,8 @@ const StyleSelect = ({
                     {_.map(styleList, (item, styleIndex) => {
                         const isChecked = item == selectedStyle
                         return (
-                            <div className="flex justify-center w-1/5">
-                                <div
-                                    className="relative flex items-center m-2 w-fit h-fit"
-                                    key={`inputImageList_${styleIndex}`}
-                                >
+                            <div className="flex justify-center w-1/5" key={`inputImageList_${styleIndex}`}>
+                                <div className="relative flex items-center m-2 w-fit h-fit">
                                     <ThumbnailDisplay
                                         imageUrl={`${imageUrlPrefix}/${item}`}
                                         isLoading={false}

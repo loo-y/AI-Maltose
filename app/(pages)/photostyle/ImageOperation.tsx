@@ -14,9 +14,9 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import ChatImagePreview from '@/app/modules/ChatImagePreview'
-import { handleUploadImage } from '@/app/shared/handlers'
+import { handleUploadImageForTensorArt } from '@/app/shared/handlers'
 import _ from 'lodash'
-import { handleGetFaceSwapImages, handleGetFaceSwapImageStyles } from '@/app/shared/handlers'
+import { handleCreateTensorArtTemplateJob, handleGetTensorArtTemplates } from '@/app/shared/handlers'
 enum SELECT_TYPE {
     imageUpload = `imageUpload`,
     styleSelect = `styleSelect`,
@@ -26,21 +26,24 @@ type ImageItem = {
     imageId: number
     imageUrl: string
     isLoading: boolean
+    resourceId: string
 }
+
+type TemplateStyle = { imageShowID: string; templateID: string }
 export default function ImageOperation(/*{ photoStyleList }: { photoStyleList: string[] }*/) {
     const [isExpended, setIsExpended] = useState(false)
     const [selectType, setSelectType] = useState<SELECT_TYPE>()
     const [imageList, setImageList] = useState<ImageItem[]>([])
     const [selectedImage, setSelectedImage] = useState<ImageItem>()
-    const [selectedStyle, setSelectedStyle] = useState<string>()
-    const [photoStyleList, setPhotoStyleList] = useState<string[]>([])
+    const [selectedStyle, setSelectedStyle] = useState<TemplateStyle>()
+    const [photoStyleList, setPhotoStyleList] = useState<TemplateStyle[]>([])
     const photoStyleState = usePhotoStyleStore(state => state)
     const { updateNewImage, updateIsLoading, isloading, updateBalanceRefreshTime } = photoStyleState || {}
 
     useEffect(() => {
-        handleGetFaceSwapImageStyles().then(res => {
+        handleGetTensorArtTemplates().then(res => {
             if (res) {
-                console.log('[handleGetFaceSwapImageStyles]', res)
+                console.log('[handleGetTensorArtTemplates]', res)
                 setPhotoStyleList(res)
             }
         })
@@ -69,9 +72,9 @@ export default function ImageOperation(/*{ photoStyleList }: { photoStyleList: s
         }
         setIsExpended(false)
         updateIsLoading(true)
-        handleGetFaceSwapImages({
-            inputImageUrl: selectedImage.imageUrl,
-            targetIDs: [selectedStyle],
+        handleCreateTensorArtTemplateJob({
+            resourceID: selectedImage.resourceId,
+            templateIDs: [selectedStyle.templateID],
         }).then(res => {
             _.map(res, item => {
                 const { status, output } = item || {}
@@ -127,7 +130,7 @@ export default function ImageOperation(/*{ photoStyleList }: { photoStyleList: s
                         >
                             {selectedStyle ? (
                                 <img
-                                    src={`${imageUrlPrefix}/${selectedStyle}`}
+                                    src={`${imageUrlPrefix}/${selectedStyle?.imageShowID}`}
                                     className="w-full h-full object-cover rounded-full"
                                 />
                             ) : (
@@ -136,7 +139,7 @@ export default function ImageOperation(/*{ photoStyleList }: { photoStyleList: s
                         </div>
                         <div className="flex flex-col">
                             <div className="text-paw-gray text-sm font-semibold">
-                                Hair Style{' '}
+                                Template Style{' '}
                                 <span className={`text-xs ${selectedStyle ? 'text-gray-500' : 'text-red-500'}`}>*</span>
                             </div>
                             <div className="text-gray-400 text-xs items-end">
@@ -201,7 +204,7 @@ const ImageSelect = ({
     selectedImage?: ImageItem
     setSelectedImage?: React.Dispatch<React.SetStateAction<ImageItem | undefined>>
 }) => {
-    const handleOnUpload = (imageItem: { imageId: number; imageUrl: string }) => {
+    const handleOnUpload = (imageItem: { imageId: number; imageUrl: string; resourceId: string }) => {
         if (_.isEmpty(imageItem)) return
         setImageList(oldList => {
             const newList = [...oldList, { ...imageItem, isLoading: true }]
@@ -209,7 +212,7 @@ const ImageSelect = ({
         })
     }
 
-    const handleOnCompleted = async (imageItem: { imageId: number; imageUrl: string }) => {
+    const handleOnCompleted = async (imageItem: { imageId: number; imageUrl: string; resourceId: string }) => {
         if (_.isEmpty(imageItem)) return
         await new Promise((resolve, reject) => {
             const img = new Image()
@@ -227,7 +230,7 @@ const ImageSelect = ({
         setImageList(oldList => {
             const newList = _.map(oldList, item => {
                 if (item.isLoading && item.imageId == imageItem.imageId) {
-                    return { ...item, imageUrl: imageItem.imageUrl, isLoading: false }
+                    return { ...item, imageUrl: imageItem.imageUrl, resourceId: imageItem.resourceId, isLoading: false }
                 }
                 return item
             })
@@ -266,11 +269,8 @@ const ImageSelect = ({
                                 const isChecked = item?.imageId == selectedImage?.imageId
                                 console.log(`isChecked: ${isChecked}, imageID: ${item.imageId}`)
                                 return (
-                                    <div className="flex justify-center w-1/5">
-                                        <div
-                                            className="relative flex items-center m-2 w-fit h-fit"
-                                            key={`inputImageList_${imageIndex}`}
-                                        >
+                                    <div className="flex justify-center w-1/5" key={`inputImageList_${imageIndex}`}>
+                                        <div className="relative flex items-center m-2 w-fit h-fit">
                                             <ThumbnailDisplay
                                                 imageUrl={item?.imageUrl}
                                                 isLoading={item?.isLoading}
@@ -313,8 +313,8 @@ const ImageUploadButton = ({
     uploadCallback,
     completedCallback,
 }: {
-    uploadCallback?: (image: { imageId: number; imageUrl: string }) => void
-    completedCallback?: (image: { imageId: number; imageUrl: string }) => void
+    uploadCallback?: (image: { imageId: number; imageUrl: string; resourceId: string }) => void
+    completedCallback?: (image: { imageId: number; imageUrl: string; resourceId: string }) => void
 }) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [alertText, setAlertText] = useState('')
@@ -352,17 +352,19 @@ const ImageUploadButton = ({
                     uploadCallback({
                         imageId,
                         imageUrl: base64Data,
+                        resourceId: '',
                     })
             }
             reader.readAsDataURL(file)
 
             const blob = new Blob([file], { type: file.type })
             fileInput.value = ''
-            const style = `faceswap`
-            const imageID = await handleUploadImage(blob, style)
+            const style = `tensorArt`
+            const imageData = await handleUploadImageForTensorArt(blob)
+            const { imageID, resourceId } = imageData || {}
             const imageUrl = `${location.protocol}//${location.host}/api/imageShow/${imageID}`
-            console.log(`imageUrl`, imageUrl)
-            completedCallback && completedCallback({ imageId, imageUrl })
+            console.log(`imageUrl`, imageUrl, `resourceId: ${resourceId}`)
+            completedCallback && completedCallback({ imageId, imageUrl, resourceId: resourceId || '' })
         }
     }
 
@@ -510,12 +512,15 @@ const StyleSelect = ({
     selectedStyle,
     setSelectedStyle,
 }: {
-    styleList: string[]
-    selectedStyle: string | undefined
-    setSelectedStyle: React.Dispatch<React.SetStateAction<string | undefined>>
+    styleList: TemplateStyle[]
+    selectedStyle: TemplateStyle | undefined
+    setSelectedStyle: React.Dispatch<React.SetStateAction<TemplateStyle | undefined>>
 }) => {
-    const handleCheck = (item: string) => {
-        if (item == selectedStyle) {
+    const handleCheck = (item: TemplateStyle) => {
+        if (!item.imageShowID) {
+            return
+        }
+        if (item?.imageShowID == selectedStyle?.imageShowID) {
             setSelectedStyle(undefined)
         } else {
             setSelectedStyle(item)
@@ -532,15 +537,12 @@ const StyleSelect = ({
             ) : (
                 <div className="flex flex-wrap flex-row my-2 ml-3 w-full">
                     {_.map(styleList, (item, styleIndex) => {
-                        const isChecked = item == selectedStyle
+                        const isChecked = item?.imageShowID && item?.imageShowID == selectedStyle?.imageShowID
                         return (
-                            <div className="flex justify-center w-1/5">
-                                <div
-                                    className="relative flex items-center m-2 w-fit h-fit"
-                                    key={`inputImageList_${styleIndex}`}
-                                >
+                            <div className="flex justify-center w-1/5" key={`inputImageList_${styleIndex}`}>
+                                <div className="relative flex items-center m-2 w-fit h-fit">
                                     <ThumbnailDisplay
-                                        imageUrl={`${imageUrlPrefix}/${item}`}
+                                        imageUrl={`${imageUrlPrefix}/${item?.imageShowID}`}
                                         isLoading={false}
                                         hideDelete={true}
                                     />

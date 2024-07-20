@@ -20,6 +20,7 @@ import AIBotList from './UserService/AIBotList'
 import ImageSwapCommon from './ImageSwapCommon'
 import FaceSwap from './ImageSwapServices/FaceSwap'
 import ImageStyle from './ImageSwapServices/ImageStyle'
+import TensorArtTemplate from './ImageSwapServices/TensorArtTemplate'
 
 const serviceList = [
     Chain,
@@ -44,6 +45,7 @@ const serviceList = [
     ImageSwapCommon,
     FaceSwap,
     ImageStyle,
+    TensorArtTemplate,
 ]
 
 export default {

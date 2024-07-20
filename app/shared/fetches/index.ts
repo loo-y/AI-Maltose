@@ -87,6 +87,51 @@ export const fetchImageStylesGraphql = async (params: {
     }
 }
 
+export const fetchTensorArtGraphql = async (params: {
+    templateIds: string[]
+    resourceId: string
+    abortController?: AbortController
+}) => {
+    const { templateIds, resourceId, abortController } = params || {}
+    const operationName = `GetTensorArtQuery`
+    const body = {
+        operationName,
+        query: `
+            mutation ${operationName}($tensorArtTemplateParams: TensorArtTemplateArgs){
+                imageSwap {
+                    TensorArtTemplate(params: $tensorArtTemplateParams)
+                }
+            }
+        `,
+        variables: {
+            tensorArtTemplateParams: {
+                templateIDs: templateIds || [],
+                resourceID: resourceId,
+            },
+        },
+    }
+
+    const options = await getCommonOptions({})
+    try {
+        const response = await fetch(`${graphqlUrl}?operationName=${operationName}`, {
+            ...options,
+            body: JSON.stringify(body),
+            signal: abortController?.signal,
+        })
+        const data = await response.json()
+        return {
+            data: data.data,
+            status: true,
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            data: String(e),
+            status: false,
+        }
+    }
+}
+
 export const fetchFaceSwapGraphql = async (params: {
     inputID?: string
     inputImageUrl?: string
@@ -252,7 +297,12 @@ const fetchAIGraphqlStream = async (
 }
 
 export const fetchUploadImage = async (imageBlob: Blob, style?: string) => {
-    const url = style ? `api/styleImageUpload?style=${style}` : `/api/imageUpload`
+    let url
+    if (style == `tensorArt`) {
+        url = `api/tensorArtImageUpload?style=${style}`
+    } else {
+        url = style ? `api/styleImageUpload?style=${style}` : `/api/imageUpload`
+    }
     const options = await getCommonOptions({ userToken: 'test' })
     delete options.headers['Content-Type']
     // 创建 FormData 对象

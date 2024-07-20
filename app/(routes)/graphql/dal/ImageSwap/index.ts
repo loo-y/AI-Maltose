@@ -79,7 +79,7 @@ export const loadImageStyles = (ctx: TBaseContext, args: { styleType: string; pr
             async keys => {
                 console.log(`loaderReplicateFaceSwap-keys-🐹🐹🐹`, keys)
                 try {
-                    const lingyiwanwuAnswerList = await Promise.all(
+                    const imageStyleResultList = await Promise.all(
                         keys.map(key =>
                             getSwapStyles({
                                 ctx,
@@ -88,7 +88,7 @@ export const loadImageStyles = (ctx: TBaseContext, args: { styleType: string; pr
                             })
                         )
                     )
-                    return lingyiwanwuAnswerList
+                    return imageStyleResultList
                 } catch (e) {
                     console.log(`[loaderReplicateFaceSwap] error: ${e}`)
                 }
@@ -104,44 +104,65 @@ export const loadImageStyles = (ctx: TBaseContext, args: { styleType: string; pr
 
 export const loadTensorArtTemplate = (
     ctx: TBaseContext,
-    args: { templateId: string; providerid: string },
-    key: string
+    args: { providerId: string; resourceId: string },
+    keys: string[]
 ) => {
     ctx.loaderTensorArtTemplateArgs = {
-        ...ctx.loaderTensorArtTemplatepArgs,
-        [key]: args,
+        ...ctx.loaderTensorArtTemplateArgs,
     }
+    _.map(keys, key => {
+        ctx.loaderTensorArtTemplateArgs[key] = {
+            ...args,
+            templateId: key,
+        }
+    })
 
     if (!ctx?.loaderTensorArtTemplate) {
         ctx.loaderTensorArtTemplate = new DataLoader<string, string>(
             async keys => {
                 console.log(`loaderTensorArtTemplate-keys-🐹🐹🐹`, keys)
-                const providerid = args.providerid
-                const imageAIProviderInfo = await getImageAIProvider({ ctx, providerid })
+                const providerId = args.providerId
+                const resourceId = args.resourceId
+                const imageAIProviderInfo = await getImageAIProvider({ ctx, providerid: providerId })
                 const { api_url: endpoint, api_key: authToken } = imageAIProviderInfo || {}
                 try {
-                    const lingyiwanwuAnswerList = await Promise.all(
+                    const tensorArtTemplateResultList = await Promise.all(
                         keys.map(key => {
                             return new Promise(async (resolve, reject) => {
                                 let job = {}
                                 const { templateId } = ctx.loaderTensorArtTemplateArgs[key]
-                                const { fields, status } = await getWorkflowTemplateInfo({ templateId })
+                                const workflowTemplateInfo = await getWorkflowTemplateInfo({ templateId, authToken })
+                                const { fields, status } = workflowTemplateInfo
+                                console.log(`workflowTemplateInfo`, workflowTemplateInfo)
                                 if (status && !_.isEmpty(fields)) {
+                                    const fieldAttrs = _.map(fields?.fieldAttrs, item => {
+                                        const { fieldName, fieldValue } = item || {}
+                                        return {
+                                            ...item,
+                                            fieldName,
+                                            fieldValue: fieldName === 'image' ? resourceId : fieldValue,
+                                        }
+                                    })
                                     const jobResult = await createJobByTemplate({
                                         templateId,
-                                        fields,
+                                        fields: {
+                                            fieldAttrs,
+                                        },
                                         authToken,
                                         endpoint,
                                     })
                                     if (jobResult?.status && jobResult?.job) {
-                                        job = jobResult.job
+                                        job = {
+                                            jobInfo: jobResult.job,
+                                            jobstatus: jobResult.jobStatus,
+                                        }
                                     }
                                 }
                                 resolve(job)
                             })
                         })
                     )
-                    return lingyiwanwuAnswerList
+                    return tensorArtTemplateResultList
                 } catch (e) {
                     console.log(`[loaderTensorArtTemplate] error: ${e}`)
                 }

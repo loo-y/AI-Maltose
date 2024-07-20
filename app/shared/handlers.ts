@@ -8,6 +8,7 @@ import {
     fetchAIBotListGraphql,
     fetchFaceSwapGraphql,
     fetchImageStylesGraphql,
+    fetchTensorArtGraphql,
 } from './fetches'
 import { IChatMessage, Roles, AI_BOT_TYPE } from './interface'
 
@@ -16,6 +17,17 @@ export const handleUploadImage = async (imageBlob: Blob, style?: string): Promis
     const { data, status } = result || {}
     if (status && data?.imageID) {
         return data.imageID
+    }
+    return null
+}
+
+export const handleUploadImageForTensorArt = async (
+    imageBlob: Blob
+): Promise<{ imageID: string; resourceId: string } | null> => {
+    const result = await fetchUploadImage(imageBlob, 'tensorArt')
+    const { data, status } = result || {}
+    if (status && data?.imageID) {
+        return data
     }
     return null
 }
@@ -161,6 +173,25 @@ export const handleGetFaceSwapImages = async ({
     return []
 }
 
+export const handleCreateTensorArtTemplateJob = async (params: {
+    resourceID: string
+    templateIDs: string[]
+    abortController?: AbortController
+}) => {
+    const { abortController, resourceID, templateIDs } = params || {}
+    const result = await fetchTensorArtGraphql({
+        resourceId: resourceID,
+        templateIds: templateIDs,
+        abortController,
+    })
+    const { data, status } = result || {}
+    console.log(`handleCreateTensorArtTemplateJob`, data)
+    if (status && data?.imageSwap?.TensorArtTemplate) {
+        return data.imageSwap?.TensorArtTemplate
+    }
+    return []
+}
+
 export const handleGetFaceSwapImageStyles = async () => {
     const result = await fetchImageStylesGraphql({
         provider: 'replicate',
@@ -171,5 +202,24 @@ export const handleGetFaceSwapImageStyles = async () => {
     if (status && data?.imageSwap?.ImageStyle) {
         return _.map(data.imageSwap.ImageStyle, item => item.style_imageshowid)
     }
+    return []
+}
+
+export const handleGetTensorArtTemplates = async () => {
+    const result = await fetchImageStylesGraphql({
+        provider: 'tensorArt',
+        styleType: 'template',
+    })
+    const { data, status } = result || {}
+    console.log(`handleGetTensorArtTemplates`, data)
+    if (status && data?.imageSwap?.ImageStyle) {
+        return _.map(data.imageSwap.ImageStyle, item => {
+            return {
+                imageShowID: item.style_imageshowid,
+                templateID: item.input_type,
+            }
+        })
+    }
+
     return []
 }
