@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { getSwapStyles, getImageAIProvider } from '../Supabase/queries'
 import { getFaceSwap } from './replicate'
 import { imageUrlPrefix, appDomain } from '@/app/shared/constants'
-import { getWorkflowTemplateInfo, createJobByTemplate } from './tensorArt'
+import { getWorkflowTemplateInfo, createJobByTemplate, getJobStatus } from './tensorArt'
 
 export const loadReplicateFaceSwap = (
     ctx: TBaseContext,
@@ -143,6 +143,7 @@ export const loadTensorArtTemplate = (
                                             fieldValue: fieldName === 'image' ? resourceId : fieldValue,
                                         }
                                     })
+                                    console.log(`fieldAttrs`, fieldAttrs)
                                     const jobResult = await createJobByTemplate({
                                         templateId,
                                         fields: {
@@ -151,6 +152,7 @@ export const loadTensorArtTemplate = (
                                         authToken,
                                         endpoint,
                                     })
+                                    console.log(`jobResult`, jobResult)
                                     if (jobResult?.status && jobResult?.job) {
                                         job = {
                                             jobInfo: jobResult.job,
@@ -174,4 +176,51 @@ export const loadTensorArtTemplate = (
         )
     }
     return ctx.loaderTensorArtTemplate
+}
+
+export const loadTensorArtJob = (ctx: TBaseContext, args: { providerId: string }, keys: string[]) => {
+    ctx.loaderTensorArtJobArgs = {
+        ...ctx.loaderTensorArtJobArgs,
+    }
+    _.map(keys, key => {
+        ctx.loaderTensorArtJobArgs[key] = {
+            ...args,
+            jobId: key,
+        }
+    })
+
+    if (!ctx?.loaderTensorArtJob) {
+        ctx.loaderTensorArtJob = new DataLoader<string, string>(
+            async keys => {
+                console.log(`loaderTensorArtJob-keys-🐹🐹🐹`, keys)
+                const providerId = args.providerId
+                const imageAIProviderInfo = await getImageAIProvider({ ctx, providerid: providerId })
+                const { api_url: endpoint, api_key: authToken } = imageAIProviderInfo || {}
+                try {
+                    const tensorArtJobResultList = await Promise.all(
+                        keys.map(key => {
+                            return new Promise(async (resolve, reject) => {
+                                const { jobId } = ctx.loaderTensorArtJobArgs[key]
+                                const jobResult = await getJobStatus({
+                                    jobId,
+                                    authToken,
+                                    endpoint,
+                                })
+                                resolve(jobResult)
+                            })
+                        })
+                    )
+                    return tensorArtJobResultList
+                } catch (e) {
+                    console.log(`[loaderTensorArtJob] error: ${e}`)
+                }
+                return new Array(keys.length || 1).fill({ status: false })
+            },
+            {
+                batchScheduleFn: callback => setTimeout(callback, 100),
+            }
+        )
+    }
+
+    return ctx.loaderTensorArtJob
 }

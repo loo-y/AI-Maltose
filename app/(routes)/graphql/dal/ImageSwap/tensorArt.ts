@@ -1,5 +1,6 @@
 import { tensorArtEndpoint } from '@/app/shared/constants'
 import { generateMD5 } from '@/app/shared/util'
+import _ from 'lodash'
 
 type TEMPLATE_FIELDS = { fieldAttrs: { nodeId: string; fieldName: string; fieldValue: any }[] }
 
@@ -114,15 +115,20 @@ export const getJobStatus = async ({
             ...options,
         })
         const result = await response.json()
-        const { job } = result || {}
+        if (!_.isEmpty(result)) {
+            return {
+                jobInfo: result,
+                status: true,
+            }
+        }
         return {
-            job,
-            status: true,
+            status: false,
         }
     } catch (e) {
         console.log(`[getJobStatus] error:`, e)
-    }
-    return {
-        status: false,
+        return {
+            errorInfo: e,
+            status: false,
+        }
     }
 }

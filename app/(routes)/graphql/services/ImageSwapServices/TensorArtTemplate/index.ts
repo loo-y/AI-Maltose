@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { loadTensorArtTemplate } from '../../../dal/ImageSwap'
+import { loadTensorArtTemplate, loadTensorArtJob } from '../../../dal/ImageSwap'
 
 const typeDefinitions = `
     scalar JSON
@@ -17,7 +17,7 @@ const typeDefinitions = `
     }
 
     input TensorArtTemplateJobArgs {
-        jobId: String
+        jobIds: [String]
     }
 `
 
@@ -36,7 +36,20 @@ export const TensorArtTemplate = async (parent: TParent, args: Record<string, an
     return results
 }
 
-export const TensorArtTemplateJob = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {}
+export const TensorArtTemplateJob = async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
+    const { userID } = parent || {}
+    const { jobIds } = args?.params || {}
+
+    if (!jobIds?.length) {
+        throw new Error('jobIds is empty')
+        return []
+    }
+
+    const key = `${userID}_tensorArtTemplateJob`
+    const loader = loadTensorArtJob(context, { providerId: `tensorArt` }, jobIds)
+    const results = (await loader.loadMany(jobIds)) || []
+    return results
+}
 
 const resolvers = {
     ImageSwapMutation: {
