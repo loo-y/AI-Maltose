@@ -9,6 +9,7 @@ import {
     fetchFaceSwapGraphql,
     fetchImageStylesGraphql,
     fetchTensorArtGraphql,
+    fetchTensorArtJobGraphql,
 } from './fetches'
 import { IChatMessage, Roles, AI_BOT_TYPE } from './interface'
 
@@ -188,6 +189,18 @@ export const handleCreateTensorArtTemplateJob = async (params: {
     console.log(`handleCreateTensorArtTemplateJob`, data)
     if (status && data?.imageSwap?.TensorArtTemplate) {
         return data.imageSwap?.TensorArtTemplate
+    }
+    return []
+}
+
+export const handleGetTensorArtJobs = async ({ jobIds }: { jobIds: string[] }) => {
+    const result = await fetchTensorArtJobGraphql({
+        jobIds,
+    })
+    const { data, status } = result || {}
+    console.log(`handleGetTensorArtJobs`, data)
+    if (status && data?.imageSwap?.TensorArtTemplateJob) {
+        return data.imageSwap?.TensorArtTemplateJob
     }
     return []
 }

@@ -154,3 +154,12 @@ CREATE TABLE IF NOT EXISTS imageai_userimages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     userid TEXT
 )
+
+create TABLE IF NOT EXISTS imageai_createdimages (
+    created_image_id  BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    style_type TEXT,
+    image_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    userid TEXT,
+    image_status TEXT
+)

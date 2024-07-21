@@ -5,6 +5,8 @@ import { imageIDEncrypt } from '../utils/tools'
 import { tensorArtEndpoint } from '@/app/shared/constants'
 import { imageHost } from '../utils/constants'
 
+export const runtime = 'edge'
+
 export async function GET(req: NextRequest) {
     return NextResponse.json({ message: 'GET request not allowed' }, { status: 405 })
 }

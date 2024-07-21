@@ -110,23 +110,32 @@ export const getJobStatus = async ({
         ...getCommonOptions(authToken),
         method: 'GET',
     }
+    let jobResult: Record<string, any> = {
+        status: false,
+        jobStatus: ``,
+    }
     try {
         const response = await fetch(url, {
             ...options,
         })
         const result = await response.json()
+        const { job } = result || {}
+        const { status, runningInfo, waitingInfo, failedInfo, successInfo } = job || {}
+
         if (!_.isEmpty(result)) {
-            return {
-                jobInfo: result,
+            jobResult = {
+                jobId,
                 status: true,
+                jobStatus: status,
+                imageUrl: (status == `SUCCESS` && successInfo?.images?.[0]?.url) || ``,
             }
+            return jobResult
         }
-        return {
-            status: false,
-        }
+        return jobResult
     } catch (e) {
         console.log(`[getJobStatus] error:`, e)
         return {
+            ...jobResult,
             errorInfo: e,
             status: false,
         }

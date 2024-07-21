@@ -4,6 +4,7 @@ import { getSwapStyles, getImageAIProvider } from '../Supabase/queries'
 import { getFaceSwap } from './replicate'
 import { imageUrlPrefix, appDomain } from '@/app/shared/constants'
 import { getWorkflowTemplateInfo, createJobByTemplate, getJobStatus } from './tensorArt'
+import { uploadImageByUrl } from '@/app/(routes)/api/imageUrlUpload/route'
 
 export const loadReplicateFaceSwap = (
     ctx: TBaseContext,
@@ -206,6 +207,15 @@ export const loadTensorArtJob = (ctx: TBaseContext, args: { providerId: string }
                                     authToken,
                                     endpoint,
                                 })
+                                console.log(`jobResult--->`, jobResult)
+                                if (jobResult?.imageUrl) {
+                                    // upload image
+                                    const imageID = await uploadImageByUrl({
+                                        imageUrl: jobResult?.imageUrl,
+                                        encrypt: true,
+                                    })
+                                    jobResult.imageID = imageID
+                                }
                                 resolve(jobResult)
                             })
                         })

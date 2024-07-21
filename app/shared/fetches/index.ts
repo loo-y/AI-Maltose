@@ -132,6 +132,46 @@ export const fetchTensorArtGraphql = async (params: {
     }
 }
 
+export const fetchTensorArtJobGraphql = async (params: { jobIds: string[]; abortController?: AbortController }) => {
+    const { jobIds, abortController } = params || {}
+    const operationName = `GetTensorArtJobQuery`
+    const body = {
+        operationName,
+        query: `
+            query ${operationName}($tensorArtTemplateJobParams: TensorArtTemplateJobArgs){
+                imageSwap {
+                    TensorArtTemplateJob(params: $tensorArtTemplateJobParams)
+                }
+            }
+        `,
+        variables: {
+            tensorArtTemplateJobParams: {
+                jobIds: jobIds,
+            },
+        },
+    }
+
+    const options = await getCommonOptions({})
+    try {
+        const response = await fetch(`${graphqlUrl}?operationName=${operationName}`, {
+            ...options,
+            body: JSON.stringify(body),
+            signal: abortController?.signal,
+        })
+        const data = await response.json()
+        return {
+            data: data.data,
+            status: true,
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            data: String(e),
+            status: false,
+        }
+    }
+}
+
 export const fetchFaceSwapGraphql = async (params: {
     inputID?: string
     inputImageUrl?: string

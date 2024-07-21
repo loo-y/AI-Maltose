@@ -393,3 +393,49 @@ export const hidenUserImage = async ({
     }
     return false
 }
+
+export const getUserCreatedImages = async ({
+    userid,
+    style_type,
+    ctx,
+}: {
+    userid: string
+    style_type: string
+    ctx?: TBaseContext
+}) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('imageai_createdimages')
+        .select('*')
+        .eq('userid', userid)
+        .eq('style_type', style_type)
+    if (_.isEmpty(error) && !_.isEmpty(data)) {
+        return data
+    }
+    return []
+}
+
+export const getUserCreatedImage = async ({
+    userid,
+    imageid,
+    ctx,
+}: {
+    userid: string
+    imageid: string
+    ctx?: TBaseContext
+}) => {
+    const supabase = createClient()
+    const { data, error } = await supabase
+        .from('imageai_createdimages')
+        .select('*')
+        .eq('userid', userid)
+        .eq('created_image_id', imageid)
+    const theImage = !_.isEmpty(data) && data?.[0]
+    if (!_.isEmpty(theImage)) {
+        return {
+            status: theImage.image_status,
+            imageUrl: theImage.image_url,
+        }
+    }
+    return {}
+}

@@ -77,9 +77,13 @@ export default function ImageOperation(/*{ photoStyleList }: { photoStyleList: s
             templateIDs: [selectedStyle.templateID],
         }).then(res => {
             _.map(res, item => {
-                const { status, output } = item || {}
-                if (status && output) {
-                    updateNewImage(output)
+                const { jobInfo } = item || {}
+                const { status, id } = jobInfo || {}
+                if (status && id) {
+                    updateNewImage({
+                        jobID: id,
+                        status: status,
+                    })
                 }
                 updateIsLoading(false)
             })
