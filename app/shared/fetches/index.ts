@@ -308,7 +308,9 @@ export const fetchUploadImage = async (imageBlob: Blob, style?: string) => {
     // 创建 FormData 对象
     const formData = new FormData()
     // 将 Blob 对象添加到 FormData 对象中
-    formData.append('file', imageBlob, 'blob')
+    const formDataName = `file`
+    formData.append(formDataName, imageBlob, 'blob')
+    url = url.includes(`?`) ? `${url}&formDataName=${formDataName}` : `${url}?formDataName=${formDataName}`
     try {
         const response = await fetch(url, {
             ...options,

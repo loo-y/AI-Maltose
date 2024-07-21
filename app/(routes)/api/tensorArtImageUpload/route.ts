@@ -12,13 +12,14 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams
     const styleType = searchParams.get('style') || ''
+    const formDataName = searchParams.get('formDataName') || ''
     try {
         const { userId } = auth()
         const formData = await req.formData()
 
         const [imageData, putInfo] = await Promise.all([
             saveFormDataAsImage({ formData, userId: userId || '', styleType }),
-            getResourcePutInfo({ formData }),
+            getResourcePutInfo({ formData, formDataName }),
         ])
 
         return NextResponse.json({ ...imageData, ...putInfo })
@@ -64,7 +65,7 @@ const saveFormDataAsImage = async ({
     return {}
 }
 
-const getResourcePutInfo = async ({ formData }: { formData: FormData }) => {
+const getResourcePutInfo = async ({ formData, formDataName }: { formData: FormData; formDataName?: string }) => {
     const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
     let authToken = env.TENSORART_TOKEN || ''
     if (!authToken) {
@@ -95,10 +96,16 @@ const getResourcePutInfo = async ({ formData }: { formData: FormData }) => {
 
         console.log(`putInfoData:`, putInfoData)
 
+        // 假设图片字段名为 'file'
+        const fileGetName = formDataName || `file`
+        const file = formData.get(fileGetName) as Blob
+        // 读取文件内容为 ArrayBuffer
+        const arrayBuffer = file ? await file.arrayBuffer() : null
+
         const responseOfPutResource = await fetch(putUrl, {
             method: 'PUT',
             headers,
-            body: formData,
+            body: arrayBuffer,
         })
         const resultOfPutResource = await responseOfPutResource.json()
 
