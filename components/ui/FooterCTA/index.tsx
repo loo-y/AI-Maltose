@@ -12,7 +12,7 @@ const FooterCTA = () => (
                     {`Start Your AI Journey, Reshape Your Work and Life with AI.`}
                 </p>
                 <NavLink
-                    href="/hairstyle"
+                    href="/photostyle"
                     className="mt-4 inline-block font-medium text-sm text-white bg-gray-800 hover:bg-gray-600 active:bg-gray-900"
                 >
                     Start painting
