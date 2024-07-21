@@ -4,7 +4,7 @@ import { getSwapStyles, getImageAIProvider } from '../Supabase/queries'
 import { getFaceSwap } from './replicate'
 import { imageUrlPrefix, appDomain } from '@/app/shared/constants'
 import { getWorkflowTemplateInfo, createJobByTemplate, getJobStatus } from './tensorArt'
-import { uploadImageByUrl } from '@/app/(routes)/api/imageUrlUpload/route'
+import { uploadImageByUrl } from '@/app/(routes)/api/utils/tools'
 
 export const loadReplicateFaceSwap = (
     ctx: TBaseContext,

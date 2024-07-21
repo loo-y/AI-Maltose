@@ -1,5 +1,5 @@
 'use client'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useRef, useEffect, useState } from 'react'
 import { usePhotoStyleStore } from './providers'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import _ from 'lodash'
@@ -38,9 +38,18 @@ const MyImageList = () => {
     const [imageUrl, setImageUrl] = useState('')
     const [intervalGetImages, setIntervalGetImages] = useState<boolean>(false)
 
-    const getImageInterval = async (newImageList: JOB_IMAGE[]) => {
-        console.log(`newImageList`, newImageList)
-        const waitingImages: JOB_IMAGE[] = _.filter(newImageList, item => {
+    const imageListRef: React.MutableRefObject<JOB_IMAGE[]> = useRef([])
+
+    useEffect(() => {
+        imageListRef.current = createdImageList
+        if (!intervalGetImages) {
+            getImageInterval()
+        }
+    }, [createdImageList])
+
+    const getImageInterval = useCallback(async () => {
+        console.log(`newImageList`, imageListRef.current)
+        const waitingImages: JOB_IMAGE[] = _.filter(imageListRef.current, item => {
             return !!item.jobID && item.status != 'SUCCESS'
         })
         if (waitingImages?.length > 0) {
@@ -62,15 +71,9 @@ const MyImageList = () => {
                     }
                 })
             }
-            getImageInterval(createdImageList)
+            getImageInterval()
         } else {
             setIntervalGetImages(false)
-        }
-    }
-
-    useEffect(() => {
-        if (!intervalGetImages) {
-            getImageInterval(createdImageList)
         }
     }, [createdImageList])
 
@@ -109,7 +112,9 @@ const MyImageList = () => {
                                     style={{ backgroundImage: `url(${showImageUrl})` }}
                                 ></div>
                             ) : (
-                                <div className="w-full h-full relative rounded-2xl bg-cover bg-no-repeat bg-center border border-solid border-gray-300 shadow-xl bg-transparent cursor-zoom-in"></div>
+                                <div className="w-full h-full relative rounded-2xl flex items-center justify-center flex-col bg-opacity-50 bg-gray-500  z-20">
+                                    <div className="w-8 h-8 border-4 border-dashed rounded-full animate-spin border-gray-500"></div>
+                                </div>
                             )}
                         </div>
                     )
