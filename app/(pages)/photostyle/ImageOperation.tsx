@@ -569,6 +569,7 @@ const StyleSelect = ({
                             </div>
                         )
                     })}
+                    <div className="clear-both h-2 w-full"></div>
                 </div>
             )}
         </div>

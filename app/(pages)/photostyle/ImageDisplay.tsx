@@ -4,7 +4,7 @@ import { usePhotoStyleStore } from './providers'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import _ from 'lodash'
 import { imageUrlPrefix } from '@/app/shared/constants'
-import { isAbsoluteUrl } from '@/app/shared/util'
+import { isAbsoluteUrl, sleep } from '@/app/shared/util'
 import ChatImagePreview from '@/app/modules/ChatImagePreview'
 import type { JOB_IMAGE } from './stores'
 import { handleGetTensorArtJobs } from '@/app/shared/handlers'
@@ -36,14 +36,18 @@ const MyImageList = () => {
     console.log(`createdImageList`, createdImageList)
     const [openPreview, setOpenPreview] = useState(false)
     const [imageUrl, setImageUrl] = useState('')
-    const [intervalGetImages, setIntervalGetImages] = useState<boolean>(false)
+    const [isGetImagesInterval, setIsGetImagesInterval] = useState<boolean>(false)
 
     const imageListRef: React.MutableRefObject<JOB_IMAGE[]> = useRef([])
 
     useEffect(() => {
         imageListRef.current = createdImageList
-        if (!intervalGetImages) {
+        if (!isGetImagesInterval) {
             getImageInterval()
+        }
+        return () => {
+            imageListRef.current = []
+            console.log(`imageListRef.current unload`, imageListRef.current)
         }
     }, [createdImageList])
 
@@ -53,7 +57,7 @@ const MyImageList = () => {
             return !!item.jobID && item.status != 'SUCCESS'
         })
         if (waitingImages?.length > 0) {
-            setIntervalGetImages(true)
+            setIsGetImagesInterval(true)
             const jobResults = await handleGetTensorArtJobs({
                 jobIds: _.map(waitingImages, item => item.jobID),
             })
@@ -71,9 +75,10 @@ const MyImageList = () => {
                     }
                 })
             }
+            await sleep(2)
             getImageInterval()
         } else {
-            setIntervalGetImages(false)
+            setIsGetImagesInterval(false)
         }
     }, [createdImageList])
 
