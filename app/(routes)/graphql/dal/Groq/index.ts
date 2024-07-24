@@ -41,8 +41,18 @@ const fetchGroq = async (ctx: TBaseContext, params: Record<string, any>, options
         searchWeb,
     } = params || {}
     const env = (typeof process != 'undefined' && process?.env) || ({} as NodeJS.ProcessEnv)
-    const API_KEY = apiKey || env?.GROQ_API_KEY || ''
-    const modelUse = modelName || DEFAULT_MODEL_NAME
+    let API_KEY = '',
+        modelUse = ''
+    if (apiKey && modelName) {
+        API_KEY = apiKey || ''
+        modelUse = modelName
+    } else if (modelName) {
+        API_KEY = env?.OPENAI_API_KEY || ''
+        modelUse = modelName
+    } else if (env.OPENAI_API_KEY) {
+        API_KEY = env.OPENAI_API_KEY || ''
+        modelUse = env.OPENAI_API_MODEL || DEFAULT_MODEL_NAME
+    }
     const max_tokens = maxOutputTokens || generationConfig.maxOutputTokens
     if (_.isEmpty(messages) || !API_KEY) {
         return 'there is no messages or api key of Groq'
@@ -78,9 +88,16 @@ const fetchGroq = async (ctx: TBaseContext, params: Record<string, any>, options
                 stream: true,
             })
 
-            let content = ``
+            let content = ``,
+                usage: Groq.Completions.CompletionUsage | null = null
+
+            if (completion.usage?.total_tokens) {
+                usage = completion.usage
+            }
             for await (const chunk of completion) {
                 const text = chunk.choices[0].delta.content
+
+                const { completion_tokens, prompt_tokens, total_tokens } = usage || {}
                 console.log(`Groq text`, text)
                 if (text) {
                     streamHandler({
@@ -91,6 +108,8 @@ const fetchGroq = async (ctx: TBaseContext, params: Record<string, any>, options
                 }
             }
             completeHandler({
+                usage,
+                model: modelUse,
                 content: content,
                 status: true,
             })
