@@ -14,15 +14,16 @@ import ChatImagePreview from './ChatImagePreview'
 
 interface IChatUserMessageProps {
     chatMessage: UserMessage
+    messageFailed?: boolean
 }
-const ChatUserMessage = ({ chatMessage }: IChatUserMessageProps) => {
+const ChatUserMessage = ({ chatMessage, messageFailed }: IChatUserMessageProps) => {
     const { role, content } = chatMessage || {}
 
     return (
         <div className="w-full">
             <div className="py-2 px-3 text-base m-auto md:px-5 lg:px-1 xl:px-5">
-                <div className="mx-auto flex flex-1 gap-3 md:gap-6 md:max-w-[50rem] w-full justify-end px-4">
-                    <div className="flex relative max-w-[70%]">
+                <div className="mx-auto flex flex-1 gap-3 md:gap-6 md:max-w-[50rem] w-full justify-end px-4 flex-col items-end">
+                    <div className="flex relative max-w-[70%] flex-col">
                         {typeof content === 'string' ? (
                             <div className="text-gray-600 bg-gray-100 rounded-3xl  px-5 py-2.5 whitespace-pre-wrap">
                                 {content}
@@ -30,6 +31,16 @@ const ChatUserMessage = ({ chatMessage }: IChatUserMessageProps) => {
                         ) : (
                             <ObjectContent content={content as (TextMessage | ImageUrlMessage)[]} />
                         )}
+                        {messageFailed ? (
+                            <div className="w-full  h-4 flex flex-row items-center gap-2 justify-end text-gray-500 italic pr-2 mt-2">
+                                <img
+                                    src="/images/icons/retry.png"
+                                    className="w-3 h-3 cursor-pointer inline"
+                                    alt="retry"
+                                />
+                                <span>retry</span>
+                            </div>
+                        ) : null}
                     </div>
                 </div>
             </div>

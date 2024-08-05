@@ -247,7 +247,7 @@ export const fetchAIGraphql = async (
             status: true,
         }
     } catch (e) {
-        console.log(e)
+        console.log(`fetchAIGraphql`, e)
         return {
             data: String(e),
             status: false,
