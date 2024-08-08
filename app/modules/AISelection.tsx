@@ -28,6 +28,8 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
     useEffect(() => {
         if (currentConversation?.aiBotIDs?.[0]) {
             setValue(currentConversation.aiBotIDs[0])
+        } else if (value) {
+            updateCurrentConversation({ ...currentConversation, aiBotIDs: [value] })
         }
     }, [currentConversation])
 
