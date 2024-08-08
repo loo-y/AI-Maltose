@@ -350,7 +350,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                             </Drawer> */}
                             </div>
                             <div className="topright signmodule mr-4 mt-1">
-                                <ul className="text-gray-700 justify-end items-center hidden md:flex flex-row gap-2 space-y-0  text-base font-semibold ">
+                                <ul className="text-gray-700 justify-end items-center hidden md:flex flex-row gap-2 space-y-0 space-x-6 text-sm font-medium ">
                                     {_.map(navigation, (item, idx) => {
                                         return (
                                             <li key={`navigation_${idx}`} className="duration-150 hover:text-gray-900">
