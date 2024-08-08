@@ -64,6 +64,7 @@ const Sidebar = ({
                             key={`conversationItem-${index}`}
                             className={`flex py-2 px-3 rounded-xl hover:bg-gray-200 cursor-pointer ${isSelected ? selectedClass : ``}`}
                             onClick={handleSelectConversation.bind(this, conversationItem?.conversation_id)}
+                            title={conversationItem?.topic || ''}
                         >
                             <div className="line-clamp-1">{conversationItem?.topic || `untitled`}</div>
                         </div>
