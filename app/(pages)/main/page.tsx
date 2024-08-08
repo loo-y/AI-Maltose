@@ -22,6 +22,12 @@ import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } 
 import { useMediaQuery } from 'react-responsive'
 import { Toaster } from '@/components/ui/sonner'
 import Loading from './Loading'
+import Link from 'next/link'
+
+const navigation = [
+    { title: 'Home', path: '/' },
+    { title: 'PhotoStyle', path: '/photostyle' },
+]
 
 const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     const [mounted, setMounted] = useState(false)
@@ -343,10 +349,30 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                                 </DrawerContent>
                             </Drawer> */}
                             </div>
-                            <div className="topright signmodule mr-4 mt-3">
-                                <SignedIn>
-                                    <UserButton />
-                                </SignedIn>
+                            <div className="topright signmodule mr-4 mt-1">
+                                <ul className="text-gray-700 justify-end items-center hidden md:flex flex-row gap-2 space-y-0  text-base font-semibold ">
+                                    {_.map(navigation, (item, idx) => {
+                                        return (
+                                            <li key={`navigation_${idx}`} className="duration-150 hover:text-gray-900">
+                                                <Link href={item.path} className="block">
+                                                    {item.title}
+                                                </Link>
+                                            </li>
+                                        )
+                                    })}
+                                    <li>
+                                        <div className="mt-2">
+                                            <SignedIn>
+                                                <UserButton />
+                                            </SignedIn>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div className="mt-2 md:hidden flex">
+                                    <SignedIn>
+                                        <UserButton />
+                                    </SignedIn>
+                                </div>
                             </div>
                         </div>
                         <ConversationBox history={history} isFetching={isFetching} waiting={waitingForResponse} />
