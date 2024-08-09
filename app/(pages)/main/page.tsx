@@ -296,6 +296,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
         // 只取最后5条
         let lastQuestMessages = _.takeRight([...history], 5)
         await handleGetAIResponse({
+            isRetry: true,
             abortController: _abortController__ || undefined,
             aiid,
             queryType: queryType,

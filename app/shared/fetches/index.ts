@@ -222,7 +222,7 @@ export const fetchFaceSwapGraphql = async (params: {
 }
 
 export const fetchAIGraphql = async (
-    paramsForAIGraphql: IGrahpqlAIFetchProps & { abortController?: AbortController }
+    paramsForAIGraphql: IGrahpqlAIFetchProps & { abortController?: AbortController } & { isRetry?: boolean }
 ) => {
     const { isStream, abortController, ...rest } = paramsForAIGraphql || {}
     if (isStream) {
@@ -256,15 +256,20 @@ export const fetchAIGraphql = async (
 }
 
 const fetchAIGraphqlStream = async (
-    paramsForAIGraphql: IGrahpqlAIFetchProps & { abortController?: AbortController }
+    paramsForAIGraphql: IGrahpqlAIFetchProps & { abortController?: AbortController } & { isRetry?: boolean }
 ) => {
     // const abortController = new AbortController()
-    const { streamHandler, nonStreamHandler, completeHandler, abortController, ...rest } = paramsForAIGraphql || {}
+    const { streamHandler, nonStreamHandler, completeHandler, abortController, isRetry, ...rest } =
+        paramsForAIGraphql || {}
     const operationName = `GetAiGraphqlQuery`
-    const body = getGraphqlAIMashupBody({
-        ...rest,
-        name: operationName,
-    })
+    const body = {
+        isRetry: isRetry || false,
+        ...getGraphqlAIMashupBody({
+            ...rest,
+            name: operationName,
+        }),
+    }
+
     try {
         const options = await getCommonOptions({ userToken: 'test' })
         return await fetchEventSource(`${graphqlUrl}?operationName=${operationName}`, {

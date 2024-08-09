@@ -34,6 +34,7 @@ export const handleUploadImageForTensorArt = async (
 }
 
 export const handleGetAIResponse = async ({
+    isRetry,
     messages,
     conversationID,
     onStream,
@@ -44,6 +45,7 @@ export const handleGetAIResponse = async ({
     aiid,
     abortController,
 }: {
+    isRetry?: boolean
     messages: IChatMessage[]
     conversationID: number
     onStream?: (arg: any) => void
@@ -57,6 +59,7 @@ export const handleGetAIResponse = async ({
     return Promise.race([
         new Promise((resolve, reject) =>
             fetchAIGraphql({
+                isRetry,
                 abortController,
                 aiid,
                 isTopic,
