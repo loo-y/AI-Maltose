@@ -286,6 +286,56 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
         }
     }
 
+    const handleRetry = async () => {
+        const _abortController__ = new AbortController()
+        const {
+            queryType,
+            imageCapability,
+            id: aiid,
+        } = _.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] }) || {}
+        // 只取最后5条
+        let lastQuestMessages = _.takeRight([...history], 5)
+        await handleGetAIResponse({
+            abortController: _abortController__ || undefined,
+            aiid,
+            queryType: queryType,
+            messages: lastQuestMessages,
+            conversationID: currentConversation?.conversation_id || 0,
+            onNonStream: (data: Record<string, any>) => {
+                const { chat } = data || {}
+                const { ChatInfo } = chat || {}
+                console.log(`ChatInfo`, ChatInfo)
+                console.log(`ChatInfo.conversationID`, ChatInfo?.conversationID)
+                if (ChatInfo?.conversationID) {
+                    updateCurrentConversation({ ...currentConversation, conversation_id: ChatInfo.conversationID })
+                }
+            },
+            onStream: (content: any) => {
+                console.log(`stream result`, content)
+                if (content && !content.includes(`__{{streamCompleted}}__`)) {
+                    // 有第一个单词返回才隐藏点点点
+                    setWaitingForResponse(false)
+                    setHistory(_history => {
+                        const newHistory = [..._history]
+                        if (newHistory?.at(-1)?.role !== Roles.assistant) {
+                            newHistory.push({
+                                role: Roles.assistant,
+                                content,
+                            })
+                        } else {
+                            newHistory!.at(-1)!.content += content
+                        }
+                        return newHistory
+                    })
+                    scrollToEnd()
+                } else if (content.includes(`__{{streamCompleted}}__`)) {
+                    setIsFetching(false)
+                    setWaitingForResponse(false)
+                }
+            },
+        })
+    }
+
     const sidebarHideClass = `md:hidden`
     const sidebarShowClass = `w-[280px]`
     const rightFullClass = `w-full`
@@ -388,7 +438,12 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                                 </div>
                             </div>
                         </div>
-                        <ConversationBox history={history} isFetching={isFetching} waiting={waitingForResponse} />
+                        <ConversationBox
+                            history={history}
+                            isFetching={isFetching}
+                            waiting={waitingForResponse}
+                            handleRetry={handleRetry}
+                        />
                     </div>
                     <div className="w-full p-0  border-transparent dark:border-transparent juice:w-full  min-h-[5.5rem] text-base">
                         <Chatinput

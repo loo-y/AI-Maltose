@@ -15,10 +15,10 @@ import ChatImagePreview from './ChatImagePreview'
 interface IChatUserMessageProps {
     chatMessage: UserMessage
     messageFailed?: boolean
+    handleRetry?: () => void
 }
-const ChatUserMessage = ({ chatMessage, messageFailed }: IChatUserMessageProps) => {
+const ChatUserMessage = ({ chatMessage, messageFailed, handleRetry }: IChatUserMessageProps) => {
     const { role, content } = chatMessage || {}
-
     return (
         <div className="w-full">
             <div className="py-2 px-3 text-base m-auto md:px-5 lg:px-1 xl:px-5">
@@ -32,13 +32,18 @@ const ChatUserMessage = ({ chatMessage, messageFailed }: IChatUserMessageProps) 
                             <ObjectContent content={content as (TextMessage | ImageUrlMessage)[]} />
                         )}
                         {messageFailed ? (
-                            <div className="w-full  h-4 flex flex-row items-center gap-2 justify-end text-gray-500 italic pr-2 mt-2">
+                            <div
+                                className="w-full  h-4 flex flex-row items-center gap-2 justify-end text-gray-500 italic pr-2 mt-2 cursor-pointer"
+                                onClick={() => {
+                                    handleRetry && handleRetry()
+                                }}
+                            >
                                 <img
                                     src="/images/icons/retry.png"
                                     className="w-3 h-3 cursor-pointer inline"
                                     alt="retry"
                                 />
-                                <span>retry</span>
+                                <span>重试</span>
                             </div>
                         ) : null}
                     </div>
