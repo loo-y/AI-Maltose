@@ -36,7 +36,8 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     const isMountedSmallScreen = mounted && !isMd
 
     const mainState = useMainStore(state => state)
-    let { currentConversation, updateCurrentConversation, updateIsLoading } = mainState
+    let { currentConversation, conversations, updateCurrentConversation, updateConversations, updateIsLoading } =
+        mainState
     const [isFetching, setIsFetching] = useState(false)
     const [waitingForResponse, setWaitingForResponse] = useState(false)
     const [history, setHistory] = useState<IHistory>([])
@@ -59,7 +60,8 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
             const { BasicInfo } = userInfo || {}
             const { conversations } = BasicInfo || {}
             // 倒排序
-            setConversationList(_.orderBy(conversations, ['conversation_id'], ['desc']))
+            // setConversationList(_.orderBy(conversations, ['conversation_id'], ['desc']))
+            updateConversations(_.orderBy(conversations, ['conversation_id'], ['desc']))
         })
 
         // 变更对话ID时，重新获取服务端的聊天记录
@@ -87,7 +89,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     }
 
     const handleCreateNewConversation = () => {
-        updateCurrentConversation({ ...currentConversation, conversation_id: 0 })
+        updateCurrentConversation({ ...currentConversation, topic: '', conversation_id: 0 })
         setHistory([])
         // refresh
         console.log(`currentConversation`, currentConversation)
@@ -102,7 +104,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 updateIsLoading(true)
                 handleGetConversationHistory({ conversationID }).then(historyFromServer => {
                     setHistory(historyFromServer)
-                    const theConversation = _.find(conversationList, c => {
+                    const theConversation = _.find(conversations, c => {
                         return c.conversation_id == conversationID
                     })
                     updateCurrentConversation(
@@ -122,7 +124,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 })
             }
         },
-        [conversationList]
+        [conversations]
     )
 
     const handleUpdateTopic = async (history: IHistory) => {
@@ -154,15 +156,15 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
             const topic = _.find(_.values(chatResult), 'text')?.text || ``
             if (topic) {
                 updateCurrentConversation({ ...currentConversation, topic })
-                setConversationList(_conversationList => {
-                    const newConversationList = _.map(_conversationList, item => {
-                        if (item.conversation_id === currentConversation.conversation_id) {
-                            return { ...item, topic }
-                        }
-                        return item
-                    })
-                    return newConversationList
-                })
+                // setConversationList(_conversationList => {
+                //     const newConversationList = _.map(_conversationList, item => {
+                //         if (item.conversation_id === currentConversation.conversation_id) {
+                //             return { ...item, topic }
+                //         }
+                //         return item
+                //     })
+                //     return newConversationList
+                // })
             }
         }
     }
@@ -233,20 +235,20 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 console.log(`ChatInfo.conversationID`, ChatInfo?.conversationID)
                 if (ChatInfo?.conversationID) {
                     updateCurrentConversation({ ...currentConversation, conversation_id: ChatInfo.conversationID })
-                    setConversationList(_conversationList => {
-                        if (_.find(_conversationList, { conversation_id: ChatInfo.conversationID })) {
-                            return _conversationList
-                        }
-                        const newConversation: ConversationType = {
-                            conversation_id: ChatInfo.conversationID,
-                            topic: ChatInfo.topic,
-                            aiBotIDs: [],
-                        }
-                        if (aiid) {
-                            newConversation.aiBotIDs = [aiid]
-                        }
-                        return [newConversation, ..._conversationList]
-                    })
+                    //     setConversationList(_conversationList => {
+                    //         if (_.find(_conversationList, { conversation_id: ChatInfo.conversationID })) {
+                    //             return _conversationList
+                    //         }
+                    //         const newConversation: ConversationType = {
+                    //             conversation_id: ChatInfo.conversationID,
+                    //             topic: ChatInfo.topic,
+                    //             aiBotIDs: [],
+                    //         }
+                    //         if (aiid) {
+                    //             newConversation.aiBotIDs = [aiid]
+                    //         }
+                    //         return [newConversation, ..._conversationList]
+                    //     })
                 }
             },
             onStream: (content: any) => {
@@ -297,7 +299,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 >
                     <Sidebar
                         currentConversation={currentConversation}
-                        conversationList={conversationList}
+                        conversationList={conversations}
                         onSelectConversation={handleChangeConversation}
                         onToggleSidebar={handleToggleSidebar}
                         onCreateNewConversation={handleCreateNewConversation}
@@ -322,7 +324,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                                                 <DrawerContent>
                                                     <Sidebar
                                                         currentConversation={currentConversation}
-                                                        conversationList={conversationList}
+                                                        conversationList={conversations}
                                                         onSelectConversation={handleChangeConversation}
                                                         onToggleSidebar={handleToggleSidebar}
                                                         onCreateNewConversation={handleCreateNewConversation}

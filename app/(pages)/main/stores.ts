@@ -1,7 +1,7 @@
 import { isNumber } from 'lodash'
 import { createStore } from 'zustand/vanilla'
 import type { ConversationType } from '@/app/shared/interface'
-
+import _ from 'lodash'
 type AIBotType = {
     id: string
     name: string
@@ -21,6 +21,8 @@ type MainState = {
 type MainActions = {
     updateIsLoading: (loading: boolean) => void
     updateCurrentConversation: (prams: ConversationType) => void
+    updateConversations: (conversations: ConversationType[]) => void
+    addConversation: (conversation: ConversationType) => void
 }
 
 export type MainStore = MainState & MainActions
@@ -46,12 +48,47 @@ export const createMainStore = (initState: MainState = defaultInitState) => {
             ...initState,
             updateCurrentConversation: ({ conversation_id, topic = '', aiBotIDs }: ConversationType) => {
                 return set(state => {
+                    let hasTheConversation = false
+                    const theConversation = {
+                        conversation_id: isNumber(conversation_id) ? conversation_id : 0,
+                        topic: conversation_id && conversation_id > 0 ? topic || '' : '',
+                        aiBotIDs: aiBotIDs || [],
+                    }
+
+                    const newConversationList = _.map(state.conversations, item => {
+                        if (item.conversation_id === conversation_id) {
+                            hasTheConversation = true
+                            return { ...item, topic, aiBotIDs }
+                        }
+                        return item
+                    })
+
                     return {
-                        currentConversation: {
-                            conversation_id: isNumber(conversation_id) ? conversation_id : 0,
-                            topic: topic || '',
-                            aiBotIDs: aiBotIDs || [],
-                        },
+                        conversations: hasTheConversation
+                            ? newConversationList
+                            : [theConversation, ...newConversationList],
+                        currentConversation: theConversation,
+                    }
+                })
+            },
+            updateConversations: (conversations: ConversationType[]) => {
+                return set(state => {
+                    return {
+                        conversations,
+                    }
+                })
+            },
+            addConversation: (conversation: ConversationType) => {
+                return set(state => {
+                    const { conversation_id, topic = '', aiBotIDs } = conversation
+                    const theConversation = {
+                        conversation_id: isNumber(conversation_id) ? conversation_id : 0,
+                        topic: conversation_id && conversation_id > 0 ? topic || '' : '',
+                        aiBotIDs: aiBotIDs || [],
+                    }
+                    return {
+                        conversations: [theConversation, ...state.conversations],
+                        currentConversation: theConversation,
                     }
                 })
             },
