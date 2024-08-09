@@ -17,6 +17,7 @@ import ChatImagePreview from '@/app/modules/ChatImagePreview'
 import { handleUploadImageForTensorArt } from '@/app/shared/handlers'
 import _ from 'lodash'
 import { handleCreateTensorArtTemplateJob, handleGetTensorArtTemplates } from '@/app/shared/handlers'
+import { toast } from 'sonner'
 enum SELECT_TYPE {
     imageUpload = `imageUpload`,
     styleSelect = `styleSelect`,
@@ -66,6 +67,7 @@ export default function ImageOperation(/*{ photoStyleList }: { photoStyleList: s
     const handleGenerate = () => {
         if (isloading) return
         if (!selectedImage || !selectedStyle) {
+            toast.warning(!selectedImage ? 'Please select an image' : 'Please select a style')
             setIsExpended(true)
             setSelectType(!selectedImage ? SELECT_TYPE.imageUpload : SELECT_TYPE.styleSelect)
             return

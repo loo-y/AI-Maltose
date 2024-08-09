@@ -5,6 +5,7 @@ import ImageOperation from './ImageOperation'
 import ImageDisplay from './ImageDisplay'
 import Topbar from './TopBar'
 import { PhotoStyleStoreProvider } from './providers'
+import { Toaster } from '@/components/ui/sonner'
 
 async function PhotoStyle() {
     return (
@@ -17,6 +18,7 @@ async function PhotoStyle() {
                         <ImageDisplay />
                     </div>
                 </div>
+                <Toaster position="top-center" richColors />
             </div>
         </main>
     )
