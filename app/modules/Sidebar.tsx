@@ -12,18 +12,15 @@ const Sidebar = ({
     className,
 }: {
     currentConversation: ConversationType
-    conversationList?: {
-        conversation_id: number
-        topic: string
-    }[]
+    conversationList?: ConversationType[]
     isMountedSmallScreen?: boolean
     className?: string
     onSelectConversation?: (conversationID: number) => void
     onToggleSidebar?: () => void
     onCreateNewConversation?: () => void
 }) => {
-    const handleSelectConversation = (conversationID: number) => {
-        typeof onSelectConversation == `function` && onSelectConversation(conversationID)
+    const handleSelectConversation = (conversationID?: number) => {
+        typeof onSelectConversation == `function` && onSelectConversation(conversationID || 0)
     }
 
     const handleToggleSidebar = () => {
@@ -58,7 +55,7 @@ const Sidebar = ({
             <div className="flex-1 my-2 conversation_list flex flex-col gap-1 text-gray-600 text-base text-[15px] h-fit overflow-y-scroll overflow-x-hidden">
                 {_.map(conversationList, (conversationItem, index) => {
                     console.log(`conversationItem`, conversationItem)
-                    const isSelected = currentConversation?.id == conversationItem?.conversation_id
+                    const isSelected = currentConversation?.conversation_id == conversationItem?.conversation_id
                     return (
                         <div
                             key={`conversationItem-${index}`}

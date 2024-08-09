@@ -10,8 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mainState: MainStore }) => {
     const { currentConversation, updateCurrentConversation } = mainState || {}
-    const { id, aiBotIDs } = currentConversation || {}
-    const selected = id && aiBotIDs?.[0]
+    const { conversation_id, aiBotIDs } = currentConversation || {}
+    const selected = conversation_id && aiBotIDs?.[0]
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState('')
 
@@ -26,6 +26,7 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
     }, [])
 
     useEffect(() => {
+        console.log(`currentConversation----->`, currentConversation)
         if (currentConversation?.aiBotIDs?.[0]) {
             setValue(currentConversation.aiBotIDs[0])
         } else if (value) {
@@ -34,7 +35,7 @@ const AISelection = ({ aiBots, mainState }: { aiBots: Record<string, any>[]; mai
     }, [currentConversation])
 
     const handleSelectAI = (currentValue: string) => {
-        if (!id && !_.includes(aiBotIDs, currentValue)) {
+        if (!conversation_id && !_.includes(aiBotIDs, currentValue)) {
             // setValue(currentValue === value ? '' : currentValue)
             // 不可反选
             setValue(currentValue)

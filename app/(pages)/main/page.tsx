@@ -16,6 +16,7 @@ import {
     TextMessage,
     UserMessage,
     AI_BOT_TYPE,
+    ConversationType,
 } from '@/app/shared/interface'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { handleGetAIResponse, handleGetUserInfo, handleGetConversationHistory } from '@/app/shared/handlers'
@@ -39,9 +40,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     const [isFetching, setIsFetching] = useState(false)
     const [waitingForResponse, setWaitingForResponse] = useState(false)
     const [history, setHistory] = useState<IHistory>([])
-    const [conversationList, setConversationList] = useState<
-        { conversation_id: number; topic: string; aiBotIDs?: string[] }[]
-    >([])
+    const [conversationList, setConversationList] = useState<ConversationType[]>([])
     const conversationContainerRef = useRef<HTMLDivElement>(null)
     const [hideSidebar, setHideSidebar] = useState(false)
     const [openDrawerSidebar, setOpenDrawerSidebar] = useState<boolean>(false)
@@ -64,10 +63,12 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
         })
 
         // 变更对话ID时，重新获取服务端的聊天记录
-        if (currentConversation?.id && currentConversation.id > 0) {
-            handleGetConversationHistory({ conversationID: currentConversation.id }).then(historyFromServer => {
-                setHistory(historyFromServer)
-            })
+        if (currentConversation?.conversation_id && currentConversation.conversation_id > 0) {
+            handleGetConversationHistory({ conversationID: currentConversation.conversation_id }).then(
+                historyFromServer => {
+                    setHistory(historyFromServer)
+                }
+            )
         }
     }, [])
 
@@ -86,7 +87,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     }
 
     const handleCreateNewConversation = () => {
-        updateCurrentConversation({ ...currentConversation, id: 0 })
+        updateCurrentConversation({ ...currentConversation, conversation_id: 0 })
         setHistory([])
         // refresh
         console.log(`currentConversation`, currentConversation)
@@ -107,11 +108,11 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                     updateCurrentConversation(
                         theConversation
                             ? {
-                                  id: theConversation.conversation_id,
+                                  conversation_id: theConversation.conversation_id,
                                   topic: theConversation.topic,
                                   aiBotIDs: theConversation.aiBotIDs,
                               }
-                            : { id: conversationID, topic: '', aiBotIDs: [] }
+                            : { conversation_id: conversationID, topic: '', aiBotIDs: [] }
                     )
                     setTimeout(() => {
                         // scoll to bottom
@@ -125,8 +126,13 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
     )
 
     const handleUpdateTopic = async (history: IHistory) => {
-        console.log(`handleUpdateTopic`, currentConversation.topic, currentConversation?.id, history.length)
-        if (!currentConversation.topic && currentConversation?.id && history.length >= 2) {
+        console.log(
+            `handleUpdateTopic`,
+            currentConversation.topic,
+            currentConversation?.conversation_id,
+            history.length
+        )
+        if (!currentConversation.topic && currentConversation?.conversation_id && history.length >= 2) {
             const { queryType, id: aiid } = _.find(aiBots, { id: currentConversation?.aiBotIDs?.[0] }) || {}
 
             const topicMessages = _.take(history, 4)
@@ -140,7 +146,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                         content: `请根据上面的对话，以用户的第一人称视角总结出话题，限定一句话。不需要出现"话题是"之类的前缀。`,
                     } as UserMessage,
                 ],
-                conversationID: currentConversation.id,
+                conversationID: currentConversation.conversation_id,
                 isTopic: true,
             })
             const chatResult = topicResult?.data?.chat || {}
@@ -150,7 +156,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                 updateCurrentConversation({ ...currentConversation, topic })
                 setConversationList(_conversationList => {
                     const newConversationList = _.map(_conversationList, item => {
-                        if (item.conversation_id === currentConversation.id) {
+                        if (item.conversation_id === currentConversation.conversation_id) {
                             return { ...item, topic }
                         }
                         return item
@@ -219,22 +225,27 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
             aiid,
             queryType: queryType,
             messages: lastQuestMessages,
-            conversationID: currentConversation?.id || 0,
+            conversationID: currentConversation?.conversation_id || 0,
             onNonStream: (data: Record<string, any>) => {
                 const { chat } = data || {}
                 const { ChatInfo } = chat || {}
                 console.log(`ChatInfo`, ChatInfo)
                 console.log(`ChatInfo.conversationID`, ChatInfo?.conversationID)
                 if (ChatInfo?.conversationID) {
-                    updateCurrentConversation({ ...currentConversation, id: ChatInfo.conversationID })
+                    updateCurrentConversation({ ...currentConversation, conversation_id: ChatInfo.conversationID })
                     setConversationList(_conversationList => {
                         if (_.find(_conversationList, { conversation_id: ChatInfo.conversationID })) {
                             return _conversationList
                         }
-                        return [
-                            { conversation_id: ChatInfo.conversationID, topic: ChatInfo.topic },
-                            ..._conversationList,
-                        ]
+                        const newConversation: ConversationType = {
+                            conversation_id: ChatInfo.conversationID,
+                            topic: ChatInfo.topic,
+                            aiBotIDs: [],
+                        }
+                        if (aiid) {
+                            newConversation.aiBotIDs = [aiid]
+                        }
+                        return [newConversation, ..._conversationList]
                     })
                 }
             },
@@ -354,7 +365,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                                     {_.map(navigation, (item, idx) => {
                                         return (
                                             <li key={`navigation_${idx}`} className="duration-150 hover:text-gray-900">
-                                                <Link href={item.path} className="block">
+                                                <Link href={item.path} className="block" target="_blank">
                                                     {item.title}
                                                 </Link>
                                             </li>

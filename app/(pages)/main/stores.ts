@@ -20,7 +20,7 @@ type MainState = {
 
 type MainActions = {
     updateIsLoading: (loading: boolean) => void
-    updateCurrentConversation: (prams: { id?: number; topic?: string; aiBotIDs?: string[] }) => void
+    updateCurrentConversation: (prams: ConversationType) => void
 }
 
 export type MainStore = MainState & MainActions
@@ -31,7 +31,7 @@ const defaultInitState: MainState = {
     userInfo: {},
     conversations: [],
     currentConversation: {
-        id: 0,
+        conversation_id: 0,
         topic: '',
     },
 }
@@ -44,11 +44,11 @@ export const createMainStore = (initState: MainState = defaultInitState) => {
     return createStore<MainStore>()(set => {
         return {
             ...initState,
-            updateCurrentConversation: ({ id, topic = '', aiBotIDs }: ConversationType) => {
+            updateCurrentConversation: ({ conversation_id, topic = '', aiBotIDs }: ConversationType) => {
                 return set(state => {
                     return {
                         currentConversation: {
-                            id: isNumber(id) ? id : 0,
+                            conversation_id: isNumber(conversation_id) ? conversation_id : 0,
                             topic: topic || '',
                             aiBotIDs: aiBotIDs || [],
                         },

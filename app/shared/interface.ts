@@ -85,7 +85,7 @@ export type AI_BOT_TYPE = {
 }
 
 export type ConversationType = {
-    id?: number
+    conversation_id?: number
     topic?: string
     aiBotIDs?: string[]
 }
