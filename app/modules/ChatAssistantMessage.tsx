@@ -20,7 +20,7 @@ const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessagePro
         try {
             if (navigator?.clipboard?.writeText) {
                 await navigator.clipboard.writeText(textToCopy)
-                toast('Copied')
+                toast.info('Copied')
             } else if (document.execCommand) {
                 const textArea = document.createElement('textarea')
                 textArea.value = textToCopy
@@ -28,7 +28,7 @@ const ChatAssistantMessage = ({ chatMessage, waiting }: IChatAssistantMessagePro
                 textArea.select()
                 document.execCommand('copy')
                 document.body.removeChild(textArea)
-                toast('Copied')
+                toast.info('Copied')
             }
         } catch (err) {
             console.error('copy failed: ', err)

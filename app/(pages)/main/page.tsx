@@ -457,7 +457,7 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
                         />
                     </div>
                 </div>
-                <Toaster />
+                <Toaster position="top-center" richColors />
             </div>
         </>
     )
