@@ -84,7 +84,7 @@ const resolvers = {
 
             const lastMessage = _.last(fixedMessages)
             // 最后一条用户的提问内容
-            if (lastMessage?.role == 'user' && !isTopic && !isRetry) {
+            if (lastMessage?.role == 'user' && !isTopic) {
                 if (!conversationID) {
                     currentConversationID = await createConversation({ userid: context.userId, aiid })
                 }
