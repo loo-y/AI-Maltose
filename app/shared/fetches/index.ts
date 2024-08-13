@@ -263,10 +263,10 @@ const fetchAIGraphqlStream = async (
         paramsForAIGraphql || {}
     const operationName = `GetAiGraphqlQuery`
     const body = {
-        isRetry: isRetry || false,
         ...getGraphqlAIMashupBody({
             ...rest,
             name: operationName,
+            isRetry: isRetry || false,
         }),
     }
 

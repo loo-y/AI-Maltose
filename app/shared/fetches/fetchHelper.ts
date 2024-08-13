@@ -30,13 +30,15 @@ export const getGraphqlAIMashupBody = ({
     workersAIParams,
     queryLingyiwanwu,
     lingyiwanwuParams,
-}: IGrahpqlAIFetchProps & { name?: string }) => {
+    isRetry,
+}: IGrahpqlAIFetchProps & { name?: string; isRetry?: boolean }) => {
     const queryName = name || 'GQAIQuery'
     let paramsList = [`$params: ChatArgs`],
         queryList = [],
         variables: Record<string, any> = {
             params: {
                 aiid,
+                isRetry: isRetry || false,
                 isTopic,
                 conversationID: conversationID || 0,
                 messages: _.isEmpty(messages)
