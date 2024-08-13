@@ -54,7 +54,7 @@ const resolvers = {
     Query: {
         chat: async (parent: TParent, args: Record<string, any>, context: TBaseContext) => {
             const chatArgs = args.params
-            const { messages, conversationID, isTopic, aiid, isRtry } = chatArgs || {}
+            const { messages, conversationID, isTopic, aiid, isRetry } = chatArgs || {}
             const fixedMessages = _.map(messages, m => {
                 const { content, contentArray, ...other } = m
                 if (_.isEmpty(contentArray)) {
@@ -84,7 +84,7 @@ const resolvers = {
 
             const lastMessage = _.last(fixedMessages)
             // 最后一条用户的提问内容
-            if (lastMessage?.role == 'user' && !isTopic && !isRtry) {
+            if (lastMessage?.role == 'user' && !isTopic && !isRetry) {
                 if (!conversationID) {
                     currentConversationID = await createConversation({ userid: context.userId, aiid })
                 }
