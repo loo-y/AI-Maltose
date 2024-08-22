@@ -133,6 +133,7 @@ WHERE u.username = 'user1';
 CREATE TABLE IF NOT EXISTS swap_styles (
     style_id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     style_imageshowid TEXT NOT NULL,
+    style_description TEXT,
     style_type TEXT NOT NULL,
     input_type TEXT
     providerid TEXT
