@@ -1,5 +1,10 @@
 import _ from 'lodash'
-import { addConversationMessage, createConversation, getAIBots } from '../../dal/Supabase/queries'
+import {
+    addConversationMessage,
+    getconversationMessages,
+    createConversation,
+    getAIBots,
+} from '../../dal/Supabase/queries'
 
 const typeDefinitions = `
     scalar JSON
@@ -89,12 +94,26 @@ const resolvers = {
                     currentConversationID = await createConversation({ userid: context.userId, aiid })
                 }
 
-                await addConversationMessage({
-                    conversation_id: currentConversationID,
-                    role: `user`,
-                    userid: context.userId,
-                    content: lastMessage?.content,
-                })
+                let isRetrySameLast = false
+
+                if (isRetry) {
+                    const existedMessages = await getconversationMessages({
+                        userid: context.userId,
+                        conversation_id: currentConversationID,
+                    })
+                    const lastMessageExisted = existedMessages?.[0]
+                    isRetrySameLast =
+                        lastMessageExisted.sender_type == 'user' && lastMessageExisted.content == lastMessage.content
+                }
+
+                if (!isRetrySameLast) {
+                    await addConversationMessage({
+                        conversation_id: currentConversationID,
+                        role: `user`,
+                        userid: context.userId,
+                        content: lastMessage?.content,
+                    })
+                }
             }
 
             let api_key, api_url, api_model_name, api_account
