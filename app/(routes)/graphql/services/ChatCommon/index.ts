@@ -101,9 +101,11 @@ const resolvers = {
                         userid: context.userId,
                         conversation_id: currentConversationID,
                     })
-                    const lastMessageExisted = existedMessages?.[0]
+                    const lastMessageExisted = existedMessages?.[0] || {}
+                    // console.log(`currentConversationID`, currentConversationID)
+                    // console.log(`lastMessageExisted`, existedMessages)
                     isRetrySameLast =
-                        lastMessageExisted.sender_type == 'user' && lastMessageExisted.content == lastMessage.content
+                        lastMessageExisted?.sender_type == 'user' && lastMessageExisted?.content == lastMessage.content
                 }
 
                 if (!isRetrySameLast) {
