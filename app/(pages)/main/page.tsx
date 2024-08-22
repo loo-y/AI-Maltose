@@ -288,6 +288,9 @@ const Main = ({ aiBots }: { aiBots: AI_BOT_TYPE[] }) => {
 
     const handleRetry = async () => {
         const _abortController__ = new AbortController()
+        setAbortController(_abortController__)
+        setWaitingForResponse(true)
+        setIsFetching(true)
         const {
             queryType,
             imageCapability,
