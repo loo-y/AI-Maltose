@@ -60,7 +60,7 @@ const saveFormDataAsImage = async ({
             }
         }
 
-        return { imageID } || {}
+        return { imageID }
     } catch (e) {
         console.log(`[saveFormDataAsImage] error:`, e)
     }
@@ -111,12 +111,10 @@ const getResourcePutInfo = async ({ formData, formDataName }: { formData: FormDa
         })
         const resultOfPutResource = await responseOfPutResource.json()
 
-        return (
-            {
-                ...resultOfPutResource,
-                resourceId,
-            } || {}
-        )
+        return {
+            ...resultOfPutResource,
+            resourceId,
+        }
     } catch (e) {
         console.log(`[getResourcePutInfo] error:`, e)
     }
