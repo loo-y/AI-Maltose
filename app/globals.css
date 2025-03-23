@@ -281,7 +281,6 @@ body .fm ::before, body .fm ::after{
 .Footer_Footer__ElFDz {
   position: fixed;
   bottom: 0;
-  width: 100%;
   background-color: var(--background-fm);
 }
 

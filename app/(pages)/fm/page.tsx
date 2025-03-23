@@ -29,7 +29,7 @@ export default function Home() {
 
     return (
         <>
-            <div className="fm">
+            <div className="fm px-5 pt-6 pb-32">
                 <div className="max-w-[--page-max-width-fm] min-h-screen pt-6 pb-32 md:pb-24 selection:bg-primary/2 mx-auto">
                     <header className="flex w-full max-w-(--page-max-width) mx-auto mb-12 md:mb-8">
                         <div className="grid grid-cols-12 gap-x-3">
@@ -212,8 +212,8 @@ Enjoy your coffee! Let me know if you need help on your way back.`}
                         </div>
                     </main>
                 </div>
-                <footer className="Footer_Footer__ElFDz py-3">
-                    <div className="relative w-full max-w-[--page-max-width-fm] m-auto">
+                <footer className="Footer_Footer__ElFDz py-3 left-0 right-0 px-5">
+                    <div className="relative max-w-[--page-max-width-fm] m-auto">
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                             <CustomButton color="tertiary" className="">
                                 <svg
