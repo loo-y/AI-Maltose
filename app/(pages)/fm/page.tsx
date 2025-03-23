@@ -29,8 +29,8 @@ export default function Home() {
 
     return (
         <>
-            <div className="fm px-5 pt-6">
-                <div className="max-w-[--page-max-width-fm] min-h-screen pb-32 md:pb-24 selection:bg-primary/2 mx-auto">
+            <div className="fm overflow-y-hidden h-screen ">
+                <div className="max-w-[--page-max-width-fm] pb-32 pt-6 px-5 md:pb-24 selection:bg-primary/2 mx-auto overflow-y-scroll h-full scrollbar-hide">
                     <header className="flex w-full max-w-(--page-max-width) mx-auto mb-12 md:mb-8">
                         <div className="grid grid-cols-12 gap-x-3">
                             <div className="col-span-2 order-1 mb-8 md:mb-0">
@@ -43,19 +43,6 @@ export default function Home() {
                                     <div className="text-current/70 mb-3">
                                         An interactive demo for developers to try the new text-to-speech model in the
                                         OpenAI API.
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-span-10 md:col-span-3 xl:col-span-4 flex justify-end items-start order-2 md:order-3">
-                                <div className="relative -top-[0.57rem]">
-                                    <div className="flex items-center cursor-pointer hover:text-current/70 transition-colors">
-                                        <label
-                                            className="pr-3 leading-none uppercase cursor-pointer"
-                                            htmlFor="theme-mode"
-                                        >
-                                            {'</>'}
-                                        </label>
-                                        <Switcher id="theme-mode" checked={darkMode} onCheckedChange={setDarkMode} />
                                     </div>
                                 </div>
                             </div>
@@ -84,16 +71,16 @@ export default function Home() {
                                                         voice
                                                     )}
                                                     onClick={() => setSelectedVoice(voice)}
-                                                    className="aspect-4/3 sm:aspect-2/1 lg:aspect-2.5/1 xl:aspect-square min-h-[60px] max-h-[100px] flex-col items-start justify-between relative"
+                                                    className="aspect-4/3 sm:aspect-2/1 lg:aspect-2.5/1 xl:aspect-square min-h-[80px] max-h-[100px] flex-col items-start justify-between relative"
                                                 >
                                                     <span>{voice}</span>
                                                 </CustomButton>
                                             </div>
                                         ))}
-                                        <div className="col-span-4 sm:col-span-3 md:col-span-2 xl:col-span-1">
+                                        <div className="col-span-4 sm:col-span-3 md:col-span-2 xl:col-span-1 relative">
                                             <CustomButton
                                                 color="neutral"
-                                                className="aspect-4/3 sm:aspect-2/1 lg:aspect-2.5/1 xl:aspect-square max-h-[100px]"
+                                                className="aspect-4/3 sm:aspect-2/1 lg:aspect-2.5/1 xl:aspect-square min-h-[80px] max-h-[100px] flex-col items-start justify-between relative"
                                                 aria-label="Select random voice"
                                             >
                                                 <svg
