@@ -29,8 +29,8 @@ export default function Home() {
 
     return (
         <>
-            <div className="fm px-5 pt-6 pb-32">
-                <div className="max-w-[--page-max-width-fm] min-h-screen pt-6 pb-32 md:pb-24 selection:bg-primary/2 mx-auto">
+            <div className="fm px-5 pt-6">
+                <div className="max-w-[--page-max-width-fm] min-h-screen pb-32 md:pb-24 selection:bg-primary/2 mx-auto">
                     <header className="flex w-full max-w-(--page-max-width) mx-auto mb-12 md:mb-8">
                         <div className="grid grid-cols-12 gap-x-3">
                             <div className="col-span-2 order-1 mb-8 md:mb-0">

@@ -1,6 +1,17 @@
   @font-face {
-    font-family: 'MapleMonoExtraLight';
-    src: url('/fonts/MapleMono-CN-ExtraLight.ttf') format('truetype');
+    font-family: 'MapleMonoCN'; /* 定义一个字体族名称 */
+    src: url('/fonts/MapleMono-CN-ExtraLight.ttf') format('truetype');/* Light 字体 */
+    font-weight: 300; /*  设置字体粗细为 300 (Light) */
+    font-style: normal; /* 设置字体样式为正常 */
+    font-display: swap; /* 优化字体加载体验 */
+  }
+
+  @font-face {
+    font-family: 'MapleMonoCN'; /* 保持字体族名称一致 */
+    src: url('/fonts/MapleMono-CN-Regular.ttf') format('truetype'); /* Regular 字体 */
+    font-weight: 400; /* 设置字体粗细为 400 (Regular) */
+    font-style: normal; /* 设置字体样式为正常 */
+    font-display: swap; /* 优化字体加载体验 */
   }
 
   @layer base {
@@ -107,7 +118,7 @@ body *:hover {
 body .fm{
   background-image: linear-gradient(to bottom right,#f8f8f8,var(--background-fm)20%);
   background-repeat: no-repeat;
-  font-family: 'MapleMonoExtraLight', sans-serif !important;
+  font-family: 'MapleMonoCN', sans-serif !important;
 }
 
 body .fm ::before, body .fm ::after{
