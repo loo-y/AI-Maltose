@@ -1,4 +1,7 @@
-
+  @font-face {
+    font-family: 'MapleMonoExtraLight';
+    src: url('/fonts/MapleMono-CN-ExtraLight.ttf') format('truetype');
+  }
 
   @layer base {
     :root {
@@ -104,6 +107,7 @@ body *:hover {
 body .fm{
   background-image: linear-gradient(to bottom right,#f8f8f8,var(--background-fm)20%);
   background-repeat: no-repeat;
+  font-family: 'MapleMonoExtraLight', sans-serif !important;
 }
 
 body .fm ::before, body .fm ::after{
